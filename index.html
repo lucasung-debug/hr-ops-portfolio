@@ -123,9 +123,9 @@
                     <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                     <span class="text-slate-600 uppercase tracking-wider">Available for New Opportunities</span>
                 </div>
-               <h1 class="text-4xl md:text-6xl font-black mb-8 leading-[1.2] tracking-tight break-keep
+<h1 class="text-4xl md:text-6xl font-black mb-8 leading-[1.2] tracking-tight break-keep
            text-slate-900
-           drop-shadow-[0_2px_6px_rgba(0,0,0,0.25)]">
+           drop-shadow-md">
   “안 찍히는 근태”를 캠페인이 아니라<br>
 <span class="relative inline-block px-2 py-1
              bg-brand-100 text-slate-900
@@ -203,7 +203,7 @@
                         <div class="mt-6 pt-6 border-t border-slate-200 flex justify-between items-end">
                             <span class="text-slate-400 text-sm font-semibold">Risk Reduction</span>
                             <div class="flex items-baseline text-blue-600">
-                                <span class="text-3xl font-black counter" data-target="85" data-prefix="-">0</span><span class="text-xl font-bold ml-0.5">%</span>
+                                <span class="text-3xl font-black counter" data-target="85" data-prefix="-">&nbsp;</span><span class="text-xl font-bold ml-0.5">%</span>
                             </div>
                         </div>
                     </article>
@@ -222,7 +222,7 @@
                         <div class="mt-6 pt-6 border-t border-slate-200 flex justify-between items-end">
                             <span class="text-slate-400 text-sm font-semibold">Growth Rate</span>
                             <div class="flex items-baseline text-emerald-600">
-                                <span class="text-3xl font-black counter" data-target="217" data-prefix="+">0</span><span class="text-xl font-bold ml-0.5">%</span>
+                                <span class="text-3xl font-black counter" data-target="217" data-prefix="+">&nbsp;</span><span class="text-xl font-bold ml-0.5">%</span>
                             </div>
                         </div>
                     </article>
@@ -240,7 +240,7 @@
                         <div class="mt-6 pt-6 border-t border-slate-200 flex justify-between items-end">
                             <span class="text-slate-400 text-sm font-semibold">Tagging Rate</span>
                             <div class="flex items-baseline text-indigo-600">
-                                <span class="text-xl font-bold mr-1">+</span><span class="text-3xl font-black counter" data-target="12" data-suffix="">0</span><span class="text-xl font-bold ml-0.5">%p</span>
+                                <span class="text-3xl font-black counter" data-target="12">&nbsp;</span><span class="text-xl font-bold ml-0.5">%p</span>
                             </div>
                         </div>
                     </article>
@@ -549,19 +549,22 @@
 
         /* --- APP LOGIC --- */
         const App = {
-            init() {
-                this.renderCareerGrid();
-                this.renderDxNav();
-                this.ui.updateCareerDuration();
+init() {
+    this.renderCareerGrid();
+    this.renderDxNav();
+    this.ui.updateCareerDuration();
                 
-                this.ui.showDx('dx1');
-                this.ui.showEdu('academic');
+    this.ui.showDx('dx1');
+    this.ui.showEdu('academic');
 
-                document.body.addEventListener('click', this.handlers.handleClick.bind(this));
-                document.getElementById('company-input').addEventListener('keydown', this.handlers.handleEnterKey.bind(this));
-                
-                this.setupObserver();
-            },
+    document.body.addEventListener('click', this.handlers.handleClick.bind(this));
+    document.getElementById('company-input')
+        .addEventListener('keydown', this.handlers.handleEnterKey.bind(this));
+
+    // ✅ 여기서만 초기화
+    this.setupObserver();
+    this.setupCounterObserver();
+},
 
             renderCareerGrid() {
                 const container = document.getElementById('career-grid');
@@ -578,41 +581,76 @@
                     </button>`).join('');
             },
 
-            renderDxNav() {
-                const nav = document.getElementById('dx-nav');
-                if(!nav) return;
-                nav.innerHTML = Object.entries(PORTFOLIO_DATA.dxCases).map(([key, val], idx) => `
-                    <button data-action="show-dx" data-id="${key}" id="btn-${key}" class="w-full text-left p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-brand-500 transition duration-300 group ${idx === 0 ? 'active-dx' : ''}">
-                        <div class="flex items-center justify-between pointer-events-none">
-                            <span class="font-bold text-slate-${idx === 0 ? '200' : '400'} group-hover:text-white break-keep">${idx + 1}. ${val.title}</span>
-                            <span class="text-xs font-mono text-${idx === 0 ? 'brand' : 'slate'}-400 badge">${val.badge}</span>
-                        </div>
-                    </button>`).join('');
-            },
+renderDxNav() {
+    const nav = document.getElementById('dx-nav');
+    if (!nav) return;
+
+    nav.innerHTML = Object.entries(PORTFOLIO_DATA.dxCases)
+        .map(([key, val], idx) => {
+            const isActive = idx === 0;
+
+            const btnClass = isActive
+                ? 'w-full text-left p-4 rounded-xl border border-brand-500 bg-slate-800 transition duration-300 active-dx'
+                : 'w-full text-left p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-brand-500 transition duration-300';
+
+            const titleClass = isActive
+                ? 'font-bold text-white break-keep'
+                : 'font-bold text-slate-400 group-hover:text-white break-keep';
+
+            const badgeClass = isActive
+                ? 'text-xs font-mono text-brand-400 badge'
+                : 'text-xs font-mono text-slate-500 group-hover:text-brand-400 badge';
+
+            return `
+                <button
+                    data-action="show-dx"
+                    data-id="${key}"
+                    id="btn-${key}"
+                    class="${btnClass} group"
+                >
+                    <div class="flex items-center justify-between pointer-events-none">
+                        <span class="${titleClass}">
+                            ${idx + 1}. ${val.title}
+                        </span>
+                        <span class="${badgeClass}">
+                            ${val.badge}
+                        </span>
+                    </div>
+                </button>
+            `;
+        })
+        .join('');
+},
 
             ui: {
-                showDx(id) {
-                     Object.keys(PORTFOLIO_DATA.dxCases).forEach(key => {
-                        const btn = document.getElementById(`btn-${key}`);
-                        if(!btn) return;
-                        const title = btn.querySelector('span:first-child');
-                        const badge = btn.querySelector('span:last-child');
-                        
-                        if (key === id) {
-                            btn.classList.add('bg-slate-800', 'border-brand-500', 'active-dx'); 
-                            btn.classList.remove('bg-slate-800/50', 'border-slate-700');
-                            title.className = "font-bold text-white break-keep";
-                            badge.className = "text-xs font-mono text-brand-400 badge";
-                        } else {
-                            btn.classList.remove('bg-slate-800', 'border-brand-500', 'active-dx'); 
-                            btn.classList.add('bg-slate-800/50', 'border-slate-700');
-                            title.className = "font-bold text-slate-400 group-hover:text-white break-keep";
-                            badge.className = "text-xs font-mono text-slate-500 group-hover:text-brand-400 badge";
-                        }
-                    });
-                    const content = PORTFOLIO_DATA.dxCases[id].content;
-                    document.getElementById('dx-content').innerHTML = content;
-                },
+showDx(id) {
+    Object.keys(PORTFOLIO_DATA.dxCases).forEach(key => {
+        const btn = document.getElementById(`btn-${key}`);
+        if (!btn) return;
+
+        const title = btn.querySelector('span:first-child');
+        const badge = btn.querySelector('span:last-child');
+
+        if (key === id) {
+            btn.className =
+                'w-full text-left p-4 rounded-xl border border-brand-500 bg-slate-800 transition duration-300 active-dx group';
+
+            title.className = 'font-bold text-white break-keep';
+            badge.className = 'text-xs font-mono text-brand-400 badge';
+        } else {
+            btn.className =
+                'w-full text-left p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-brand-500 transition duration-300 group';
+
+            title.className =
+                'font-bold text-slate-400 group-hover:text-white break-keep';
+            badge.className =
+                'text-xs font-mono text-slate-500 group-hover:text-brand-400 badge';
+        }
+    });
+
+    document.getElementById('dx-content').innerHTML =
+        PORTFOLIO_DATA.dxCases[id].content;
+},
 
                 showEdu(key) {
                     ['academic', 'training', 'activities', 'skills'].forEach(id => {
@@ -803,79 +841,163 @@
                 }
             },
 
-            setupObserver() {
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('active');
-                            const canvases = entry.target.querySelectorAll('canvas');
-                            canvases.forEach(canvas => {
-                                if(!canvas.classList.contains('rendered')) {
-                                    this.initChart(canvas.id);
-                                    canvas.classList.add('rendered');
-                                }
-                            });
-                             const counters = entry.target.querySelectorAll('.counter');
-                            counters.forEach(counter => {
-                                if(counter.classList.contains('counted')) return;
-                                const target = +counter.getAttribute('data-target');
-                                const prefix = counter.getAttribute('data-prefix') || '';
-                                const suffix = counter.getAttribute('data-suffix') || '';
-                                let count = 0;
-                                const duration = 1500;
-                                const startTime = performance.now();
-                                const updateCount = (currentTime) => {
-                                    const elapsed = currentTime - startTime;
-                                    const progress = Math.min(elapsed / duration, 1);
-                                    const ease = 1 - Math.pow(1 - progress, 4);
-                                    count = Math.floor(ease * target);
-                                    counter.innerText = `${prefix}${count}${suffix}`;
-                                    if (progress < 1) requestAnimationFrame(updateCount);
-                                    else counter.innerText = `${prefix}${target}${suffix}`;
-                                };
-                                requestAnimationFrame(updateCount);
-                                counter.classList.add('counted');
-                            });
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                }, { threshold: 0.15 });
-                
-                document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-            },
+setupObserver() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
 
-            initChart(id) {
-                if (typeof Chart === 'undefined') return;
+            entry.target.classList.add('active');
 
-                  const ctx = document.getElementById(id).getContext('2d');
-                const commonConfig = {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { enabled: true } },
-                    scales: { x: { display: false }, y: { display: false } },
-                    animation: { duration: 2000, easing: 'easeOutQuart' }
-                };
+            const canvases = entry.target.querySelectorAll('canvas');
+            canvases.forEach(canvas => {
+                if (!canvas.classList.contains('rendered')) {
+                    this.initChart(canvas.id);
+                    canvas.classList.add('rendered');
+                }
+            });
 
-                if (id === 'riskChart') {
-                    new Chart(ctx, { type: 'bar', data: { labels: ['Before', 'After'], datasets: [{ data: [144, 21], backgroundColor: ['#cbd5e1', '#2563eb'], borderRadius: 12, barThickness: 50 }] }, options: commonConfig });
-                } else if (id === 'recruitChart') {
-                    new Chart(ctx, { type: 'line', data: { labels: ['Q2', 'Q3', 'Q4'], datasets: [{ data: [35, 72, 111], borderColor: '#10b981', borderWidth: 4, backgroundColor: (ctx) => { const g = ctx.chart.ctx.createLinearGradient(0,0,0,200); g.addColorStop(0,"rgba(16,185,129,0.2)"); g.addColorStop(1,"rgba(16,185,129,0)"); return g; }, fill: true, tension: 0.4, pointRadius: 4 }] }, options: { ...commonConfig, scales: { y: { display: false, min: 0 } } } });
-                } else if (id === 'efficiencyChart') {
-                    new Chart(ctx, { type: 'bar', data: { labels: ['기존', '개선'], datasets: [{ data: [73, 85], backgroundColor: ['#cbd5e1', '#4f46e5'], borderRadius: 12, barThickness: 50 }] }, options: { ...commonConfig, scales: { y: { display: false, min: 50 } } } });
+            observer.unobserve(entry.target);
+        });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+},
+
+setupCounterObserver() {
+    const counters = document.querySelectorAll('.counter');
+    if (!counters.length) return;
+
+    const counterObserver = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+
+            const counter = entry.target;
+            if (counter.classList.contains('counted')) return;
+
+            const target = +counter.dataset.target;
+            const prefix = counter.dataset.prefix || '';
+            const suffix = counter.dataset.suffix || '';
+            const duration = 1500;
+            const start = performance.now();
+
+            function animate(now) {
+                const progress = Math.min((now - start) / duration, 1);
+                const ease = 1 - Math.pow(1 - progress, 4);
+                const value = Math.floor(ease * target);
+                counter.textContent = `${prefix}${value}${suffix}`;
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    counter.textContent = `${prefix}${target}${suffix}`;
                 }
             }
-        };
+
+            requestAnimationFrame(animate);
+            counter.classList.add('counted');
+            obs.unobserve(counter);
+        });
+    }, { threshold: 0.6 });
+
+    counters.forEach(c => counterObserver.observe(c));
+},
+
+initChart(id) {
+    if (typeof Chart === 'undefined') return;
+
+    // ✅ [중요] 차트 중복 생성 방어
+    this.charts = this.charts || {};
+    if (this.charts[id]) return;
+
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+
+    const commonConfig = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: { enabled: true }
+        },
+        scales: {
+            x: { display: false },
+            y: { display: false }
+        },
+        animation: {
+            duration: 2000,
+            easing: 'easeOutQuart'
+        }
+    };
+
+    if (id === 'riskChart') {
+        this.charts[id] = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Before', 'After'],
+                datasets: [{
+                    data: [144, 21],
+                    backgroundColor: ['#cbd5e1', '#2563eb'],
+                    borderRadius: 12,
+                    barThickness: 50
+                }]
+            },
+            options: commonConfig
+        });
+    }
+
+    if (id === 'recruitChart') {
+        this.charts[id] = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Q2', 'Q3', 'Q4'],
+                datasets: [{
+                    data: [35, 72, 111],
+                    borderColor: '#10b981',
+                    borderWidth: 4,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    fill: true,
+                    backgroundColor: (ctx) => {
+                        const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 200);
+                        g.addColorStop(0, 'rgba(16,185,129,0.2)');
+                        g.addColorStop(1, 'rgba(16,185,129,0)');
+                        return g;
+                    }
+                }]
+            },
+            options: commonConfig
+        });
+    }
+
+    if (id === 'efficiencyChart') {
+        this.charts[id] = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['기존', '개선'],
+                datasets: [{
+                    data: [73, 85],
+                    backgroundColor: ['#cbd5e1', '#4f46e5'],
+                    borderRadius: 12,
+                    barThickness: 50
+                }]
+            },
+            options: commonConfig
+        });
+    }
+}
 
         // Boot
         App.init();
         
-        window.toggleMenu = function() {
-            document.getElementById('mobile-menu').classList.toggle('open');
-        }
+       
     });
     </script>
 </body>
 
 </html>
+
 
 
 
