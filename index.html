@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="성명재 HR Operations Portfolio - 데이터 기반 인사 운영 전문가">
+    <title>성명재 | HR Operations Portfolio</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: { sans: ['Pretendard', 'sans-serif'] },
+                colors: { brand: { 500: '#2563eb', 600: '#1d4ed8' } }
+            }
+        }
+    }
+</script>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+
+    <style>
+        body { font-family: 'Pretendard', sans-serif; letter-spacing: -0.02em; word-break: keep-all; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .break-keep { word-break: keep-all; }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.6); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .glass-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); }
+        .biz-card { background: #ffffff; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .biz-card:hover { transform: rotateX(2deg) rotateY(2deg) translateY(-5px); }
+        #mobile-menu { transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; }
+        #mobile-menu.open { max-height: 400px; opacity: 1; }
+        #detail-modal, #system-modal { transition: opacity 0.3s ease; }
+        #detail-modal.hidden, #system-modal.hidden { opacity: 0; pointer-events: none; }
+        #detail-modal:not(.hidden), #system-modal:not(.hidden) { opacity: 1; pointer-events: auto; }
+        .active-dx { border-color: #2563eb !important; background-color: #1e293b !important; }
+        .active-dx span:first-child { color: white !important; }
+        .active-dx span:last-child { color: #60a5fa !important; }
+        .prose h4 { color: #2563eb; font-weight: 700; margin-top: 1.5em; margin-bottom: 0.5em; font-size: 1.1em; }
+        .prose ul { list-style-type: disc; padding-left: 1.2em; margin-bottom: 1em; color: #475569; font-size: 0.95em; }
+        .prose li { margin-bottom: 0.3em; }
+        .prose strong { color: #1e293b; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 selection:bg-brand-500 selection:text-white">
+
+    <!-- Header -->
+    <header class="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6">
+            <nav class="flex items-center justify-between h-16">
+                <a href="#" class="flex items-center space-x-3 group">
+                    <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-2">
+                        <span class="font-extrabold text-xl tracking-tight">성명재</span>
+                        <span class="hidden md:inline-block w-px h-4 bg-slate-300"></span>
+                        <div class="flex gap-1">
+                            <span class="text-[10px] md:text-xs font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full border border-brand-100">HR Ops</span>
+                            <span class="text-[10px] md:text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">Recruiter</span>
+                            <span class="text-[10px] md:text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">GA</span>
+                        </div>
+                    </div>
+                </a>
+                <div class="hidden lg:flex space-x-6 text-sm font-semibold text-slate-500">
+                    <a href="#summary" class="hover:text-brand-600 transition py-2">Intro</a>
+                    <a href="#dashboard" class="hover:text-brand-600 transition py-2">Performance</a>
+                    <a href="#experience" class="hover:text-brand-600 transition py-2">Career</a>
+                    <a href="#automation" class="hover:text-brand-600 transition py-2">DX Case</a>
+                    <a href="#education" class="hover:text-brand-600 transition py-2">Growth</a>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="#contact-card" class="hidden md:inline-flex bg-slate-900 text-white px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-widest hover:bg-slate-800 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0">CONTACT ME</a>
+                    <button id="menu-btn" class="lg:hidden p-2 text-slate-600 hover:text-brand-600 focus:outline-none transition" aria-label="Toggle Menu">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </div>
+        <div id="mobile-menu" class="lg:hidden bg-white border-b border-slate-100 shadow-xl">
+            <nav class="px-6 py-4 space-y-2">
+                <a href="#summary" class="block p-3 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition" data-action="close-menu">Intro</a>
+                <a href="#dashboard" class="block p-3 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition" data-action="close-menu">Performance</a>
+                <a href="#experience" class="block p-3 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition" data-action="close-menu">Career</a>
+                <a href="#automation" class="block p-3 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition" data-action="close-menu">DX Case</a>
+                <a href="#education" class="block p-3 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition" data-action="close-menu">Growth</a>
+                <a href="#contact-card" class="block p-3 mt-2 rounded-lg text-sm font-black text-white bg-slate-900 text-center uppercase tracking-widest" data-action="close-menu">Contact Me</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Detail Modal -->
+    <div id="detail-modal" class="fixed inset-0 z-[100] hidden justify-center items-center px-4" role="dialog" aria-modal="true">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" data-action="close-modal"></div>
+        <div class="relative w-full max-w-3xl max-h-[85vh] bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col transform transition-all">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/80 backdrop-blur sticky top-0 z-10">
+                <div><h3 id="modal-title" class="text-xl font-bold text-slate-900 break-keep"></h3><p id="modal-subtitle" class="text-xs text-slate-500 mt-1"></p></div>
+                <button data-action="close-modal" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition" aria-label="Close modal">✕</button>
+            </div>
+            <div id="modal-content" class="p-8 overflow-y-auto custom-scrollbar prose max-w-none text-slate-600"></div>
+        </div>
+    </div>
+
+    <!-- System Modal -->
+    <div id="system-modal" class="fixed inset-0 z-[110] hidden justify-center items-center px-4" role="dialog" aria-modal="true">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" data-action="close-system-modal"></div>
+        <div id="system-modal-content" class="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl p-6 transform transition-all text-center"></div>
+    </div>
+
+    <main>
+        <!-- Hero -->
+        <section id="summary" class="pt-40 pb-24 relative overflow-hidden">
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none z-0">
+                <div class="absolute top-20 left-1/4 w-72 h-72 bg-blue-200/40 rounded-full mix-blend-multiply filter blur-3xl animate-float"></div>
+                <div class="absolute bottom-20 right-1/4 w-96 h-96 bg-indigo-200/40 rounded-full mix-blend-multiply filter blur-3xl animate-float" style="animation-delay: 2s"></div>
+            </div>
+            <div class="max-w-5xl mx-auto px-6 text-center relative z-10 reveal active">
+                <div class="inline-flex items-center space-x-2 bg-white/80 backdrop-blur border border-slate-200 px-4 py-1.5 rounded-full text-xs font-bold mb-8 shadow-sm cursor-default">
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    <span class="text-slate-600 uppercase tracking-wider">Available for New Opportunities</span>
+                </div>
+                <h1 class="text-4xl md:text-6xl font-black mb-8 leading-[1.2] tracking-tight text-slate-900 break-keep">
+                    “안 찍히는 근태”를 캠페인이 아니라<br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-indigo-600">데이터</span>로 해결했습니다.
+                </h1>
+                <p class="text-xl text-slate-600 mb-4 max-w-3xl mx-auto leading-relaxed font-medium break-keep">
+                    동선 분석으로 근태기를 재배치해 인식률 15% 개선, 수기 오류율 8%p 감소.
+                </p>
+                <p class="text-lg text-slate-500 mb-12 max-w-3xl mx-auto leading-relaxed break-keep">
+                    실제 데이터를 근거로 인사 운영을 안정화하는 인사담당자,<br>
+                    <strong>기준을 설계하고 리스크를 예방하는 효율적인 조직문화에 기여하겠습니다.</strong>
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="#contact-card" class="bg-brand-600 text-white px-8 py-4 rounded-full font-bold hover:bg-brand-700 transition shadow-xl shadow-brand-500/20 flex items-center justify-center gap-2 transform hover:-translate-y-1">
+                        지금 바로 영입 제안하기 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Performance -->
+        <section id="dashboard" class="py-24 bg-white relative">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6 reveal">
+                    <div>
+                        <h2 class="text-sm font-black text-brand-600 mb-2 uppercase tracking-widest">Performance Dashboard</h2>
+                        <h3 class="text-3xl md:text-4xl font-bold text-slate-900 break-keep">수치로 증명하는 인사 혁신</h3>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-slate-500 font-medium">오뚜기라면 인사팀 실무 성과</p>
+                        <p class="text-xs text-slate-400 mt-1">Updated: 2025.12</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <article class="reveal glass-card p-8 rounded-3xl bg-slate-50/50">
+                        <div class="flex justify-between items-start mb-6">
+                            <div>
+                                <p class="text-xs font-bold text-blue-500 mb-1 uppercase tracking-wider">Risk Mgmt</p>
+                                <h4 class="text-xl font-bold break-keep">근태 리스크 예방</h4>
+                                <p class="text-[10px] text-slate-400 mt-1">52시간 초과예상자 관리 개선</p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                        </div>
+                        <div class="h-48 relative"><canvas id="riskChart"></canvas></div>
+                        <div class="mt-6 pt-6 border-t border-slate-200 flex justify-between items-end">
+                            <span class="text-slate-400 text-sm font-semibold">Risk Reduction</span>
+                            <div class="flex items-baseline text-blue-600">
+                                <span class="text-3xl font-black counter" data-target="85" data-prefix="-">0</span><span class="text-xl font-bold ml-0.5">%</span>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="reveal glass-card p-8 rounded-3xl bg-slate-50/50" style="transition-delay: 100ms;">
+                        <div class="flex justify-between items-start mb-6">
+                            <div>
+                                <p class="text-xs font-bold text-emerald-500 mb-1 uppercase tracking-wider">Recruiting</p>
+                                <h4 class="text-xl font-bold break-keep">채용 지원자풀 확대</h4>
+                                <p class="text-[10px] text-slate-400 mt-1">*생산직 오퍼레이터 지원자수 변화</p>
+                            </div>
+                            <div class="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            </div>
+                        </div>
+                        <div class="h-48 relative"><canvas id="recruitChart"></canvas></div>
+                        <div class="mt-6 pt-6 border-t border-slate-200 flex justify-between items-end">
+                            <span class="text-slate-400 text-sm font-semibold">Growth Rate</span>
+                            <div class="flex items-baseline text-emerald-600">
+                                <span class="text-3xl font-black counter" data-target="217" data-prefix="+">0</span><span class="text-xl font-bold ml-0.5">%</span>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="reveal glass-card p-8 rounded-3xl bg-slate-50/50" style="transition-delay: 200ms;">
+                        <div class="flex justify-between items-start mb-6">
+                            <div>
+                                <p class="text-xs font-bold text-indigo-500 mb-1 uppercase tracking-wider">Efficiency</p>
+                                <h4 class="text-xl font-bold break-keep">근태기 인식률 개선</h4>
+                            </div>
+                            <div class="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            </div>
+                        </div>
+                        <div class="h-48 relative"><canvas id="efficiencyChart"></canvas></div>
+                        <div class="mt-6 pt-6 border-t border-slate-200 flex justify-between items-end">
+                            <span class="text-slate-400 text-sm font-semibold">Tagging Rate</span>
+                            <div class="flex items-baseline text-indigo-600">
+                                <span class="text-xl font-bold mr-1">+</span><span class="text-3xl font-black counter" data-target="12" data-suffix="">0</span><span class="text-xl font-bold ml-0.5">%p</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Career -->
+        <section id="experience" class="py-24 bg-slate-50 border-t border-slate-100">
+            <div class="max-w-6xl mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto mb-16 reveal">
+                    <h2 class="text-sm font-black text-brand-600 mb-4 uppercase tracking-widest">Career</h2>
+                    <h3 class="text-3xl font-bold text-slate-900 mb-4 break-keep">문제를 정의하고, 작동하는 시스템을 만듭니다.</h3>
+                    <p class="text-slate-500 text-lg break-keep">현장의 비효율을 데이터로 정의하고,<br>기술로 작동하는 인사 운영 구조를 만들어 왔습니다.</p>
+                </div>
+                
+                <div class="max-w-5xl mx-auto reveal">
+                    <article class="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-sm border border-slate-100">
+                        <div class="flex flex-col md:flex-row justify-between mb-8 gap-4 border-b border-slate-100 pb-8">
+                            <div>
+                                <div class="flex flex-wrap gap-2 mb-3">
+                                    <span class="text-[10px] font-black text-brand-600 uppercase tracking-widest bg-brand-50 px-3 py-1 rounded-full border border-brand-100">HR Ops</span>
+                                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-full border border-slate-100">Recruiter</span>
+                                </div>
+                                <h4 class="text-3xl font-bold text-slate-900">오뚜기라면(주) | 인사팀 | 사원</h4>
+                                <p class="text-slate-500 text-sm mt-2 break-keep">채용운영, 근태관리, 도급/파견관리, 급여 운영 지원, 정부지원사원 관리 등</p>
+                            </div>
+                            <div class="md:text-right">
+                                <p class="text-slate-400 font-bold text-sm flex items-center md:justify-end gap-1 mb-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    <span id="career-duration">2025.03 ~ 재직 중</span>
+                                </p>
+                                <p class="text-slate-600 font-medium text-sm bg-slate-50 px-3 py-1.5 rounded-lg inline-block break-keep md:text-right text-left">
+                                    "약 700명 규모 제조 현장의 인사 운영 구조를 4명의 인사팀이 효율화 하기 위해<br class="hidden md:inline">
+                                    적극적으로 데이터 기반 재설계 제안 및 운영 담당"
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="mb-8">
+                            <h5 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Key Projects (Click for Detail)</h5>
+                            <div id="career-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Dynamic Injection -->
+                            </div>
+                        </div>
+
+                        <div>
+                            <h5 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Operations & Compliance</h5>
+                            <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-slate-600 list-disc pl-4 marker:text-slate-300">
+                                <li>M/H 기반 도급비, 파견비 정산 오류 제로 달성</li>
+                                <li>월별 노무비 분석 대시보드 개발 참여</li>
+                                <li>정부 인건비 지원사업 운영 및 관리</li>
+                                <li>대관업무 지원 (노동부 해석 질의 등)</li>
+                                <li>분기 노사협의회 자료 준비 및 노조 대응 지원</li>
+                                <li>코스트코, BRCGS 등 글로벌 심사 인권 분야 대응</li>
+                                <li>기업 월례/연례 행사 기획 및 운영</li>
+                            </ul>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- DX Case -->
+        <section id="automation" class="py-24 bg-slate-900 text-white relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-brand-900/30 to-transparent"></div>
+            <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+            <div class="max-w-7xl mx-auto px-6 relative z-10">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <div class="lg:col-span-4 reveal">
+                        <span class="text-brand-400 font-bold tracking-wider text-sm mb-4 block">DIGITAL TRANSFORMATION CASE</span>
+                        <h2 class="text-3xl font-bold mb-8 leading-tight break-keep">가장 비효율적인 업무를<br><span class="text-brand-500 italic">가장 지능적인 프로세스</span>로</h2>
+                        <div id="dx-nav" class="space-y-3">
+                            <!-- Injected -->
+                        </div>
+                    </div>
+                    <div class="lg:col-span-8 reveal relative min-h-[600px]">
+                        <div id="dx-content" class="relative bg-slate-800/90 backdrop-blur p-8 rounded-3xl border border-slate-700 shadow-2xl h-full flex flex-col justify-center">
+                            <!-- Injected -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Growth Section -->
+        <section id="education" class="py-24 bg-white border-t border-slate-100">
+            <div class="max-w-5xl mx-auto px-6">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="text-sm font-black text-brand-600 mb-4 uppercase tracking-widest">Growth & Learning</h2>
+                    <h3 class="text-3xl font-bold text-slate-900 break-keep">학력 및 교육 사항</h3>
+                </div>
+                
+                <div class="flex justify-center mb-12 reveal">
+                    <div class="inline-flex bg-slate-50 p-1.5 rounded-2xl shadow-inner border border-slate-100 overflow-x-auto max-w-full">
+                        <button data-action="show-edu" data-id="academic" id="edu-tab-academic" class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all bg-white text-brand-600 shadow-sm whitespace-nowrap">학력 사항</button>
+                        <button data-action="show-edu" data-id="training" id="edu-tab-training" class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all text-slate-500 hover:text-slate-700 whitespace-nowrap">직무 교육</button>
+                        <button data-action="show-edu" data-id="activities" id="edu-tab-activities" class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all text-slate-500 hover:text-slate-700 whitespace-nowrap">주요 활동</button>
+                        <button data-action="show-edu" data-id="skills" id="edu-tab-skills" class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all text-slate-500 hover:text-slate-700 whitespace-nowrap">보유 기술</button>
+                    </div>
+                </div>
+
+                <div id="education-content" class="min-h-[200px] mb-16 reveal"></div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 reveal">
+                    <a href="https://www.credential.net/e50ea40f-aae0-41d7-b242-d6551212a14f" target="_blank" rel="noopener noreferrer" class="p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:bg-white hover:border-blue-100 hover:shadow-lg transition group">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-2xl shadow-sm border border-slate-100 group-hover:scale-110 transition">📜</div>
+                            <span class="text-xs font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">2026.01.11</span>
+                        </div>
+                        <div class="text-xs font-bold text-slate-400 uppercase mb-1">Certification</div>
+                        <h5 class="text-xl font-bold text-slate-900 mb-1 break-keep">Google Analytics Certification</h5>
+                        <p class="text-sm text-slate-500">Google • Click to Verify ↗</p>
+                    </a>
+                    <div class="p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:bg-white hover:border-indigo-100 hover:shadow-lg transition group">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-2xl shadow-sm border border-slate-100 group-hover:scale-110 transition">🗣️</div>
+                            <span class="text-xs font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded">2024.09.21</span>
+                        </div>
+                        <div class="text-xs font-bold text-slate-400 uppercase mb-1">Language</div>
+                        <h5 class="text-xl font-bold text-slate-900 mb-1 break-keep">TOEIC Speaking IM2</h5>
+                        <p class="text-sm text-slate-500">ETS • Practical Communication</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact -->
+        <section id="contact-card" class="py-24 bg-slate-100 flex flex-col justify-center items-center px-4">
+            <div class="reveal grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12 z-10 w-full max-w-2xl">
+                <a href="https://drive.google.com/uc?export=download&id=1sTqdcd8MPOAjTG9nQo7m2SNFGWzE7Llx" target="_blank" class="flex items-center gap-3 bg-white px-5 py-4 rounded-xl shadow-sm hover:shadow-lg border border-slate-200 hover:border-brand-200 transition group hover:-translate-y-1">
+                    <span class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-500 group-hover:bg-brand-50 group-hover:text-brand-600 transition border border-slate-100 shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </span>
+                    <div class="text-left">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Resume (KR)</p>
+                        <p class="text-sm font-bold text-slate-700 group-hover:text-brand-700">입사지원서 (국문)</p>
+                    </div>
+                </a>
+                <a href="https://drive.google.com/uc?export=download&id=1UhAHgmxX9bQ51uPwV2wTwif1-QNBn5Rh" target="_blank" class="flex items-center gap-3 bg-white px-5 py-4 rounded-xl shadow-sm hover:shadow-lg border border-slate-200 hover:border-brand-200 transition group hover:-translate-y-1">
+                    <span class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-500 group-hover:bg-brand-50 group-hover:text-brand-600 transition border border-slate-100 shrink-0">
+                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </span>
+                    <div class="text-left">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Resume (EN)</p>
+                        <p class="text-sm font-bold text-slate-700 group-hover:text-brand-700">입사지원서 (영문)</p>
+                    </div>
+                </a>
+                <a href="https://drive.google.com/uc?export=download&id=1FEuhZWT7z_EjbulkEPNe9VksuVzZw4vV" target="_blank" class="flex items-center gap-3 bg-white px-5 py-4 rounded-xl shadow-sm hover:shadow-lg border border-slate-200 hover:border-brand-200 transition group hover:-translate-y-1">
+                    <span class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-500 group-hover:bg-brand-50 group-hover:text-brand-600 transition border border-slate-100 shrink-0">
+                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </span>
+                    <div class="text-left">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Portfolio (KR)</p>
+                        <p class="text-sm font-bold text-slate-700 group-hover:text-brand-700">경력기술서 (국문)</p>
+                    </div>
+                </a>
+                <a href="https://drive.google.com/uc?export=download&id=1YtTpVhKyjNThPHPFAt0_LMbHNd5MIAHm" target="_blank" class="flex items-center gap-3 bg-white px-5 py-4 rounded-xl shadow-sm hover:shadow-lg border border-slate-200 hover:border-brand-200 transition group hover:-translate-y-1">
+                    <span class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-500 group-hover:bg-brand-50 group-hover:text-brand-600 transition border border-slate-100 shrink-0">
+                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </span>
+                    <div class="text-left">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Portfolio (EN)</p>
+                        <p class="text-sm font-bold text-slate-700 group-hover:text-brand-700">경력기술서 (영문)</p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="reveal relative w-full max-w-[500px] aspect-[1.7/1] bg-white rounded-2xl shadow-2xl overflow-hidden biz-card border border-slate-200">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-brand-600 to-brand-400 rounded-bl-[4rem] opacity-90 z-0"></div>
+                <div class="absolute bottom-0 left-0 w-24 h-24 bg-slate-100 rounded-tr-[3rem] z-0"></div>
+                
+                <div class="relative z-10 h-full flex flex-col justify-between p-8 md:p-10">
+                    <div>
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">HR/GA Generalist</p>
+                                <h2 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">성명재</h2>
+                            </div>
+                            <div class="w-10 h-10 md:w-12 md:h-12 bg-white/90 backdrop-blur rounded-full shadow-lg flex items-center justify-center text-brand-600 font-black text-xl border border-slate-100">S</div>
+                        </div>
+                        <p class="text-brand-600 font-bold text-sm mt-1">Sung Myeong Jae</p>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="space-y-1.5">
+                            <div class="flex items-center gap-3 text-sm text-slate-600 group cursor-pointer hover:text-brand-600 transition">
+                                <span class="w-5 h-5 flex items-center justify-center bg-slate-50 rounded text-xs">📧</span> 
+                                <span class="font-medium">proposition97@gmail.com</span>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 mt-2 border-t border-slate-100">
+                            <div class="flex items-end gap-2 group">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase mb-1">Company :</span>
+                                <div class="relative flex-1 flex items-center border-b-2 border-slate-300 focus-within:border-brand-500 transition-colors">
+                                    <input type="text" id="company-input" 
+                                        class="w-full bg-transparent border-none focus:ring-0 text-[10px] font-bold text-brand-600 placeholder-slate-300 pb-0.5 outline-none" 
+                                        placeholder="Type Name & Enter" 
+                                        autocomplete="off">
+                                    <button data-action="confirm-download" class="text-slate-400 hover:text-brand-600 transition p-1" aria-label="Download All">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-8 bg-slate-100 text-center border-t border-slate-200/50">
+        <p class="text-[10px] text-slate-400 font-mono">© 2026 Sung Myeong-jae. Designed for Gemini.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        // Modal Details Data (Restored Full Content)
+        const modalDetails = {
+            'tableau': {
+                title: "Tableau Bootcamp 29기 상세 학습",
+                subtitle: "데이터 시각화 및 비즈니스 인텔리전스 역량 강화",
+                content: `<div class="space-y-8 break-keep"><div><h4 class="text-brand-600">📊 Key Learning: 기능과 활용</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4"><div class="bg-slate-50 p-4 rounded-xl border border-slate-100"><strong class="block mb-2 text-slate-800">1. 시각화 기초 & 차트</strong><ul class="text-sm space-y-1 text-slate-600 list-none pl-0"><li>• 차원 vs 측정값, 집계 원리 이해</li><li>• 이중축/콤보 차트, 트리맵, 산점도 구현</li><li>• 맵 시각화(레이어/필터) 및 대시보드 배치</li></ul></div><div class="bg-slate-50 p-4 rounded-xl border border-slate-100"><strong class="block mb-2 text-slate-800">2. 계산식 & 고급 분석</strong><ul class="text-sm space-y-1 text-slate-600 list-none pl-0"><li>• LOD(FIXED)를 활용한 전국 기준 비율 산출</li><li>• 테이블 계산(전일 대비 등락, 구성비)</li><li>• 매개변수를 활용한 동적 측정값 전환</li></ul></div><div class="bg-slate-50 p-4 rounded-xl border border-slate-100"><strong class="block mb-2 text-slate-800">3. 특수 차트 & 디자인</strong><ul class="text-sm space-y-1 text-slate-600 list-none pl-0"><li>• 도넛, 워터폴(수익 누계), 범프(순위 변동)</li><li>• 퍼널, 간트 차트(영업시간 시각화)</li><li>• 대시보드 디자인 10원칙 적용 (Z형 배치 등)</li></ul></div><div class="bg-slate-50 p-4 rounded-xl border border-slate-100"><strong class="block mb-2 text-slate-800">4. 데이터 전처리 (Prep)</strong><ul class="text-sm space-y-1 text-slate-600 list-none pl-0"><li>• Union/Join을 통한 데이터 결합 및 정제</li><li>• 값 그룹핑 및 불필요 필드 정리</li><li>• 분석용 데이터셋 출력 및 자동화</li></ul></div></div></div><div><h4 class="text-brand-600">💡 My Perspective: HR 데이터 관점</h4><div class="bg-blue-50/50 p-5 rounded-2xl border border-blue-100"><ul class="space-y-3 text-sm text-slate-700 list-none pl-0"><li class="flex gap-2"><span class="text-blue-500 font-bold">01</span><span><strong>'감'이 아닌 '근거' 기반의 결정:</strong> 직관에 의존하던 인사 운영을 근태/채용 Pipeline/인력 투입 현황 등 실시간 데이터 모니터링 체계로 전환 가능함.</span></li><li class="flex gap-2"><span class="text-blue-500 font-bold">02</span><span><strong>평균의 함정 탈피:</strong> 전체 평균이 적정하더라도 특정 부서나 공정의 과로 위험(Outlier)을 박스플롯 등으로 즉시 시각화하여 선제적 조치 가능.</span></li><li class="flex gap-2"><span class="text-blue-500 font-bold">03</span><span><strong>전달력 있는 커뮤니케이션:</strong> 정적인 엑셀 보고서를 넘어, 경영진과 현장 관리자가 직접 필터를 조작하며 인사이트를 얻는 대시보드 구축이 핵심.</span></li></ul></div></div><div><h4 class="text-brand-600">🚀 Next Step: 현업 적용 계획</h4><div class="overflow-hidden border border-slate-200 rounded-xl"><table class="w-full text-sm text-left text-slate-600"><thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200"><tr><th class="px-4 py-3 w-1/4">단계</th><th class="px-4 py-3">실행 목표</th></tr></thead><tbody class="divide-y divide-slate-100"><tr><td class="px-4 py-3 font-semibold">1단계: 모니터링</td><td class="px-4 py-3">부서/공정별 근태 편차 및 위험 구간(52시간 임계) 자동 시각화</td></tr><tr><td class="px-4 py-3 font-semibold">2단계: 인력 매칭</td><td class="px-4 py-3">정원(TO) vs 실 투입 인력(직영/도급) 차이 분석 및 경고 시스템</td></tr><tr><td class="px-4 py-3 font-semibold">3단계: 채용 분석</td><td class="px-4 py-3">채용 단계별(서류-면접-입사) 전환율 Funnel 및 병목 구간 시각화</td></tr><tr><td class="px-4 py-3 font-semibold">4단계: 운영 자동화</td><td class="px-4 py-3">HR 원천 데이터 표준화 및 Tableau Prep을 활용한 전처리 자동화</td></tr></tbody></table></div></div></div>`
+            },
+            'hr_basic': {
+                title: "인사관리 기본과정 (직무급 중심)",
+                subtitle: "HRM 전반의 실무 이론 및 노동법 이슈 대응",
+                content: `<div class="space-y-8 break-keep"><div><h4 class="text-brand-600">📚 Key Learning: HR 체계의 이해</h4><ul class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 text-sm text-slate-600 list-none pl-0"><li class="bg-slate-50 px-4 py-3 rounded-lg border border-slate-100"><strong>📌 직무관리:</strong> 직무분석 절차, 직무기술서/명세서 작성, 직무평가</li><li class="bg-slate-50 px-4 py-3 rounded-lg border border-slate-100"><strong>📌 채용관리:</strong> 역량 중심 면접(BEI) 설계 및 채용 브랜딩 변화</li><li class="bg-slate-50 px-4 py-3 rounded-lg border border-slate-100"><strong>📌 성과관리:</strong> MBO vs OKR, 성과책임(Accountability) 규명</li><li class="bg-slate-50 px-4 py-3 rounded-lg border border-slate-100"><strong>📌 보상관리:</strong> 직무급/역할급 설계 논리, Merit Increase 매트릭스</li><li class="bg-slate-50 px-4 py-3 rounded-lg border border-slate-100"><strong>📌 노동법:</strong> 근로시간, 연차, 모성보호, 퇴직 관리 등 필수 법규</li></ul></div><div><h4 class="text-brand-600">💡 My Perspective: 인사이트</h4><div class="space-y-4 text-sm"><div class="flex gap-4"><div class="w-1 bg-brand-500 rounded-full shrink-0"></div><div><strong class="block text-slate-800 mb-1">직무 기준(Job Value)이 HR의 시작점이다</strong><p class="text-slate-600">직무 가치가 불명확하면 채용-평가-보상의 논리가 모두 어긋남. '사람'이 아닌 '역할'에 집중하는 것이 공정성의 핵심.</p></div></div><div class="flex gap-4"><div class="w-1 bg-brand-500 rounded-full shrink-0"></div><div><strong class="block text-slate-800 mb-1">보상은 '금액'보다 '설득 논리'가 중요하다</strong><p class="text-slate-600">구성원은 결과값 자체보다 "왜 내가 이 평가/보상을 받았는가"에 대한 설명에 반응함. HR은 이 논리를 설계하고 전달하는 역할.</p></div></div><div class="flex gap-4"><div class="w-1 bg-brand-500 rounded-full shrink-0"></div><div><strong class="block text-slate-800 mb-1">리스크 관리는 '절차적 정당성'에서 온다</strong><p class="text-slate-600">퇴직, 징계 등 민감 이슈는 결과보다 '사전 예고-소명 기회-일관된 기준'이라는 절차를 준수했는가가 법적/조직적 리스크를 결정함.</p></div></div></div></div><div><h4 class="text-brand-600">🚀 Next Step: 현업 적용 계획</h4><div class="bg-slate-50 rounded-xl p-5 border border-slate-100"><ul class="space-y-4 text-sm text-slate-700 list-none pl-0"><li class="flex items-start gap-3"><span class="text-xl">✅</span><div><strong>직무 기반 HR 체계 재점검</strong><p class="text-slate-500 mt-1">현행 직무기술서의 실효성 점검 및 채용 JD와의 정합성 검증</p></div></li><li class="flex items-start gap-3"><span class="text-xl">✅</span><div><strong>보상 수용성 강화 모델링</strong><p class="text-slate-500 mt-1">평가 등급별 인상률 시뮬레이션(Top/Mid/Low) 및 커뮤니케이션 가이드 마련</p></div></li><li class="flex items-start gap-3"><span class="text-xl">✅</span><div><strong>노무 리스크 대응 매뉴얼화</strong><p class="text-slate-500 mt-1">반복되는 이슈(연차, 근로시간, 도급) 중심의 Case Study 루틴화</p></div></li></ul></div></div></div>`
+            }
+        };
+
+        const PORTFOLIO_DATA = {
+            careerProjects: [
+                {
+                    id: 'career_1', 
+                    title: '근태기 루트 효율화', 
+                    sub: '동선 분석 기반 기기 재배치 프로젝트', 
+                    desc: '동선 데이터 분석을 통한 기기 재배치 및 인식률 개선', 
+                    modalContent: `<div class="space-y-6"><div><h4 class="text-brand-600">🔍 문제 상황</h4><p class="text-slate-600 text-sm leading-relaxed">기존 근태기가 직원들의 주 이동 동선과 동떨어진 곳에 위치하여, 출퇴근 시 태깅 누락이 빈번하게 발생했습니다. 이로 인해 월말 수기 수정 요청 건수가 급증하여 행정 업무 효율 감소 및 급여 신뢰도 하락 리스크 지속.</p></div><div><h4 class="text-brand-600">🛠️ 실행 (Action)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>동선 히트맵 분석:</strong> 노조와 협의하여 CCTV, 근태로그 기반 식당, 주차장, 탈의실 등 주요 거점과 작업장 간의 이동 경로를 2주간 추적 분석.</li><li><strong>병목 구간 식별:</strong> 출퇴근 피크 타임에 대기 줄이 길어지는 구역과 아예 사용되지 않는 기기 식별.</li><li><strong>기기 재배치:</strong> 유휴 기기 3대를 주 동선 교차점으로 이동 설치하고, 인식 속도가 느린 구형 기기 교체.</li></ul></div><div><h4 class="text-brand-600">📈 결과 (Result)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>인식률 개선:</strong> 전체 근태 태깅률 73% → 85% (15% 개선)</li><li><strong>오류 감소:</strong> 월 평균 수기 수정 요청 건수 8%p 감소</li><li><strong>현장 만족도:</strong> 출퇴근 대기 시간 단축으로 현장 직원 불만 해소</li></ul></div></div>`
+                },
+                {
+                    id: 'career_2', 
+                    title: 'ATS(채용관리솔루션) 도입', 
+                    sub: '나인하이어 도입을 통한 채용 프로세스 디지털 전환', 
+                    desc: 'Ninehire 도입 및 채용 프로세스 디지털 전환', 
+                    modalContent: `<div class="space-y-6"><div><h4 class="text-brand-600">🔍 문제 상황</h4><p class="text-slate-600 text-sm leading-relaxed">이메일과 엑셀로 지원자를 관리하여 서류 분실 위험이 높고, 탈락 지원자 서류 폐기에 대한 법률 위반 리스크 상존. 전형 안내 지연으로 지원자 이탈이 발생하며 데이터 집계가 불가능.</p></div><div><h4 class="text-brand-600">🛠️ 실행 (Action)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>솔루션 선정:</strong> 비용 대비 효율성이 높은 '나인하이어' 선정 및 도입 추진.</li><li><strong>프로세스 표준화:</strong> 서류-면접-처우협의-입사 단계별 평가표 및 알림 템플릿 전산화.</li><li><strong>협업 구조 개선:</strong> 현업 면접관에게 평가 링크를 자동 발송하여 실시간 평가 취합 구조 마련.</li></ul></div><div><h4 class="text-brand-600">📈 결과 (Result)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>지원자 경험 개선:</strong> 전형 결과 통보 리드타임 단축 (관리직 8주→6주, 생산직 6주→4주).</li><li><strong>지원자 수 증가:</strong> 채용 포털과 자체 홈페이지 연동으로 직무별 지원자 평균 27% 증가.</li><li><strong>데이터 자산화:</strong> 채용 채널별 ROI, 리드타임 등 데이터 분석 대시보드화.</li><li><strong>커뮤니케이션 강화:</strong> 알림톡/이메일을 활용한 단계별 커뮤니케이션 횟수 증가로<br>긍정적 채용 리뷰가 증가(0건→6건)하고 부정 리뷰가 감소(28건→2건)했습니다.</li><li><strong>법적 리스크 해소:</strong> 탈락자 개인정보 자동 파기 프로세스 구축.</li></ul></div></div>`
+                },
+                {
+                    id: 'career_3', 
+                    title: '직무 분석 기반 채용 홍보', 
+                    sub: '타겟 맞춤형 채용 콘텐츠 기획', 
+                    desc: '타겟 맞춤형 채용 콘텐츠 제작 및 채널 다각화', 
+                    modalContent: `<div class="space-y-6"><div><h4 class="text-brand-600">🔍 문제 상황</h4><p class="text-slate-600 text-sm leading-relaxed">단순 개요식 채용 공고로 직무에 대한 명확한 인사이트 제공이 불가하여 오해 발생. 우수 인재(MZ 세대)의 관심을 끌지 못하고 허수 지원자가 다수 발생.</p></div><div><h4 class="text-brand-600">🛠️ 실행 (Action)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>직무 인터뷰:</strong> 현직자 인터뷰를 통해 실제 업무 내용과 필요 역량(Keyword) 도출.</li><li><strong>데이터 기반 분석:</strong> 텍스트 마이닝으로 직무별 필요 스킬을 도출하고, 이를 기반으로 공고 문구 고도화.</li><li><strong>채널 최적화:</strong> 직무별 타겟이 모이는 특화 커뮤니티 및 학교 취업센터로 홍보 채널 확장.</li></ul></div><div><h4 class="text-brand-600">📈 결과 (Result)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>적합성 향상:</strong> 서류→1차 면접 전환율 6%→15% 상승, 최종 합격률 0.3%→0.5% 개선.</li><li><strong>채용 효율화:</strong> 동일 직무 재공고 횟수가 13회에서 2회로 대폭 감소.</li><li><strong>브랜딩:</strong> 보수적인 제조 기업 이미지를 탈피하고 소통하는 조직 이미지 구축.</li></ul></div></div>`
+                },
+                {
+                    id: 'career_4', 
+                    title: '근태 리스크 예방 프로세스', 
+                    sub: '주 52시간 근무제 준수 모니터링 시스템', 
+                    desc: '주 52시간 초과 예상자 사전 알림 및 모니터링', 
+                    modalContent: `<div class="space-y-6"><div><h4 class="text-brand-600">🔍 문제 상황</h4><p class="text-slate-600 text-sm leading-relaxed">생산 물량 급증 시 특정 직무/라인의 연장 근로가 법적 한도(52시간)에 육박. 중간 관리 실패로 사후 대응만 가능하여 법적 리스크에 노출됨.</p></div><div><h4 class="text-brand-600">🛠️ 실행 (Action)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>사전 알림 체계:</strong> 주 45시간 도달 시 해당 직원 및 부서장에게 경고 메일/알림 자동 발송.</li><li><strong>유연근무 도입:</strong> 생산 라인별 2주 단위 탄력근무제를 테스트 시행하여 효과성 검증.</li><li><strong>모니터링 대시보드:</strong> 전사 근로시간 현황을 부서별/개인별로 시각화하여 매주 경영진 공유.</li><li><strong>대체 휴무 활성화:</strong> 초과 근무 불가피 시 사전 대체휴무 지정을 권고하는 전자 신청 프로세스 개선.</li></ul></div><div><h4 class="text-brand-600">📈 결과 (Result)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>법적 리스크 감소:</strong> 초과 예상 인원 144명→21명 감소, 특별연장근로 승인 건수 2건→0건 개선.</li><li><strong>관리자 인식 개선:</strong> 연장/휴일 근무 시간이 5% 감소했음에도 생산량이 보전됨을 증명하여 인식 개선.</li><li><strong>제도 개선 근거:</strong> 4조 3교대 개편 및 유연근무제 도입의 논리적 근거 강화.</li></ul></div></div>`
+                },
+                {
+                    id: 'career_5', 
+                    title: '온보딩 개선 및 퇴사율 제고', 
+                    sub: '신규 입사자 조기 적응 지원 프로그램', 
+                    desc: '신규 입사자 적응 프로그램 구조화 및 멘토링', 
+                    modalContent: `<div class="space-y-6"><div><h4 class="text-brand-600">🔍 문제 상황</h4><p class="text-slate-600 text-sm leading-relaxed">입사 초기 체계적인 교육 부재로 인해 신규 입사자들이 조직 적응에 어려움을 겪고, 수습 기간 내 조기 퇴사율이 상승함.</p></div><div><h4 class="text-brand-600">🛠️ 실행 (Action)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>커리큘럼 구조화:</strong> 1주차(OT) → 2주차(직무스킬) → 3주차(현장실습) → 4주차(심화실습) → 5주차(임원교류) 로드맵 구축.</li><li><strong>콘텐츠 고도화:</strong> 비즈니스 매너, 팀워크, AX 리터러시 교육 등 신입사원 필수 역량 교육 도입.</li><li><strong>PBL 기반 교류:</strong> 현업 기반 AX 과제를 통해 CDP 수립을 돕고 임원진과 의견 교류 행사 기획.</li><li><strong>지원 체계:</strong> 버디(Buddy) 제도 운영 및 노션 기반 온보딩 가이드북 제작 (접근성 확대).</li></ul></div><div><h4 class="text-brand-600">📈 결과 (Result)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>퇴사율 감소:</strong> 수습 기간 내 조기 퇴사율 10%p 감소.</li><li><strong>적응도 향상:</strong> 입사 3개월 차 설문조사 결과 직무 및 조직 만족도 상승.</li><li><strong>성장 기반 마련:</strong> CDP에 기반한 향후 교육 개선 방향 수립 가능.</li></ul></div></div>`
+                },
+                {
+                    id: 'career_6', 
+                    title: '반복 행정 업무 자동화 (DX)', 
+                    sub: 'GAS/MAKE 활용 업무 효율화', 
+                    desc: '경조사/증명서 발급 등 단순 반복 업무 시스템화', 
+                    modalContent: `<div class="space-y-6"><div><h4 class="text-brand-600">🔍 문제 상황</h4><p class="text-slate-600 text-sm leading-relaxed">경조사 신청 등 단순 반복 행정 업무가 카톡이나 전화로 접수되어 담당자의 업무 몰입을 방해하고 이력 관리가 안 됨.</p></div><div><h4 class="text-brand-600">🛠️ 실행 (Action)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>신청 창구 일원화:</strong> Google Apps Script를 활용한 사내 신청 웹앱 개발.</li><li><strong>프로세스 자동화:</strong> 신청 시 이메일 발송 (MAKE 연동).</li><li><strong>데이터베이스화:</strong> 모든 신청 내역이 구글 시트에 자동 기록되어 별도 대장 관리 불필요.</li><li><strong>전자세금계산서 발행:</strong> 관리대장 기반 전자세금계산서 발행 요청으로 행정업무 추가소요 개선.</li></ul></div><div><h4 class="text-brand-600">📈 결과 (Result)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>시간 절감:</strong> 단순 행정 업무 소요 시간 90% 단축.</li><li><strong>오류 제거:</strong> 수기 입력으로 인한 오기재 및 누락 0건.</li><li><strong>확장 계획:</strong> 재직증명서 등 개인 발급 서류의 모바일 발급 자동화 추진 중.</li></ul></div></div>`
+                }
+            ],
+            dxCases: {
+                'dx1': { title: '경조화환 주문 시스템 자동화', badge: 'GAS + MAKE', content: `<div class="animate-[slideIn_0.3s_ease-out]"><div class="mb-6"><span class="text-xs font-mono text-emerald-400 border border-emerald-500/30 px-2 py-1 rounded bg-emerald-500/10">GAS + MAKE + Sheets</span><h3 class="text-2xl font-bold text-white mt-2 mb-2 break-keep">경조화환 주문 시스템 자동화</h3></div><div class="space-y-6"><div><strong class="text-slate-300 block mb-1 text-sm uppercase tracking-wider">Background & Problem</strong><p class="text-slate-400 text-sm leading-relaxed break-keep">기존 카카오톡/문자로 건별 신청하여 누락 및 오기입(Human Error) 발생. 전표 재상신 등 회계 감사 리스크 존재.</p></div><div><strong class="text-brand-400 block mb-1 text-sm uppercase tracking-wider">Solution Logic</strong><ul class="text-slate-300 text-sm space-y-2 list-disc pl-4 break-keep"><li><span class="text-white font-bold">보안 로그인 웹앱:</span> 사번-생년월일 매칭으로 DB 정합성 검증 후 접속 (구글 폼의 익명성/보안 문제 해결)</li><li><span class="text-white font-bold">신청 프로세스 표준화:</span> 필수 정보(일시, 장소, 부고장 첨부) 입력 시 구글 시트 자동 적재 및 '신청 완료' 문구 즉시 피드백</li><li><span class="text-white font-bold">자동 알림 (MAKE):</span> 신청 즉시 업체(발주), 담당자, 팀장에게 Outlook 메일 자동 발송</li><li><span class="text-white font-bold">회계 연동:</span> 월말 정산 데이터 자동 생성 및 회계 계정별 세금계산서 발행 리스트 원클릭 추출</li></ul></div><div class="pt-4 border-t border-slate-700"><strong class="text-emerald-400 block mb-1 text-sm uppercase tracking-wider">Result</strong><p class="text-white text-sm font-bold break-keep">휴먼에러 Zero, 반복 행정 리소스 90% 절감, 개인정보 보안 리스크 최소화</p></div></div></div>` },
+                'dx2': { title: '전자 서명 수집 프로그램', badge: 'GAS WebApp', content: `<div class="animate-[slideIn_0.3s_ease-out]"><div class="mb-6"><span class="text-xs font-mono text-blue-400 border border-blue-500/30 px-2 py-1 rounded bg-blue-500/10">Google Apps Script WebApp</span><h3 class="text-2xl font-bold text-white mt-2 mb-2 break-keep">모바일 전자 서명 수집 프로그램</h3></div><div class="space-y-6"><div><strong class="text-slate-300 block mb-1 text-sm uppercase tracking-wider">Background & Problem</strong><p class="text-slate-400 text-sm leading-relaxed break-keep">생산직 550명의 '전자 윤리서약서' 서명이 필요했으나 개인 PC 사용 불가. 종이 서명→스캔→자르기→등록 시 2주 이상 소요되어 심사 일정 준수 위기.</p></div><div><strong class="text-brand-400 block mb-1 text-sm uppercase tracking-wider">Solution Logic</strong><ul class="text-slate-300 text-sm space-y-2 list-disc pl-4 break-keep"><li><span class="text-white font-bold">Mobile First 접근:</span> PC가 없는 현장직도 본인 휴대폰으로 즉시 접속 가능한 웹앱 개발</li><li><span class="text-white font-bold">Canvas API 활용:</span> 터치 스크린에 직접 서명하고, 이를 이미지 파일(Blob)로 변환하여 서버에 자동 저장</li><li><span class="text-white font-bold">실시간 수합 모니터링:</span> 미제출자 명단 실시간 파악 및 독려 가능</li></ul></div><div class="pt-4 border-t border-slate-700"><strong class="text-emerald-400 block mb-1 text-sm uppercase tracking-wider">Result</strong><p class="text-white text-sm font-bold break-keep">기존 2주 소요 업무를 3일 만에 550명 전원 수합 완료, 심사 성공적 종료</p></div></div></div>` },
+                'dx3': { title: '직무 키워드 분석', badge: 'Text Mining', content: `<div class="animate-[slideIn_0.3s_ease-out]"><div class="mb-6"><span class="text-xs font-mono text-purple-400 border border-purple-500/30 px-2 py-1 rounded bg-purple-500/10">GPT Agent + Text Mining</span><h3 class="text-2xl font-bold text-white mt-2 mb-2 break-keep">직무 키워드 분석 및 분류 고도화</h3></div><div class="space-y-6"><div><strong class="text-slate-300 block mb-1 text-sm uppercase tracking-wider">Background & Problem</strong><p class="text-slate-400 text-sm leading-relaxed break-keep">직무 분류 고도화를 위해 사내 인터뷰/설문 텍스트를 분석해야 했으나, 단순 AI 활용 시 프롬프트마다 결과가 달라져 데이터 신뢰도 확보가 어려움.</p></div><div><strong class="text-brand-400 block mb-1 text-sm uppercase tracking-wider">Solution Logic</strong><ul class="text-slate-300 text-sm space-y-2 list-disc pl-4 break-keep"><li><span class="text-white font-bold">Agent Persona 설계:</span> '직무 분석가' 페르소나와 일관된 분석 프레임워크를 탑재한 GPT Agent 설계</li><li><span class="text-white font-bold">정성 데이터의 정량화:</span> 텍스트 마이닝을 통해 직무별 빈출 키워드(역량, 스킬, 태도) 추출 및 군집화</li><li><span class="text-white font-bold">활용 확장:</span> 직군이 아닌 '직무' 단위 분류 체계 수립, 채용 공고 JD 개선, 수당 체계 근거 마련</li></ul></div><div class="pt-4 border-t border-slate-700"><strong class="text-emerald-400 block mb-1 text-sm uppercase tracking-wider">Future Plan</strong><p class="text-white text-sm font-bold break-keep">외부 지원자 데이터(600건+) 대상 EVP(Employee Value Proposition) 발굴 분석 확대 중</p></div></div></div>` }
+            },
+            education: {
+                'academic': `<div class="flex flex-col md:flex-row gap-6 p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:border-brand-100 transition duration-300 animate-[slideIn_0.4s_ease-out]"><div class="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center text-3xl border border-slate-100">🎓</div><div class="flex-1"><div class="flex flex-col md:flex-row md:items-center justify-between mb-2"><h4 class="text-xl font-bold text-slate-900 break-keep">한국항공대학교 (4년제)</h4><span class="text-xs font-bold text-brand-600 bg-brand-50 px-3 py-1 rounded-full w-fit mt-2 md:mt-0">2017.03 ~ 2021.02</span></div><p class="text-slate-700 font-bold mb-4 break-keep">경영학부 경영학 전공</p><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="bg-white p-4 rounded-xl border border-slate-100"><span class="text-xs text-slate-400 block mb-1">전체 평점</span><span class="text-lg font-bold text-slate-800">3.67 / 4.5</span><span class="text-xs text-slate-400 ml-1">(133학점 이수)</span></div><div class="bg-white p-4 rounded-xl border border-slate-100"><span class="text-xs text-slate-400 block mb-1">전공 평점</span><span class="text-lg font-bold text-brand-600">3.78 / 4.5</span><span class="text-xs text-slate-400 ml-1">(67학점 이수)</span></div></div></div></div>`,
+                'training': `<div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-[slideIn_0.4s_ease-out]"><div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-md transition group"><div class="flex justify-between items-start mb-2"><span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">HRM / HRD</span><span class="text-xs text-slate-400">2025.07.07 ~ 09 (18H)</span></div><h4 class="text-lg font-bold text-slate-900 break-keep">인사관리 기본과정 (직무급 중심)</h4><p class="text-xs text-brand-600 mb-2 font-bold break-keep">KPC 한국생산성본부</p><p class="text-sm text-slate-500 mb-4 leading-relaxed line-clamp-2 break-keep">직무분석~보상/평가 실무 및 노동법 이슈 정리</p><div class="flex items-center justify-between mt-auto"><span class="text-xs font-medium text-slate-400 bg-white px-2 py-1 rounded border border-slate-200">수료 완료</span><button data-action="open-modal" data-id="hr_basic" class="text-xs font-bold text-brand-600 hover:underline flex items-center gap-1">상세 내용 보기 →</button></div></div><div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-md transition group"><div class="flex justify-between items-start mb-2"><span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Data Visualization</span><span class="text-xs text-slate-400">2025.10.14 ~ 23 (40H)</span></div><h4 class="text-lg font-bold text-slate-900 break-keep">Tableau Bootcamp 29기</h4><p class="text-xs text-brand-600 mb-2 font-bold break-keep">Tableau Korea (Online)</p><p class="text-sm text-slate-500 mb-4 leading-relaxed line-clamp-2 break-keep">대시보드 제작 실습 및 Prep 데이터 정렬 학습</p><div class="flex items-center justify-between mt-auto"><span class="text-xs font-medium text-slate-400 bg-white px-2 py-1 rounded border border-slate-200">수료 완료</span><button data-action="open-modal" data-id="tableau" class="text-xs font-bold text-brand-600 hover:underline flex items-center gap-1">상세 내용 보기 →</button></div></div></div>`,
+                'activities': '', // Populated by JS
+                'skills': `<div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-[slideIn_0.4s_ease-out]"><div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-md transition"><div class="flex items-center gap-3 mb-4"><span class="text-2xl bg-white p-2 rounded-lg shadow-sm">📊</span><h4 class="text-lg font-bold text-slate-900">Data & Analytics</h4></div><ul class="space-y-3 text-sm text-slate-600"><li class="flex justify-between items-center"><span>Tableau</span><span class="text-xs font-bold bg-blue-100 text-blue-600 px-2 py-0.5 rounded">Intermediate</span></li><li class="flex justify-between items-center"><span>Google Analytics 4</span><span class="text-xs font-bold bg-blue-100 text-blue-600 px-2 py-0.5 rounded">Certified</span></li><li class="flex justify-between items-center"><span>Python (Text Mining)</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Basic</span></li></ul></div><div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-md transition"><div class="flex items-center gap-3 mb-4"><span class="text-2xl bg-white p-2 rounded-lg shadow-sm">⚙️</span><h4 class="text-lg font-bold text-slate-900">Automation & Dev</h4></div><ul class="space-y-3 text-sm text-slate-600"><li class="flex justify-between items-center"><span>Google Apps Script</span><span class="text-xs font-bold bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded">Intermediate</span></li><li class="flex justify-between items-center"><span>MAKE (Integromat)</span><span class="text-xs font-bold bg-purple-100 text-purple-600 px-2 py-0.5 rounded">Workflow</span></li><li class="flex justify-between items-center"><span>HTML / CSS</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Basic</span></li></ul></div><div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-md transition"><div class="flex items-center gap-3 mb-4"><span class="text-2xl bg-white p-2 rounded-lg shadow-sm">🤖</span><h4 class="text-lg font-bold text-slate-900">HR Tech & AI</h4></div><div class="space-y-3 text-sm text-slate-600"><li class="flex justify-between items-center"><span>Ninehire (ATS)</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Admin</span></li><li class="flex justify-between items-center"><span>GPT Agent Design</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Prompt Eng.</span></li><li class="flex justify-between items-center"><span>Slack / Notion / Teams</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Collaboration</span></li></div></div><div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-md transition"><div class="flex items-center gap-3 mb-4"><span class="text-2xl bg-white p-2 rounded-lg shadow-sm">📝</span><h4 class="text-lg font-bold text-slate-900">Office & Documentation</h4></div><ul class="space-y-3 text-sm text-slate-600"><li class="flex justify-between items-center"><span>Excel / Google Sheets</span><span class="text-xs font-bold bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded">Advanced</span></li><li class="flex justify-between items-center"><span>PowerPoint</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Proficient</span></li><li class="flex justify-between items-center"><span>Word / HWP</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Proficient</span></li></ul></div></div>`
+            },
+            modalDetails: modalDetails, // Link to the variable defined above
+            activitiesList: [
+                { id: 'act1', title: '공군 제15특수임무비행단', role: '부대훈련총괄', icon: '🪖', content: `<div class="space-y-4"><div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100"><strong class="text-brand-600 block mb-1">💡 성과 요약</strong><ul class="list-disc pl-4 text-sm text-slate-700 space-y-1"><li>사격훈련 진행률 45% → 75% 대폭 개선</li><li>공군 사격대회 순위 16위 → 8위로 상승</li><li>시설 수리 및 훈련 병행 기간 안전사고 0건 유지</li></ul></div><div><strong class="text-slate-800 block mb-2">🚀 주요 프로젝트 1: 사격훈련 운영 체계 개편</strong><p class="text-sm text-slate-600 mb-2"><strong>문제:</strong> 무기고 봉인 등 예측 불가능한 일정으로 훈련 중단 반복</p><p class="text-sm text-slate-600"><strong>해결:</strong> 방첩/보안 부서와 봉인 일정 사전 통보 체계 확립 및 인트라넷 예약 시스템 구축으로 '예측 가능한 훈련 리듬' 설계</p></div><div><strong class="text-slate-800 block mb-2">🔧 주요 프로젝트 2: 노후 사격장 부분 수리 전략</strong><p class="text-sm text-slate-600 mb-2"><strong>문제:</strong> 사로 60% 파손으로 전면 수리 시 훈련 중단 위기</p><p class="text-sm text-slate-600"><strong>해결:</strong> 긴급 구역 우선 수리 및 안전 가드 확보를 통한 '부분 수리 + 훈련 병행' 프로세스 설계로 운영 연속성 확보</p></div><div class="border-t border-slate-100 pt-3"><span class="text-xs font-bold text-slate-400 uppercase tracking-widest">핵심 역량</span><p class="text-sm text-slate-700 mt-1">계획-현장-안전 연동 운영 설계, 다부서 이해관계 조율(Facility/Security)</p></div></div>` },
+                { id: 'act2', title: '공군 연세대학교 학생군사교육단', role: '창설 TF 팀장', icon: '🏛️', content: `<div class="space-y-4"><div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100"><strong class="text-brand-600 block mb-1">💡 성과 요약</strong><ul class="list-disc pl-4 text-sm text-slate-700 space-y-1"><li>창설 검열 시 '주요 미흡사항 없음' 인정</li><li>후보생 지원자 전년 대비 100% 증가</li></ul></div><div><strong class="text-slate-800 block mb-2">📢 주요 프로젝트 1: 후보생 모집 브랜딩 리뉴얼</strong><p class="text-sm text-slate-600"><strong>해결:</strong> '병역'이 아닌 '전문 커리어'로 소구점 전환</p></div><div class="border-t border-slate-100 pt-3"><span class="text-xs font-bold text-slate-400 uppercase tracking-widest">핵심 역량</span><p class="text-sm text-slate-700 mt-1">0 to 1 조직 구축, 이해관계자 관리</p></div></div>` },
+                { id: 'act3', title: '공군 제51항공통제비행전대', role: '인사정훈담당', icon: '✈️', content: `<div class="space-y-4"><div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100"><strong class="text-brand-600 block mb-1">💡 성과 요약</strong><ul class="list-disc pl-4 text-sm text-slate-700 space-y-1"><li>교육 만족도 64점 → 88점 향상</li><li>코로나 시기 연가 사용률 6%p 상승</li></ul></div><div><strong class="text-slate-800 block mb-2">🎓 주요 프로젝트 1: 내부 강사 양성</strong><p class="text-sm text-slate-600"><strong>해결:</strong> 외부 전문가 초빙 강사 코칭 프로그램 도입</p></div><div class="border-t border-slate-100 pt-3"><span class="text-xs font-bold text-slate-400 uppercase tracking-widest">핵심 역량</span><p class="text-sm text-slate-700 mt-1">HRD 시스템 내재화, 규정 준수</p></div></div>` },
+                { id: 'act4', title: '종로3가 주얼리 상권 리브랜딩', role: '상상마케팅스쿨', icon: '💎', content: `<div class="space-y-4"><div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100"><strong class="text-brand-600 block mb-1">💡 성과 요약</strong><ul class="list-disc pl-4 text-sm text-slate-700 space-y-1"><li>베스트프레젠터상 수상</li><li>데이터 기반 2030 타겟 니즈 도출</li></ul></div><div><strong class="text-slate-800 block mb-2">🔍 문제 정의: 경험 부재의 상권</strong><p class="text-sm text-slate-600">핵심은 제품이 아닌 <strong>'방문하고 인증할 만한 경험'의 부재</strong></p></div><div class="border-t border-slate-100 pt-3"><span class="text-xs font-bold text-slate-400 uppercase tracking-widest">핵심 역량</span><p class="text-sm text-slate-700 mt-1">문제 구조화, 공간 브랜딩 기획</p></div></div>` },
+                { id: 'act5', title: 'LCC 부가서비스 구독 모델', role: '교내 비즈니스 경진대회', icon: '🏆', content: `<div class="space-y-4"><div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100"><strong class="text-brand-600 block mb-1">💡 성과 요약</strong><ul class="list-disc pl-4 text-sm text-slate-700 space-y-1"><li>최우수상 수상</li><li>사용자 경험(UX) 개선 모델 제시</li></ul></div><div><strong class="text-slate-800 block mb-2">💡 솔루션: 여행 경험의 단순화</strong><p class="text-sm text-slate-600">수하물/좌석/기내식을 묶은 <strong>'월정액 구독 모델'</strong> 제안</p></div><div class="border-t border-slate-100 pt-3"><span class="text-xs font-bold text-slate-400 uppercase tracking-widest">핵심 역량</span><p class="text-sm text-slate-700 mt-1">비즈니스 모델 설계, UX 중심 사고</p></div></div>` }
+            ],
+            // New: Download Links
+            downloads: {
+                resume_kr: "https://drive.google.com/uc?export=download&id=1sTqdcd8MPOAjTG9nQo7m2SNFGWzE7Llx",
+                resume_en: "https://drive.google.com/uc?export=download&id=1UhAHgmxX9bQ51uPwV2wTwif1-QNBn5Rh",
+                portfolio_kr: "https://drive.google.com/uc?export=download&id=1FEuhZWT7z_EjbulkEPNe9VksuVzZw4vV",
+                portfolio_en: "https://drive.google.com/uc?export=download&id=1YtTpVhKyjNThPHPFAt0_LMbHNd5MIAHm"
+            }
+        };
+
+        /* --- APP LOGIC --- */
+        const App = {
+            init() {
+                this.renderCareerGrid();
+                this.renderDxNav();
+                this.ui.updateCareerDuration();
+                
+                this.ui.showDx('dx1');
+                this.ui.showEdu('academic');
+
+                document.body.addEventListener('click', this.handlers.handleClick.bind(this));
+                document.getElementById('company-input').addEventListener('keydown', this.handlers.handleEnterKey.bind(this));
+                
+                this.setupObserver();
+            },
+
+            renderCareerGrid() {
+                const container = document.getElementById('career-grid');
+                if(!container) return;
+                
+                container.innerHTML = PORTFOLIO_DATA.careerProjects.map(proj => `
+                    <button data-action="open-modal" data-id="${proj.id}" class="p-5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:shadow-md hover:border-brand-200 transition text-left group">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-brand-600 font-bold text-sm">Project ${proj.id.split('_')[1].padStart(2, '0')}</span>
+                            <span class="text-slate-400 group-hover:text-brand-500 transition">↗</span>
+                        </div>
+                        <h5 class="font-bold text-slate-800 text-lg break-keep group-hover:text-brand-700 transition">${proj.title}</h5>
+                        <p class="text-xs text-slate-500 mt-1">${proj.desc}</p>
+                    </button>`).join('');
+            },
+
+            renderDxNav() {
+                const nav = document.getElementById('dx-nav');
+                if(!nav) return;
+                nav.innerHTML = Object.entries(PORTFOLIO_DATA.dxCases).map(([key, val], idx) => `
+                    <button data-action="show-dx" data-id="${key}" id="btn-${key}" class="w-full text-left p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-brand-500 transition duration-300 group ${idx === 0 ? 'active-dx' : ''}">
+                        <div class="flex items-center justify-between pointer-events-none">
+                            <span class="font-bold text-slate-${idx === 0 ? '200' : '400'} group-hover:text-white break-keep">${idx + 1}. ${val.title}</span>
+                            <span class="text-xs font-mono text-${idx === 0 ? 'brand' : 'slate'}-400 badge">${val.badge}</span>
+                        </div>
+                    </button>`).join('');
+            },
+
+            ui: {
+                showDx(id) {
+                     Object.keys(PORTFOLIO_DATA.dxCases).forEach(key => {
+                        const btn = document.getElementById(`btn-${key}`);
+                        if(!btn) return;
+                        const title = btn.querySelector('span:first-child');
+                        const badge = btn.querySelector('span:last-child');
+                        
+                        if (key === id) {
+                            btn.classList.add('bg-slate-800', 'border-brand-500', 'active-dx'); 
+                            btn.classList.remove('bg-slate-800/50', 'border-slate-700');
+                            title.className = "font-bold text-white break-keep";
+                            badge.className = "text-xs font-mono text-brand-400 badge";
+                        } else {
+                            btn.classList.remove('bg-slate-800', 'border-brand-500', 'active-dx'); 
+                            btn.classList.add('bg-slate-800/50', 'border-slate-700');
+                            title.className = "font-bold text-slate-400 group-hover:text-white break-keep";
+                            badge.className = "text-xs font-mono text-slate-500 group-hover:text-brand-400 badge";
+                        }
+                    });
+                    const content = PORTFOLIO_DATA.dxCases[id].content;
+                    document.getElementById('dx-content').innerHTML = content;
+                },
+
+                showEdu(key) {
+                    ['academic', 'training', 'activities', 'skills'].forEach(id => {
+                        const btn = document.getElementById(`edu-tab-${id}`);
+                        if(!btn) return;
+                        if(id === key) {
+                            btn.className = "px-6 py-2.5 rounded-xl text-sm font-bold transition-all bg-white text-brand-600 shadow-sm whitespace-nowrap border border-slate-100";
+                        } else {
+                            btn.className = "px-6 py-2.5 rounded-xl text-sm font-bold transition-all text-slate-500 hover:text-slate-700 whitespace-nowrap";
+                        }
+                    });
+                    
+                    let content = PORTFOLIO_DATA.education[key];
+                    if(key === 'activities' && !content) {
+                        content = App.utils.generateActivitiesHTML();
+                        PORTFOLIO_DATA.education['activities'] = content;
+                    }
+                    document.getElementById('education-content').innerHTML = content;
+                },
+
+                toggleActivity(id) {
+                    const el = document.getElementById(id);
+                    const icon = document.getElementById(`icon-${id}`);
+                    if (!el) return;
+                    if (el.classList.contains('hidden')) { el.classList.remove('hidden'); if(icon) icon.style.transform = 'rotate(180deg)'; } 
+                    else { el.classList.add('hidden'); if(icon) icon.style.transform = 'rotate(0deg)'; }
+                },
+
+                openModal(id) {
+                    let data = PORTFOLIO_DATA.modalDetails[id];
+                    
+                    if(!data && id.startsWith('career_')) {
+                         const proj = PORTFOLIO_DATA.careerProjects.find(p => p.id === id);
+                         if(proj) { data = { title: proj.title, subtitle: proj.sub, content: proj.modalContent }; }
+                    }
+                    if (!data) return;
+                    document.getElementById('modal-title').textContent = data.title;
+                    document.getElementById('modal-subtitle').textContent = data.subtitle;
+                    document.getElementById('modal-content').innerHTML = data.content;
+                    const modal = document.getElementById('detail-modal');
+                    modal.classList.remove('hidden'); modal.classList.add('flex');
+                    setTimeout(() => { modal.style.opacity = '1'; }, 10);
+                    document.body.style.overflow = 'hidden';
+                },
+
+                closeModal() {
+                    const modal = document.getElementById('detail-modal');
+                    modal.style.opacity = '0';
+                    setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); document.body.style.overflow = ''; }, 300);
+                },
+
+                openSystemModal(type, extraData) {
+                    const modal = document.getElementById('system-modal');
+                    const content = document.getElementById('system-modal-content');
+                    
+                    if (type === 'selection') {
+                        content.innerHTML = `
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">언어 선택</h3>
+                            <p class="text-sm text-slate-500 mb-6">다운로드할 문서의 언어를 선택해주세요.</p>
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <button data-action="download-exec" data-lang="KR" data-company="${extraData}" class="py-3 rounded-xl bg-slate-100 text-slate-700 font-bold hover:bg-brand-50 hover:text-brand-600 transition">국문 (KR)</button>
+                                <button data-action="download-exec" data-lang="EN" data-company="${extraData}" class="py-3 rounded-xl bg-slate-100 text-slate-700 font-bold hover:bg-brand-50 hover:text-brand-600 transition">영문 (EN)</button>
+                            </div>
+                            <button data-action="close-system-modal" class="text-xs text-slate-400 hover:text-slate-600">취소</button>
+                        `;
+                    } else if (type === 'thankyou') {
+                        content.innerHTML = `
+                            <div class="text-3xl mb-3">🙌</div>
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">다운로드 감사합니다!</h3>
+                            <p class="text-sm text-slate-500 mb-6 leading-relaxed">좋은 소식으로 다시 뵙기를<br>진심으로 바라겠습니다.</p>
+                            <button data-action="close-system-modal" class="w-full py-3 rounded-xl bg-brand-600 text-white font-bold hover:bg-brand-700 transition">확인</button>
+                        `;
+                    }
+
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    setTimeout(() => { modal.style.opacity = '1'; }, 10);
+                },
+
+                closeSystemModal() {
+                    const modal = document.getElementById('system-modal');
+                    modal.style.opacity = '0';
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                    }, 300);
+                },
+
+                confirmDownload() {
+                    const input = document.getElementById('company-input');
+                    const companyName = input.value.trim();
+                    if (!companyName) {
+                        alert('회사명을 입력해주세요.');
+                        return;
+                    }
+                    this.openSystemModal('selection', companyName);
+                },
+
+                executeDownload(lang) {
+                    const resumeUrl = lang === 'KR' ? PORTFOLIO_DATA.downloads.resume_kr : PORTFOLIO_DATA.downloads.resume_en;
+                    const portfolioUrl = lang === 'KR' ? PORTFOLIO_DATA.downloads.portfolio_kr : PORTFOLIO_DATA.downloads.portfolio_en;
+                    
+                    const link1 = document.createElement('a');
+                    link1.href = resumeUrl;
+                    link1.style.display = 'none';
+                    document.body.appendChild(link1);
+                    link1.click();
+                    document.body.removeChild(link1);
+
+                    setTimeout(() => {
+                        const link2 = document.createElement('a');
+                        link2.href = portfolioUrl;
+                        link2.style.display = 'none';
+                        document.body.appendChild(link2);
+                        link2.click();
+                        document.body.removeChild(link2);
+                    }, 800);
+
+                    setTimeout(() => {
+                        this.openSystemModal('thankyou');
+                    }, 1500);
+                },
+
+                updateCareerDuration() {
+                    const startDate = new Date('2025-03-01');
+                    const today = new Date();
+                    let years = today.getFullYear() - startDate.getFullYear();
+                    let months = today.getMonth() - startDate.getMonth();
+                    if (months < 0) { years--; months += 12; }
+                    if (today < startDate) { document.getElementById('career-duration').innerHTML = `2025.03 ~ 재직 중 <span class='text-brand-500 ml-1'>(입사 예정)</span>`; return; }
+                    const durationText = years > 0 ? `${years}년 ${months}개월` : `${months}개월`;
+                    document.getElementById('career-duration').innerHTML = `2025.03 ~ 재직 중 <span class='text-brand-500 ml-1'>(${durationText})</span>`;
+                }
+            },
+
+            handlers: {
+                handleClick(e) {
+                    const target = e.target.closest('[data-action]');
+                    if (!target) return;
+                    
+                    const action = target.dataset.action;
+                    const id = target.dataset.id;
+                    
+                    if (action === 'show-dx') App.ui.showDx(id);
+                    if (action === 'show-edu') App.ui.showEdu(id);
+                    if (action === 'open-modal') App.ui.openModal(id);
+                    if (action === 'close-modal') App.ui.closeModal();
+                    if (action === 'toggle-activity') App.ui.toggleActivity(id);
+                    if (action === 'close-menu') document.getElementById('mobile-menu').classList.remove('open');
+                    if (action === 'confirm-download') App.ui.confirmDownload();
+                    if (action === 'close-system-modal') App.ui.closeSystemModal();
+                    if (action === 'download-exec') App.ui.executeDownload(target.dataset.lang);
+                },
+
+                handleEnterKey(e) {
+                    if (e.key === 'Enter') {
+                        App.ui.confirmDownload();
+                    }
+                }
+            },
+
+            utils: {
+                generateActivitiesHTML() {
+                    return `<div class="space-y-4 animate-[slideIn_0.4s_ease-out]">` + 
+                    PORTFOLIO_DATA.activitiesList.map(act => `
+                        <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 hover:border-brand-200 transition cursor-pointer group" data-action="toggle-activity" data-id="${act.id}">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <div class="flex items-center gap-4">
+                                    <span class="text-3xl bg-white p-2 rounded-xl shadow-sm border border-slate-100">${act.icon}</span>
+                                    <div>
+                                        <h4 class="font-bold text-slate-900 text-lg break-keep">${act.title}</h4>
+                                        <div class="flex flex-wrap items-center gap-2 mt-1 text-sm text-slate-500">
+                                            <span>${act.period}</span>
+                                            <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
+                                            <span class="font-medium text-brand-600">${act.role}</span>
+                                            <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
+                                            <span>${act.rank}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="text-slate-300 group-hover:text-brand-500 transition transform rotate-0" id="icon-${act.id}">▼</span>
+                            </div>
+                            <div id="${act.id}" class="hidden mt-6 pt-6 border-t border-slate-200/80 animate-[slideIn_0.3s_ease-out]">
+                                ${act.content}
+                            </div>
+                        </div>
+                    `).join('') + `</div>`;
+                }
+            },
+
+            setupObserver() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('active');
+                            const canvases = entry.target.querySelectorAll('canvas');
+                            canvases.forEach(canvas => {
+                                if(!canvas.classList.contains('rendered')) {
+                                    this.initChart(canvas.id);
+                                    canvas.classList.add('rendered');
+                                }
+                            });
+                             const counters = entry.target.querySelectorAll('.counter');
+                            counters.forEach(counter => {
+                                if(counter.classList.contains('counted')) return;
+                                const target = +counter.getAttribute('data-target');
+                                const prefix = counter.getAttribute('data-prefix') || '';
+                                const suffix = counter.getAttribute('data-suffix') || '';
+                                let count = 0;
+                                const duration = 1500;
+                                const startTime = performance.now();
+                                const updateCount = (currentTime) => {
+                                    const elapsed = currentTime - startTime;
+                                    const progress = Math.min(elapsed / duration, 1);
+                                    const ease = 1 - Math.pow(1 - progress, 4);
+                                    count = Math.floor(ease * target);
+                                    counter.innerText = `${prefix}${count}${suffix}`;
+                                    if (progress < 1) requestAnimationFrame(updateCount);
+                                    else counter.innerText = `${prefix}${target}${suffix}`;
+                                };
+                                requestAnimationFrame(updateCount);
+                                counter.classList.add('counted');
+                            });
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.15 });
+                
+                document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+            },
+
+            initChart(id) {
+                if (typeof Chart === 'undefined') return;
+
+                  const ctx = document.getElementById(id).getContext('2d');
+                const commonConfig = {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { enabled: true } },
+                    scales: { x: { display: false }, y: { display: false } },
+                    animation: { duration: 2000, easing: 'easeOutQuart' }
+                };
+
+                if (id === 'riskChart') {
+                    new Chart(ctx, { type: 'bar', data: { labels: ['Before', 'After'], datasets: [{ data: [144, 21], backgroundColor: ['#cbd5e1', '#2563eb'], borderRadius: 12, barThickness: 50 }] }, options: commonConfig });
+                } else if (id === 'recruitChart') {
+                    new Chart(ctx, { type: 'line', data: { labels: ['Q2', 'Q3', 'Q4'], datasets: [{ data: [35, 72, 111], borderColor: '#10b981', borderWidth: 4, backgroundColor: (ctx) => { const g = ctx.chart.ctx.createLinearGradient(0,0,0,200); g.addColorStop(0,"rgba(16,185,129,0.2)"); g.addColorStop(1,"rgba(16,185,129,0)"); return g; }, fill: true, tension: 0.4, pointRadius: 4 }] }, options: { ...commonConfig, scales: { y: { display: false, min: 0 } } } });
+                } else if (id === 'efficiencyChart') {
+                    new Chart(ctx, { type: 'bar', data: { labels: ['기존', '개선'], datasets: [{ data: [73, 85], backgroundColor: ['#cbd5e1', '#4f46e5'], borderRadius: 12, barThickness: 50 }] }, options: { ...commonConfig, scales: { y: { display: false, min: 50 } } } });
+                }
+            }
+        };
+
+        // Boot
+        App.init();
+        
+        window.toggleMenu = function() {
+            document.getElementById('mobile-menu').classList.toggle('open');
+        }
+    });
+    </script>
+</body>
+</html>
