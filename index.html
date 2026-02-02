@@ -169,7 +169,81 @@ class="bg-white text-slate-900 px-8 py-4 rounded-full font-bold
         </div>
     </div>
 </section>
+변경된 내용:
 
+"Available for New Opportunities" 배지 제거
+메인 헤드라인 변경
+"Impact Summary" → "HR Operations"로 변경
+설명 텍스트 전면 수정
+수치 표현 방식 변경 (15% → +12%p, 8%p → –8%p)
+CTA 버튼 텍스트 "지금 바로 영입 제안하기" → "면접 제안 하기"
+"Available for New Opportunities" 배지 재생성
+헤드라인 수치, 시스템 강조색 추가
+설명 텍스트 볼드체 삭제
+IMPACT RESULT 이하 문장 강조 처리오후 9:27수정된 코드입니다:
+html<!-- Hero -->
+<section id="summary" class="pt-40 pb-24 relative overflow-hidden">
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none z-0">
+        <div class="absolute top-20 left-1/4 w-72 h-72 bg-blue-200/40 rounded-full mix-blend-multiply filter blur-3xl animate-float"></div>
+        <div class="absolute bottom-20 right-1/4 w-96 h-96 bg-indigo-200/40 rounded-full mix-blend-multiply filter blur-3xl animate-float" style="animation-delay: 2s"></div>
+    </div>
+    <div class="max-w-5xl mx-auto px-6 text-center relative z-10 reveal active">
+        <div class="inline-flex items-center space-x-2 bg-white/80 backdrop-blur border border-slate-200 px-4 py-1.5 rounded-full text-xs font-bold mb-8 shadow-sm cursor-default">
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            <span class="text-slate-600 uppercase tracking-wider">Available for New Opportunities</span>
+        </div>
+        <h1 class="text-4xl md:text-6xl font-black mb-8 leading-[1.2] tracking-tight break-keep
+   text-slate-900
+   drop-shadow-[0_2px_6px_rgba(0,0,0,0.25)]">
+HR의 문제를 <span class="text-brand-600">수치로</span> 증명하고,<br>
+<span class="relative inline-block px-2 py-1
+     bg-brand-100 text-slate-900
+     rounded-lg font-black">
+시스템으로
+</span>
+안착시킵니다.
+</h1>
+        <!-- Impact Summary -->
+        <div class="max-w-3xl mx-auto mt-10 mb-10 text-center">
+
+            <p class="text-sm font-bold text-brand-600 tracking-widest uppercase mb-3">
+                HR Operations
+            </p>
+
+            <p class="text-xl md:text-2xl text-slate-900 break-keep leading-snug">
+                근태·채용·현장 데이터를 정리해 임직원이 실제로 이용할 수 있는<br>
+                인사 운영 시스템으로 정리·구현해온 HR Ops입니다.
+            </p>
+
+            <div class="w-12 h-[2px] bg-slate-300 mx-auto my-6"></div>
+
+            <p class="text-base md:text-lg break-keep leading-relaxed">
+                <span class="font-black text-slate-900 block mb-2">
+                    IMPACT RESULT
+                </span>
+                <span class="font-bold text-slate-900">
+                    동선 분석 기반 근태기 재배치로<br>
+                    근태기 인식률 <span class="text-brand-600">+12%p</span>, 수기 정정율 <span class="text-brand-600">–8%p</span> 개선
+                </span>
+            </p>
+        </div>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <a href="#contact-card"
+class="bg-white text-slate-900 px-8 py-4 rounded-full font-bold
+  border-2 border-slate-900
+  hover:bg-slate-900 hover:text-white
+  transition shadow-xl
+  flex items-center justify-center gap-2
+  transform hover:-translate-y-1">
+면접 제안 하기
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+       d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+</svg>
+</a>
+        </div>
+    </div>
+</section>
         <!-- Performance -->
         <section id="dashboard" class="py-24 bg-white relative">
             <div class="max-w-7xl mx-auto px-6">
@@ -872,6 +946,7 @@ class="bg-white text-slate-900 px-8 py-4 rounded-full font-bold
 </body>
 
 </html>
+
 
 
 
