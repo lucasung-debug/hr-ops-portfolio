@@ -756,29 +756,17 @@ executeDownload(lang) {
     const resumeUrl = lang === 'KR' ? PORTFOLIO_DATA.downloads.resume_kr : PORTFOLIO_DATA.downloads.resume_en;
     const portfolioUrl = lang === 'KR' ? PORTFOLIO_DATA.downloads.portfolio_kr : PORTFOLIO_DATA.downloads.portfolio_en;
     
-    // 첫 번째 파일 다운로드
-    const link1 = document.createElement('a');
-    link1.href = resumeUrl;
-    link1.download = ''; // 다운로드 속성 추가
-    link1.style.display = 'none';
-    document.body.appendChild(link1);
-    link1.click();
-    document.body.removeChild(link1);
+    // 첫 번째 파일 - 새 탭으로 열기
+    window.open(resumeUrl, '_blank');
 
-    // 두 번째 파일 다운로드 (딜레이 증가)
+    // 두 번째 파일 - 딜레이 후 새 탭으로 열기
     setTimeout(() => {
-        const link2 = document.createElement('a');
-        link2.href = portfolioUrl;
-        link2.download = ''; // 다운로드 속성 추가
-        link2.style.display = 'none';
-        document.body.appendChild(link2);
-        link2.click();
-        document.body.removeChild(link2);
-    }, 1500); // 800ms → 1500ms로 증가
+        window.open(portfolioUrl, '_blank');
+    }, 2000);
 
     setTimeout(() => {
         this.openSystemModal('thankyou');
-    }, 2500); // 1500ms → 2500ms로 증가
+    }, 3000);
 },
 
                 updateCareerDuration() {
@@ -920,6 +908,7 @@ counters.forEach(counter => {
 </body>
 
 </html>
+
 
 
 
