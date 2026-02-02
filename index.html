@@ -817,26 +817,25 @@ class="bg-white text-slate-900 px-8 py-4 rounded-full font-bold
                                 }
                             });
                              const counters = entry.target.querySelectorAll('.counter');
-                            counters.forEach(counter => {
-                                if(counter.classList.contains('counted')) return;
-                                const target = +counter.getAttribute('data-target');
-                                const prefix = counter.getAttribute('data-prefix') || '';
-                                const suffix = counter.getAttribute('data-suffix') || '';
-                                let count = 0;
-                                const duration = 1500;
-                                const startTime = performance.now();
-                                const updateCount = (currentTime) => {
-                                    const elapsed = currentTime - startTime;
-                                    const progress = Math.min(elapsed / duration, 1);
-                                    const ease = 1 - Math.pow(1 - progress, 4);
-                                    count = Math.floor(ease * target);
-                                    counter.innerText = `${prefix}${count}${suffix}`;
-                                    if (progress < 1) requestAnimationFrame(updateCount);
-                                    else counter.innerText = `${prefix}${target}${suffix}`;
-                                };
-                                requestAnimationFrame(updateCount);
-                                counter.classList.add('counted');
-                            });
+counters.forEach(counter => {
+    if(counter.classList.contains('counted')) return;
+    const target = +counter.getAttribute('data-target');
+    const prefix = counter.getAttribute('data-prefix') || '';
+    const suffix = counter.getAttribute('data-suffix') || '';
+    let count = 0;
+    const duration = 2000;
+    const startTime = performance.now();
+    const updateCount = (currentTime) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        count = Math.floor(progress * target); // linear 진행
+        counter.innerText = `${prefix}${count}${suffix}`;
+        if (progress < 1) requestAnimationFrame(updateCount);
+        else counter.innerText = `${prefix}${target}${suffix}`;
+    };
+    requestAnimationFrame(updateCount);
+    counter.classList.add('counted');
+});
                             observer.unobserve(entry.target);
                         }
                     });
@@ -877,6 +876,7 @@ class="bg-white text-slate-900 px-8 py-4 rounded-full font-bold
 </body>
 
 </html>
+
 
 
 
