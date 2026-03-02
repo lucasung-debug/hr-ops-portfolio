@@ -1534,6 +1534,13 @@ counters.forEach(counter => {
         FloatBar.init();
         CareerEditPanel.init();
         ImageEditor.init();
+
+        // 전역 노출 (HTML inline onclick에서 접근 가능하도록)
+        window.AuthModal = AuthModal;
+        window.CareerEditPanel = CareerEditPanel;
+        window.ImageEditor = ImageEditor;
+        window.FloatBar = FloatBar;
+        window.InlineEditor = InlineEditor;
     });
     </script>
 </body>
