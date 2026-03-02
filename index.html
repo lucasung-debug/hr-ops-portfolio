@@ -54,23 +54,60 @@
         #inline-edit-bar.open { transform: translateY(0); }
         body.edit-mode { padding-top: 56px !important; }
         body.edit-mode [data-inline-editable] {
-            outline: 2px dashed #818cf8;
-            outline-offset: 3px;
-            border-radius: 6px;
-            cursor: text;
+            outline: 2px dashed #818cf8; outline-offset: 3px;
+            border-radius: 6px; cursor: text;
             transition: outline-color 0.15s, background 0.15s;
         }
-        body.edit-mode [data-inline-editable]:hover {
-            outline-color: #4f46e5;
-            background: rgba(99,102,241,0.05);
+        body.edit-mode [data-inline-editable]:hover { outline-color: #4f46e5; background: rgba(99,102,241,0.05); }
+        body.edit-mode [data-inline-editable]:focus { outline: 2px solid #2563eb; background: rgba(37,99,235,0.06); box-shadow: 0 0 0 5px rgba(37,99,235,0.09); }
+        body.edit-mode #dx-content[contenteditable="true"],
+        body.edit-mode #education-content[contenteditable="true"] {
+            outline: 2px dashed #818cf8; outline-offset: 4px; border-radius: 8px; cursor: text;
         }
-        body.edit-mode [data-inline-editable]:focus {
-            outline: 2px solid #2563eb;
-            background: rgba(37,99,235,0.06);
-            box-shadow: 0 0 0 5px rgba(37,99,235,0.09);
+        body.edit-mode #dx-content[contenteditable="true"]:focus,
+        body.edit-mode #education-content[contenteditable="true"]:focus {
+            outline-color: #4f46e5; box-shadow: 0 0 0 5px rgba(79,70,229,0.09);
+        }
+        body.edit-mode #dx-nav button span[contenteditable="true"] {
+            outline: 1px dashed rgba(139,92,246,0.7); padding: 1px 3px; border-radius: 3px; cursor: text; display: inline-block;
         }
         #inline-edit-fab { transition: opacity 0.2s, transform 0.2s; }
         #inline-edit-fab.hidden-fab { opacity: 0; pointer-events: none; transform: scale(0.8); }
+        /* FLOAT BAR (Rich Text) */
+        #float-bar { position: fixed; z-index: 9999; display: none; background: #1e293b; border-radius: 10px; padding: 6px 10px; box-shadow: 0 8px 28px rgba(0,0,0,0.35); pointer-events: auto; white-space: nowrap; }
+        .fb-btn { background: transparent; color: #e2e8f0; border: none; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 700; min-width: 28px; transition: background 0.1s; vertical-align: middle; }
+        .fb-btn:hover { background: rgba(255,255,255,0.15); }
+        .fb-sep { width: 1px; height: 18px; background: rgba(255,255,255,0.2); margin: 0 4px; display: inline-block; vertical-align: middle; }
+        .fb-select { background: rgba(255,255,255,0.1); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 3px 6px; font-size: 12px; cursor: pointer; vertical-align: middle; }
+        .fb-color-label { cursor: pointer; padding: 4px 8px; border-radius: 6px; font-size: 13px; font-weight: 700; position: relative; display: inline-block; vertical-align: middle; color: #e2e8f0; }
+        .fb-color-label:hover { background: rgba(255,255,255,0.15); }
+        .fb-color-label input[type=color] { opacity: 0; position: absolute; inset: 0; cursor: pointer; width: 100%; height: 100%; }
+        /* EDIT PANELS (Career / Image) */
+        #career-edit-panel, #image-editor { position: fixed; inset: 0; z-index: 3000; display: none; align-items: center; justify-content: center; padding: 16px; }
+        .ep-bg { position: absolute; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); }
+        .ep-box { position: relative; background: white; border-radius: 20px; box-shadow: 0 25px 60px rgba(0,0,0,0.3); width: 100%; max-width: 640px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; }
+        .ep-head { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #f1f5f9; background: #fafafa; }
+        .ep-head h3 { font-weight: 800; font-size: 15px; color: #1e293b; margin: 0; }
+        .ep-head > button { background: #f1f5f9; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 12px; color: #64748b; }
+        .ep-head > button:hover { background: #e2e8f0; }
+        .ep-body { padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+        .ep-label { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }
+        .ep-input { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 14px; color: #1e293b; outline: none; font-family: inherit; transition: border-color 0.15s; }
+        .ep-input:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+        .ep-rich { width: 100%; min-height: 180px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; font-size: 14px; color: #475569; outline: none; overflow-y: auto; line-height: 1.7; font-family: inherit; transition: border-color 0.15s; }
+        .ep-rich:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+        .ep-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 20px; border-top: 1px solid #f1f5f9; }
+        .ep-cancel { background: #f1f5f9; color: #64748b; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 700; }
+        .ep-cancel:hover { background: #e2e8f0; }
+        .ep-save { background: #4f46e5; color: white; border: none; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 700; }
+        .ep-save:hover { background: #4338ca; }
+        .ie-filebtn { display: block; text-align: center; padding: 14px; border: 2px dashed #c7d2fe; border-radius: 10px; cursor: pointer; color: #4f46e5; font-weight: 700; font-size: 13px; transition: background 0.15s; }
+        .ie-filebtn:hover { background: #f5f3ff; }
+        /* IMAGE OVERLAYS */
+        .img-edit-wrap { position: relative; display: inline-block; }
+        .img-edit-btn { position: absolute; inset: 0; background: rgba(79,70,229,0.6); color: white; font-weight: 700; font-size: 11px; border: 2px dashed rgba(255,255,255,0.8); cursor: pointer; border-radius: 4px; display: none; align-items: center; justify-content: center; z-index: 10; transition: background 0.2s; flex-direction: column; gap: 2px; }
+        .img-edit-btn:hover { background: rgba(79,70,229,0.88); }
+        body.edit-mode .img-edit-btn { display: flex; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 selection:bg-brand-500 selection:text-white">
@@ -161,7 +198,7 @@
             <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
             <span class="text-slate-600 uppercase tracking-wider">Available for New Opportunities</span>
         </div>
-        <h1 id="hero-headline" class="text-4xl md:text-6xl font-black mb-8 leading-[1.2] tracking-tight break-keep
+        <h1 id="hero-headline" data-inline-editable data-inline-key="heroHeadlineHTML" data-inline-type="html" class="text-4xl md:text-6xl font-black mb-8 leading-[1.2] tracking-tight break-keep
    text-slate-900
    drop-shadow-[0_2px_6px_rgba(0,0,0,0.25)]">
 HR의 문제를 <span class="text-brand-600">수치로</span> 증명하고,<br>
@@ -506,12 +543,26 @@ class="bg-white text-slate-900 px-8 py-4 rounded-full font-bold
     <script>
     document.addEventListener('DOMContentLoaded', () => {
 
-        // content.js의 SITE_CONTENT를 기본값으로 사용, localStorage 우선 적용
+        // ── 콘텐츠 로드: content.js 기본값 + localStorage 덮어쓰기 (빈값 보호) ──
         const _saved = localStorage.getItem('portfolio_content');
-        const PORTFOLIO_DATA = _saved ? JSON.parse(_saved) : JSON.parse(JSON.stringify(SITE_CONTENT));
-
-        // Legacy: modalDetails 별도 참조 (PORTFOLIO_DATA.modalDetails로 이미 포함)
-        const modalDetails = PORTFOLIO_DATA.modalDetails;
+        let PORTFOLIO_DATA;
+        try {
+            if (typeof SITE_CONTENT === 'undefined') throw new Error('content.js not loaded');
+            const _defaults = JSON.parse(JSON.stringify(SITE_CONTENT));
+            if (_saved) {
+                // Merge: saved 우선, 단 비어있는 핵심 필드는 기본값 유지
+                PORTFOLIO_DATA = Object.assign(_defaults, JSON.parse(_saved));
+                ['heroHeadlineHTML','heroSubtitle','heroDescription','heroImpactHTML'].forEach(k => {
+                    if (!PORTFOLIO_DATA[k] && _defaults[k]) PORTFOLIO_DATA[k] = _defaults[k];
+                });
+            } else {
+                PORTFOLIO_DATA = _defaults;
+            }
+        } catch(e) {
+            console.warn('content.js 로드 오류, localStorage 사용:', e);
+            PORTFOLIO_DATA = _saved ? JSON.parse(_saved) : {};
+        }
+        const modalDetails = PORTFOLIO_DATA.modalDetails || {};
 
 
 
@@ -534,8 +585,8 @@ class="bg-white text-slate-900 px-8 py-4 rounded-full font-bold
 
             updateHeroContent() {
                 const d = PORTFOLIO_DATA;
-                const si = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.innerHTML = val; };
-                const st = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.textContent = val; };
+                const si = (id, val) => { const el = document.getElementById(id); if (el && val) el.innerHTML = val; };
+                const st = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
                 si('hero-headline', d.heroHeadlineHTML);
                 st('hero-subtitle', d.heroSubtitle);
                 si('hero-description', d.heroDescription);
@@ -876,30 +927,196 @@ counters.forEach(counter => {
             document.getElementById('mobile-menu').classList.toggle('open');
         }
 
-        // =============================================
-        // INLINE EDITOR
-        // =============================================
-        const InlineEditor = {
-            active: false,
-            snapshot: null,
+        // =====================================================================
+        // COMPREHENSIVE VISUAL EDITOR
+        // =====================================================================
 
-            toggle() {
-                this.active ? this.cancel() : this.enable();
+        // ── FLOATING RICH TEXT TOOLBAR ──
+        const FloatBar = {
+            el: null,
+            init() {
+                this.el = document.createElement('div');
+                this.el.id = 'float-bar';
+                this.el.innerHTML = `<div style="display:flex;align-items:center;gap:2px;flex-wrap:nowrap;">
+                    <button class="fb-btn" onmousedown="event.preventDefault();FloatBar.exec('bold')" title="굵게 (Ctrl+B)"><b>B</b></button>
+                    <button class="fb-btn" onmousedown="event.preventDefault();FloatBar.exec('italic')" title="기울기 (Ctrl+I)"><i>I</i></button>
+                    <button class="fb-btn" onmousedown="event.preventDefault();FloatBar.exec('underline')" title="밑줄"><u>U</u></button>
+                    <button class="fb-btn" onmousedown="event.preventDefault();FloatBar.exec('strikeThrough')" title="취소선"><s>S</s></button>
+                    <span class="fb-sep"></span>
+                    <label class="fb-color-label" title="글자 색상"><span style="border-bottom:2px solid #ef4444;">A</span><input type="color" value="#1e293b" onchange="FloatBar.exec('foreColor',this.value)"></label>
+                    <label class="fb-color-label" title="형광펜"><span style="background:#fef08a;padding:0 2px;">H</span><input type="color" value="#fef08a" onchange="FloatBar.exec('hiliteColor',this.value)"></label>
+                    <span class="fb-sep"></span>
+                    <select class="fb-select" onchange="FloatBar.exec('fontSize',this.value)" title="글자 크기">
+                        <option value="1">극소</option><option value="2">소</option>
+                        <option value="3" selected>보통</option><option value="4">대</option><option value="5">특대</option>
+                    </select>
+                    <span class="fb-sep"></span>
+                    <button class="fb-btn" onmousedown="event.preventDefault();FloatBar.exec('removeFormat')" title="서식 제거" style="font-size:10px;letter-spacing:-0.5px;">✕서식</button>
+                </div>`;
+                document.body.appendChild(this.el);
             },
+            show() {
+                if (!this.el) return;
+                const sel = window.getSelection();
+                if (!sel || !sel.rangeCount || sel.isCollapsed) { this.hide(); return; }
+                const node = sel.anchorNode;
+                if (!node) return;
+                const editable = (node.nodeType === 3 ? node.parentElement : node);
+                if (!editable.closest('[contenteditable="true"]')) { this.hide(); return; }
+                const rect = sel.getRangeAt(0).getBoundingClientRect();
+                if (!rect.width && !rect.height) { this.hide(); return; }
+                this.el.style.display = 'block';
+                const bw = this.el.offsetWidth || 320;
+                const bh = this.el.offsetHeight || 44;
+                let x = rect.left + rect.width / 2 - bw / 2;
+                let y = rect.top - bh - 10;
+                x = Math.max(8, Math.min(x, window.innerWidth - bw - 8));
+                if (y < 8) y = rect.bottom + 10;
+                this.el.style.left = x + 'px';
+                this.el.style.top = y + 'px';
+            },
+            hide() { if (this.el) this.el.style.display = 'none'; },
+            exec(cmd, val) { document.execCommand(cmd, false, val !== undefined ? val : null); }
+        };
+
+        // ── CAREER EDIT PANEL ──
+        const CareerEditPanel = {
+            el: null, idx: -1,
+            init() {
+                this.el = document.createElement('div');
+                this.el.id = 'career-edit-panel';
+                this.el.innerHTML = `
+                    <div class="ep-bg" onclick="CareerEditPanel.close()"></div>
+                    <div class="ep-box">
+                        <div class="ep-head"><h3>📝 프로젝트 편집</h3><button onclick="CareerEditPanel.close()">✕</button></div>
+                        <div class="ep-body">
+                            <span class="ep-label">제목</span><input id="ep-title" class="ep-input">
+                            <span class="ep-label">부제목</span><input id="ep-sub" class="ep-input">
+                            <span class="ep-label">카드 요약</span><input id="ep-desc" class="ep-input">
+                            <span class="ep-label">모달 상세 내용 — 텍스트 선택 후 상단 서식 도구 사용 가능</span>
+                            <div id="ep-content" class="ep-rich" contenteditable="true" spellcheck="false"></div>
+                        </div>
+                        <div class="ep-foot">
+                            <button class="ep-cancel" onclick="CareerEditPanel.close()">취소</button>
+                            <button class="ep-save" onclick="CareerEditPanel.save()">이 프로젝트 저장</button>
+                        </div>
+                    </div>`;
+                document.body.appendChild(this.el);
+            },
+            open(proj) {
+                if (!proj) return;
+                this.idx = PORTFOLIO_DATA.careerProjects.findIndex(p => p.id === proj.id);
+                document.getElementById('ep-title').value = proj.title || '';
+                document.getElementById('ep-sub').value = proj.sub || '';
+                document.getElementById('ep-desc').value = proj.desc || '';
+                document.getElementById('ep-content').innerHTML = proj.modalContent || '';
+                this.el.style.display = 'flex';
+            },
+            close() { this.el.style.display = 'none'; },
+            save() {
+                const proj = PORTFOLIO_DATA.careerProjects[this.idx];
+                if (!proj) return;
+                proj.title = document.getElementById('ep-title').value;
+                proj.sub = document.getElementById('ep-sub').value;
+                proj.desc = document.getElementById('ep-desc').value;
+                proj.modalContent = document.getElementById('ep-content').innerHTML;
+                App.renderCareerGrid();
+                this.close();
+                InlineEditor._toast('프로젝트 저장됨. 전체 저장 ✓ 버튼을 잊지 마세요!');
+            }
+        };
+
+        // ── IMAGE EDITOR ──
+        const ImageEditor = {
+            el: null, current: null,
+            init() {
+                this.el = document.createElement('div');
+                this.el.id = 'image-editor';
+                this.el.innerHTML = `
+                    <div class="ep-bg" onclick="ImageEditor.close()"></div>
+                    <div class="ep-box" style="max-width:440px;">
+                        <div class="ep-head"><h3>🖼️ 이미지 / GIF 변경</h3><button onclick="ImageEditor.close()">✕</button></div>
+                        <div class="ep-body" style="gap:12px;">
+                            <span class="ep-label">이미지 URL 직접 입력</span>
+                            <input id="ie-url" class="ep-input" type="url" placeholder="https://...이미지주소.jpg">
+                            <div style="text-align:center;color:#94a3b8;font-size:12px;font-weight:600;padding:4px 0;">— 또는 —</div>
+                            <label class="ie-filebtn">📁 파일 선택 (JPG, PNG, GIF 등)<input type="file" accept="image/*,.gif" onchange="ImageEditor.fromFile(this)" style="display:none;"></label>
+                            <div id="ie-preview" style="display:none;text-align:center;margin-top:4px;"><img style="max-width:100%;max-height:200px;border-radius:8px;border:1px solid #e2e8f0;"></div>
+                        </div>
+                        <div class="ep-foot">
+                            <button class="ep-cancel" onclick="ImageEditor.close()">취소</button>
+                            <button class="ep-save" onclick="ImageEditor.apply()">적용</button>
+                        </div>
+                    </div>`;
+                document.body.appendChild(this.el);
+            },
+            open(img) {
+                this.current = img;
+                document.getElementById('ie-url').value = img.getAttribute('src') || '';
+                document.getElementById('ie-preview').style.display = 'none';
+                this.el.style.display = 'flex';
+            },
+            close() { this.el.style.display = 'none'; this.current = null; },
+            fromFile(input) {
+                const f = input.files[0];
+                if (!f) return;
+                const reader = new FileReader();
+                reader.onload = e => {
+                    document.getElementById('ie-url').value = e.target.result;
+                    const p = document.getElementById('ie-preview');
+                    p.querySelector('img').src = e.target.result;
+                    p.style.display = 'block';
+                };
+                reader.readAsDataURL(f);
+            },
+            apply() {
+                const url = document.getElementById('ie-url').value.trim();
+                if (!url || !this.current) { alert('URL을 입력하거나 파일을 선택하세요.'); return; }
+                this.current.src = url;
+                if (!PORTFOLIO_DATA._images) PORTFOLIO_DATA._images = {};
+                const key = this.current.id || ('img_' + Date.now());
+                if (!this.current.id) this.current.id = key;
+                PORTFOLIO_DATA._images[key] = url;
+                this.close();
+                InlineEditor._toast('이미지 변경됨. 전체 저장 ✓ 버튼을 잊지 마세요!');
+            }
+        };
+
+        // ── MAIN INLINE EDITOR ──
+        const InlineEditor = {
+            active: false, snapshot: null,
 
             enable() {
+                if (this.active) return;
                 this.active = true;
                 this.snapshot = JSON.parse(JSON.stringify(PORTFOLIO_DATA));
-
                 document.body.classList.add('edit-mode');
                 document.getElementById('inline-edit-bar').classList.add('open');
                 document.getElementById('inline-edit-fab').classList.add('hidden-fab');
-
+                // Simple text/HTML fields
                 document.querySelectorAll('[data-inline-editable]').forEach(el => {
                     el.setAttribute('contenteditable', 'true');
                     el.setAttribute('spellcheck', 'false');
-                    // Prevent link/button default clicks inside editable areas
-                    el.addEventListener('click', this._stopProp, true);
+                });
+                // DX content & Education content
+                ['dx-content','education-content'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) { el.setAttribute('contenteditable','true'); el.setAttribute('spellcheck','false'); }
+                });
+                // DX nav: make title/badge spans editable
+                document.querySelectorAll('#dx-nav button span').forEach(s => s.setAttribute('contenteditable','true'));
+                // Image overlays
+                document.querySelectorAll('main img, section img').forEach(img => {
+                    if (img.closest('.img-edit-wrap')) return;
+                    const wrap = document.createElement('span');
+                    wrap.className = 'img-edit-wrap';
+                    img.parentNode.insertBefore(wrap, img);
+                    wrap.appendChild(img);
+                    const btn = document.createElement('button');
+                    btn.className = 'img-edit-btn';
+                    btn.innerHTML = '🖼️<br>변경';
+                    btn.onclick = e => { e.stopPropagation(); ImageEditor.open(img); };
+                    wrap.appendChild(btn);
                 });
             },
 
@@ -908,76 +1125,146 @@ counters.forEach(counter => {
                 document.body.classList.remove('edit-mode');
                 document.getElementById('inline-edit-bar').classList.remove('open');
                 document.getElementById('inline-edit-fab').classList.remove('hidden-fab');
-
+                FloatBar.hide();
                 document.querySelectorAll('[data-inline-editable]').forEach(el => {
-                    el.removeAttribute('contenteditable');
-                    el.removeAttribute('spellcheck');
-                    el.removeEventListener('click', this._stopProp, true);
+                    el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck');
+                });
+                ['dx-content','education-content'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+                });
+                document.querySelectorAll('#dx-nav button span[contenteditable]').forEach(s => s.removeAttribute('contenteditable'));
+                document.querySelectorAll('.img-edit-btn').forEach(b => b.remove());
+                document.querySelectorAll('.img-edit-wrap').forEach(w => {
+                    const img = w.querySelector('img');
+                    if (img) w.parentNode.insertBefore(img, w);
+                    w.remove();
                 });
             },
 
-            _stopProp(e) { e.stopPropagation(); },
+            _collectDxNavEdits() {
+                document.querySelectorAll('#dx-nav button').forEach(btn => {
+                    const key = btn.id.replace('btn-','');
+                    if (!PORTFOLIO_DATA.dxCases[key]) return;
+                    const spans = btn.querySelectorAll('span');
+                    if (spans[0]) PORTFOLIO_DATA.dxCases[key].title = spans[0].textContent.replace(/^\d+\.\s*/,'').trim();
+                    if (spans[1]) PORTFOLIO_DATA.dxCases[key].badge = spans[1].textContent.trim();
+                });
+            },
+
+            _collectSectionEdits() {
+                const dxEl = document.getElementById('dx-content');
+                if (dxEl && dxEl.getAttribute('contenteditable')) {
+                    const activeKey = Object.keys(PORTFOLIO_DATA.dxCases).find(k =>
+                        document.getElementById('btn-'+k)?.classList.contains('active-dx')) || 'dx1';
+                    PORTFOLIO_DATA.dxCases[activeKey].content = dxEl.innerHTML;
+                }
+                const eduEl = document.getElementById('education-content');
+                if (eduEl && eduEl.getAttribute('contenteditable')) {
+                    const activeKey = ['academic','training','activities','skills'].find(k =>
+                        document.getElementById('edu-tab-'+k)?.className.includes('text-brand-600')) || 'academic';
+                    PORTFOLIO_DATA.education[activeKey] = eduEl.innerHTML;
+                }
+            },
 
             cancel() {
-                // Restore visual content from snapshot
                 document.querySelectorAll('[data-inline-editable]').forEach(el => {
-                    const key = el.dataset.inlineKey;
-                    const type = el.dataset.inlineType;
+                    const key = el.dataset.inlineKey; const type = el.dataset.inlineType;
                     const val = this.snapshot[key];
-                    if (val !== undefined) {
-                        if (type === 'text') el.textContent = val;
-                        else el.innerHTML = val;
-                    }
-                }.bind(this));
+                    if (val) { type === 'text' ? (el.textContent = val) : (el.innerHTML = val); }
+                });
                 Object.assign(PORTFOLIO_DATA, this.snapshot);
                 this.disable();
+                App.renderCareerGrid(); App.renderDxNav(); App.ui.showDx('dx1'); App.ui.showEdu('academic');
                 this._toast('취소되었습니다.');
             },
 
             save() {
                 document.querySelectorAll('[data-inline-editable]').forEach(el => {
-                    const key = el.dataset.inlineKey;
-                    const type = el.dataset.inlineType;
-                    PORTFOLIO_DATA[key] = type === 'text'
-                        ? el.textContent.trim()
-                        : el.innerHTML.trim();
+                    const key = el.dataset.inlineKey; const type = el.dataset.inlineType;
+                    PORTFOLIO_DATA[key] = type === 'text' ? el.textContent.trim() : el.innerHTML.trim();
                 });
-
-                // Sync derived fields
-                const nameEl = document.getElementById('nav-profile-name');
-                if (nameEl) nameEl.textContent = PORTFOLIO_DATA.profileName;
+                this._collectDxNavEdits();
+                this._collectSectionEdits();
+                const navEl = document.getElementById('nav-profile-name');
+                if (navEl) navEl.textContent = PORTFOLIO_DATA.profileName;
                 const compEl = document.getElementById('dashboard-company');
                 if (compEl && PORTFOLIO_DATA.companyName) compEl.textContent = PORTFOLIO_DATA.companyName + ' 실무 성과';
-
                 localStorage.setItem('portfolio_content', JSON.stringify(PORTFOLIO_DATA));
                 this.disable();
-                this._toast('✓ 저장되었습니다! 포트폴리오에 즉시 반영됩니다.');
+                this._toast('✓ 전체 저장 완료!');
             },
 
             _toast(msg) {
                 const t = document.createElement('div');
-                t.className = 'fixed bottom-24 left-1/2 z-[700] bg-slate-900 text-white px-6 py-3 rounded-full text-sm font-bold shadow-xl';
+                t.className = 'fixed bottom-24 left-1/2 z-[800] bg-slate-900 text-white px-6 py-3 rounded-full text-sm font-bold shadow-xl';
                 t.style.cssText = 'transform:translateX(-50%);transition:opacity 0.4s;white-space:nowrap;';
-                t.textContent = msg;
-                document.body.appendChild(t);
-                setTimeout(() => { t.style.opacity = '0'; }, 2200);
+                t.textContent = msg; document.body.appendChild(t);
+                setTimeout(() => { t.style.opacity='0'; }, 2200);
                 setTimeout(() => t.remove(), 2700);
             }
         };
 
-        // FAB button
+        // ── MONKEY-PATCH showDx: auto-save before switching ──
+        const _origShowDx = App.ui.showDx.bind(App.ui);
+        App.ui.showDx = function(id) {
+            if (InlineEditor.active) {
+                const cur = Object.keys(PORTFOLIO_DATA.dxCases).find(k =>
+                    document.getElementById('btn-'+k)?.classList.contains('active-dx'));
+                if (cur) { const el = document.getElementById('dx-content'); if (el) PORTFOLIO_DATA.dxCases[cur].content = el.innerHTML; }
+            }
+            _origShowDx(id);
+            if (InlineEditor.active) {
+                const el = document.getElementById('dx-content');
+                if (el) el.setAttribute('contenteditable','true');
+            }
+        };
+
+        // ── MONKEY-PATCH showEdu: auto-save before switching ──
+        const _origShowEdu = App.ui.showEdu.bind(App.ui);
+        App.ui.showEdu = function(key) {
+            if (InlineEditor.active) {
+                const cur = ['academic','training','activities','skills'].find(k =>
+                    document.getElementById('edu-tab-'+k)?.className.includes('text-brand-600'));
+                if (cur) { const el = document.getElementById('education-content'); if (el) PORTFOLIO_DATA.education[cur] = el.innerHTML; }
+            }
+            _origShowEdu(key);
+            if (InlineEditor.active) {
+                const el = document.getElementById('education-content');
+                if (el) el.setAttribute('contenteditable','true');
+            }
+        };
+
+        // ── EVENT LISTENERS ──
         document.getElementById('inline-edit-toggle').addEventListener('click', () => InlineEditor.enable());
-
-        // Tooltip on FAB hover
-        const fab = document.getElementById('inline-edit-toggle');
-        const tooltip = document.getElementById('inline-edit-tooltip');
-        fab.addEventListener('mouseenter', () => { tooltip.style.opacity = '1'; });
-        fab.addEventListener('mouseleave', () => { tooltip.style.opacity = '0'; });
-
-        // Edit bar buttons
+        const _fab = document.getElementById('inline-edit-toggle');
+        const _tip = document.getElementById('inline-edit-tooltip');
+        _fab.addEventListener('mouseenter', () => { _tip.style.opacity = '1'; });
+        _fab.addEventListener('mouseleave', () => { _tip.style.opacity = '0'; });
         document.getElementById('inline-save-btn').addEventListener('click', () => InlineEditor.save());
         document.getElementById('inline-cancel-btn').addEventListener('click', () => InlineEditor.cancel());
-        document.getElementById('inline-admin-btn').addEventListener('click', () => window.open('admin.html', '_blank'));
+        document.getElementById('inline-admin-btn').addEventListener('click', () => window.open('admin.html','_blank'));
+
+        // FloatBar: show on text selection
+        document.addEventListener('mouseup', () => { if (InlineEditor.active) setTimeout(() => FloatBar.show(), 20); });
+        document.addEventListener('keyup', e => {
+            if (InlineEditor.active && e.shiftKey) setTimeout(() => FloatBar.show(), 20);
+        });
+
+        // Career card intercept (capture phase — fires before App handler)
+        document.addEventListener('click', e => {
+            if (!InlineEditor.active) return;
+            const card = e.target.closest('[data-action="open-modal"]');
+            if (card && card.dataset.id && card.dataset.id.startsWith('career_')) {
+                e.stopImmediatePropagation(); e.preventDefault();
+                CareerEditPanel.open(PORTFOLIO_DATA.careerProjects.find(p => p.id === card.dataset.id));
+            }
+        }, true);
+
+        // Initialize all panels
+        FloatBar.init();
+        CareerEditPanel.init();
+        ImageEditor.init();
     });
     </script>
 </body>
