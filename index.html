@@ -143,6 +143,14 @@
         .med-pane.active { display: flex; }
         .med-preview { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; max-height: 200px; display: none; }
         .med-preview iframe, .med-preview img { width: 100%; display: block; max-height: 200px; }
+        /* EDIT MODE — ITEM ADD/DELETE CONTROLS */
+        .edit-item-wrap { position: relative; }
+        .edit-del-overlay { position: absolute; top: 7px; right: 7px; background: #fef2f2; border: 1.5px solid #fecaca; color: #ef4444; border-radius: 50%; width: 26px; height: 26px; display: none; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; z-index: 20; padding: 0; }
+        .edit-del-overlay:hover { background: #fee2e2; }
+        body.edit-mode .edit-del-overlay { display: flex; }
+        .edit-add-card { border: 2px dashed #c7d2fe !important; background: #f5f3ff !important; color: #4f46e5; display: none; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 13px; cursor: pointer; transition: background 0.15s; }
+        .edit-add-card:hover { background: #ede9fe !important; }
+        body.edit-mode .edit-add-card { display: flex; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 selection:bg-brand-500 selection:text-white">
@@ -673,28 +681,74 @@ class="bg-white text-slate-900 px-8 py-4 rounded-full font-bold
             renderCareerGrid() {
                 const container = document.getElementById('career-grid');
                 if(!container) return;
-                
-                container.innerHTML = PORTFOLIO_DATA.careerProjects.map(proj => `
-                    <button data-action="open-modal" data-id="${proj.id}" class="p-5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:shadow-md hover:border-brand-200 transition text-left group">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-brand-600 font-bold text-sm">Project ${proj.id.split('_')[1].padStart(2, '0')}</span>
-                            <span class="text-slate-400 group-hover:text-brand-500 transition">↗</span>
-                        </div>
-                        <h5 class="font-bold text-slate-800 text-lg break-keep group-hover:text-brand-700 transition">${proj.title}</h5>
-                        <p class="text-xs text-slate-500 mt-1">${proj.desc}</p>
-                    </button>`).join('');
+                container.innerHTML = PORTFOLIO_DATA.careerProjects.map((proj, i) => `
+                    <div class="edit-item-wrap">
+                        <button class="edit-del-overlay" onclick="event.stopPropagation();App._deleteCareer('${proj.id}')" title="이 프로젝트 삭제">🗑️</button>
+                        <button data-action="open-modal" data-id="${proj.id}" class="p-5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:shadow-md hover:border-brand-200 transition text-left group w-full">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-brand-600 font-bold text-sm">Project ${String(i + 1).padStart(2, '0')}</span>
+                                <span class="text-slate-400 group-hover:text-brand-500 transition">↗</span>
+                            </div>
+                            <h5 class="font-bold text-slate-800 text-lg break-keep group-hover:text-brand-700 transition">${proj.title}</h5>
+                            <p class="text-xs text-slate-500 mt-1">${proj.desc}</p>
+                        </button>
+                    </div>`).join('') + `
+                    <button onclick="App._addCareer()" class="edit-add-card p-5 rounded-xl border" style="min-height:100px;">
+                        <span style="font-size:20px;">➕</span><span>프로젝트 추가</span>
+                    </button>`;
+            },
+
+            _addCareer() {
+                const newProj = { id: 'career_' + Date.now(), title: '새 프로젝트', sub: '부제목', desc: '한 줄 요약', modalContent: '' };
+                PORTFOLIO_DATA.careerProjects.push(newProj);
+                this.renderCareerGrid();
+                window.CareerEditPanel.open(newProj);
+            },
+            _deleteCareer(id) {
+                if (!confirm('이 프로젝트를 삭제하시겠습니까?')) return;
+                PORTFOLIO_DATA.careerProjects = PORTFOLIO_DATA.careerProjects.filter(p => p.id !== id);
+                this.renderCareerGrid();
+                InlineEditor._toast('프로젝트 삭제됨.');
             },
 
             renderDxNav() {
                 const nav = document.getElementById('dx-nav');
                 if(!nav) return;
                 nav.innerHTML = Object.entries(PORTFOLIO_DATA.dxCases).map(([key, val], idx) => `
-                    <button data-action="show-dx" data-id="${key}" id="btn-${key}" class="w-full text-left p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-brand-500 transition duration-300 group ${idx === 0 ? 'active-dx' : ''}">
-                        <div class="flex items-center justify-between pointer-events-none">
-                            <span class="font-bold text-slate-${idx === 0 ? '200' : '400'} group-hover:text-white break-keep">${idx + 1}. ${val.title}</span>
-                            <span class="text-xs font-mono text-${idx === 0 ? 'brand' : 'slate'}-400 badge">${val.badge}</span>
-                        </div>
-                    </button>`).join('');
+                    <div class="edit-item-wrap">
+                        <button class="edit-del-overlay" onclick="event.stopPropagation();App._deleteDx('${key}')" title="이 케이스 삭제" style="top:8px;right:8px;">🗑️</button>
+                        <button data-action="show-dx" data-id="${key}" id="btn-${key}" class="w-full text-left p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-brand-500 transition duration-300 group ${idx === 0 ? 'active-dx' : ''}">
+                            <div class="flex items-center justify-between pointer-events-none">
+                                <span class="font-bold text-slate-${idx === 0 ? '200' : '400'} group-hover:text-white break-keep">${idx + 1}. ${val.title}</span>
+                                <span class="text-xs font-mono text-${idx === 0 ? 'brand' : 'slate'}-400 badge">${val.badge}</span>
+                            </div>
+                        </button>
+                    </div>`).join('') + `
+                    <button onclick="App._addDx()" class="edit-add-card w-full p-4 rounded-xl border border-slate-700" style="min-height:52px;border-radius:12px;">
+                        ➕ DX 케이스 추가
+                    </button>`;
+            },
+
+            _addDx() {
+                const newKey = 'dx' + Date.now();
+                PORTFOLIO_DATA.dxCases[newKey] = {
+                    title: '새 DX 케이스',
+                    badge: 'Tool',
+                    content: `<div class="animate-[slideIn_0.3s_ease-out]"><div class="mb-6"><span class="text-xs font-mono text-emerald-400 border border-emerald-500/30 px-2 py-1 rounded bg-emerald-500/10">Tool</span><h3 class="text-2xl font-bold text-white mt-2 mb-2 break-keep">새 DX 케이스</h3></div><div class="space-y-6"><div><strong class="text-slate-300 block mb-1 text-sm uppercase tracking-wider">Background & Problem</strong><p class="text-slate-400 text-sm leading-relaxed break-keep">문제 상황을 입력하세요.</p></div><div><strong class="text-brand-400 block mb-1 text-sm uppercase tracking-wider">Solution Logic</strong><ul class="text-slate-300 text-sm space-y-2 list-disc pl-4 break-keep"><li><span class="text-white font-bold">항목 1:</span> 내용 입력</li></ul></div><div class="pt-4 border-t border-slate-700"><strong class="text-emerald-400 block mb-1 text-sm uppercase tracking-wider">Result</strong><p class="text-white text-sm font-bold break-keep">결과를 입력하세요.</p></div></div></div>`
+                };
+                this.renderDxNav();
+                document.querySelectorAll('#dx-nav button[id^="btn-"] span').forEach(s => s.setAttribute('contenteditable','true'));
+                App.ui.showDx(newKey);
+                InlineEditor._toast('DX 케이스 추가됨. 좌측 제목/배지와 우측 내용을 직접 편집하세요.');
+            },
+            _deleteDx(key) {
+                if (!confirm('이 DX 케이스를 삭제하시겠습니까?')) return;
+                delete PORTFOLIO_DATA.dxCases[key];
+                this.renderDxNav();
+                document.querySelectorAll('#dx-nav button[id^="btn-"] span').forEach(s => s.setAttribute('contenteditable','true'));
+                const firstKey = Object.keys(PORTFOLIO_DATA.dxCases)[0];
+                if (firstKey) App.ui.showDx(firstKey);
+                InlineEditor._toast('DX 케이스 삭제됨.');
             },
 
             ui: {
@@ -731,13 +785,16 @@ class="bg-white text-slate-900 px-8 py-4 rounded-full font-bold
                             btn.className = "px-6 py-2.5 rounded-xl text-sm font-bold transition-all text-slate-500 hover:text-slate-700 whitespace-nowrap";
                         }
                     });
-                    
-                    let content = PORTFOLIO_DATA.education[key];
-                    if(key === 'activities' && !content) {
-                        content = App.utils.generateActivitiesHTML();
-                        PORTFOLIO_DATA.education['activities'] = content;
+                    if (key === 'training') {
+                        App.renderTrainingList();
+                        return;
                     }
-                    document.getElementById('education-content').innerHTML = content;
+                    let content = PORTFOLIO_DATA.education[key];
+                    if(key === 'activities') {
+                        App.renderActivitiesList();
+                        return;
+                    }
+                    document.getElementById('education-content').innerHTML = content || '';
                 },
 
                 toggleActivity(id) {
@@ -878,7 +935,15 @@ executeDownload(lang) {
                     
                     if (action === 'show-dx') App.ui.showDx(id);
                     if (action === 'show-edu') App.ui.showEdu(id);
-                    if (action === 'open-modal') App.ui.openModal(id);
+                    if (action === 'open-modal') {
+                        const isEdit = document.body.classList.contains('edit-mode');
+                        if (isEdit && id && id.startsWith('career_')) {
+                            const proj = PORTFOLIO_DATA.careerProjects.find(p => p.id === id);
+                            if (proj) window.CareerEditPanel.open(proj);
+                        } else {
+                            App.ui.openModal(id);
+                        }
+                    }
                     if (action === 'close-modal') App.ui.closeModal();
                     if (action === 'toggle-activity') App.ui.toggleActivity(id);
                     if (action === 'close-menu') document.getElementById('mobile-menu').classList.remove('open');
@@ -894,9 +959,100 @@ executeDownload(lang) {
                 }
             },
 
+            renderTrainingList() {
+                const container = document.getElementById('education-content');
+                if (!container) return;
+                const list = PORTFOLIO_DATA.trainingList || [];
+                container.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-[slideIn_0.4s_ease-out]">` +
+                    list.map(item => `
+                        <div class="edit-item-wrap">
+                            <button class="edit-del-overlay" onclick="event.stopPropagation();App._deleteTraining('${item.id}')" title="이 교육 삭제">🗑️</button>
+                            <div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-md transition group">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">${item.category}</span>
+                                    <span class="text-xs text-slate-400">${item.dates}</span>
+                                </div>
+                                <h4 class="text-lg font-bold text-slate-900 break-keep">${item.title}</h4>
+                                <p class="text-xs text-brand-600 mb-2 font-bold break-keep">${item.org}</p>
+                                <p class="text-sm text-slate-500 mb-4 leading-relaxed line-clamp-2 break-keep">${item.desc}</p>
+                                <div class="flex items-center justify-between mt-auto">
+                                    <span class="text-xs font-medium text-slate-400 bg-white px-2 py-1 rounded border border-slate-200">${item.status}</span>
+                                    ${item.modalId ? `<button data-action="open-modal" data-id="${item.modalId}" class="text-xs font-bold text-brand-600 hover:underline flex items-center gap-1">상세 내용 보기 →</button>` : ''}
+                                </div>
+                            </div>
+                        </div>`).join('') +
+                    `<div class="edit-item-wrap">
+                        <button onclick="App._addTraining()" class="edit-add-card p-6 rounded-2xl border" style="min-height:120px;">
+                            <span style="font-size:20px;">➕</span><span>교육 추가</span>
+                        </button>
+                    </div></div>`;
+            },
+
+            _addTraining() {
+                const newItem = { id: 'tr_' + Date.now(), category: '카테고리', dates: '날짜', title: '교육명', org: '기관명', desc: '교육 내용 요약', status: '수료 완료', modalId: '' };
+                if (!PORTFOLIO_DATA.trainingList) PORTFOLIO_DATA.trainingList = [];
+                PORTFOLIO_DATA.trainingList.push(newItem);
+                this.renderTrainingList();
+                window.TrainingEditPanel.open(newItem);
+            },
+            _deleteTraining(id) {
+                if (!confirm('이 교육 항목을 삭제하시겠습니까?')) return;
+                PORTFOLIO_DATA.trainingList = (PORTFOLIO_DATA.trainingList || []).filter(t => t.id !== id);
+                this.renderTrainingList();
+                InlineEditor._toast('교육 항목 삭제됨.');
+            },
+
+            renderActivitiesList() {
+                const container = document.getElementById('education-content');
+                if (!container) return;
+                const list = PORTFOLIO_DATA.activitiesList || [];
+                container.innerHTML = `<div class="space-y-4 animate-[slideIn_0.4s_ease-out]">` +
+                    list.map(act => `
+                        <div class="edit-item-wrap bg-slate-50 rounded-2xl border border-slate-100 hover:border-brand-200 transition cursor-pointer group">
+                            <button class="edit-del-overlay" onclick="event.stopPropagation();App._deleteActivity('${act.id}')" title="이 활동 삭제">🗑️</button>
+                            <div data-action="toggle-activity" data-id="${act.id}" class="p-6">
+                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                    <div class="flex items-center gap-4">
+                                        <span class="text-3xl bg-white p-2 rounded-xl shadow-sm border border-slate-100">${act.icon}</span>
+                                        <div>
+                                            <h4 class="font-bold text-slate-900 text-lg break-keep">${act.title}</h4>
+                                            <div class="flex flex-wrap items-center gap-2 mt-1 text-sm text-slate-500">
+                                                <span>${act.period}</span>
+                                                <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
+                                                <span class="font-medium text-brand-600">${act.role}</span>
+                                                <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
+                                                <span>${act.rank}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span class="text-slate-300 group-hover:text-brand-500 transition transform rotate-0" id="icon-${act.id}">▼</span>
+                                </div>
+                                <div id="${act.id}" class="hidden mt-6 pt-6 border-t border-slate-200/80 animate-[slideIn_0.3s_ease-out]">
+                                    ${act.content}
+                                </div>
+                            </div>
+                        </div>`).join('') +
+                    `<button onclick="App._addActivity()" class="edit-add-card w-full p-5 rounded-2xl border" style="min-height:64px;">
+                        ➕ 활동 추가
+                    </button></div>`;
+            },
+
+            _addActivity() {
+                const newAct = { id: 'act_' + Date.now(), icon: '⭐', title: '새 활동', role: '역할', period: '기간', rank: '성과', content: '<p class="text-slate-600 text-sm">내용을 입력하세요.</p>' };
+                PORTFOLIO_DATA.activitiesList.push(newAct);
+                this.renderActivitiesList();
+                window.ActivityEditPanel.open(newAct);
+            },
+            _deleteActivity(id) {
+                if (!confirm('이 활동 항목을 삭제하시겠습니까?')) return;
+                PORTFOLIO_DATA.activitiesList = PORTFOLIO_DATA.activitiesList.filter(a => a.id !== id);
+                this.renderActivitiesList();
+                InlineEditor._toast('활동 항목 삭제됨.');
+            },
+
             utils: {
                 generateActivitiesHTML() {
-                    return `<div class="space-y-4 animate-[slideIn_0.4s_ease-out]">` + 
+                    return `<div class="space-y-4 animate-[slideIn_0.4s_ease-out]">` +
                     PORTFOLIO_DATA.activitiesList.map(act => `
                         <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 hover:border-brand-200 transition cursor-pointer group" data-action="toggle-activity" data-id="${act.id}">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -1309,6 +1465,130 @@ counters.forEach(counter => {
             }
         };
 
+        // ── TRAINING EDIT PANEL ──
+        const TrainingEditPanel = {
+            el: null, idx: -1,
+            init() {
+                this.el = document.createElement('div');
+                this.el.id = 'training-edit-panel';
+                this.el.style.cssText = 'position:fixed;inset:0;z-index:3000;display:none;align-items:center;justify-content:center;padding:16px;';
+                this.el.innerHTML = `
+                    <div class="ep-bg" onclick="TrainingEditPanel.close()"></div>
+                    <div class="ep-box">
+                        <div class="ep-head"><h3>📚 교육 편집</h3><button onclick="TrainingEditPanel.close()">✕</button></div>
+                        <div class="ep-body">
+                            <span class="ep-label">카테고리</span>
+                            <input id="tep-category" class="ep-input" placeholder="예: HRM / HRD">
+                            <span class="ep-label">기간 / 시간</span>
+                            <input id="tep-dates" class="ep-input" placeholder="예: 2025.07.07 ~ 09 (18H)">
+                            <span class="ep-label">교육명</span>
+                            <input id="tep-title" class="ep-input" placeholder="교육 제목">
+                            <span class="ep-label">기관명</span>
+                            <input id="tep-org" class="ep-input" placeholder="예: KPC 한국생산성본부">
+                            <span class="ep-label">설명 (한 줄)</span>
+                            <textarea id="tep-desc" class="ep-textarea" rows="2" placeholder="교육 내용 요약"></textarea>
+                            <span class="ep-label">수료 상태</span>
+                            <input id="tep-status" class="ep-input" placeholder="예: 수료 완료">
+                            <span class="ep-label">상세 모달 ID (선택)</span>
+                            <input id="tep-modalid" class="ep-input" placeholder="예: tableau (상세보기 버튼 연결, 없으면 빈칸)">
+                        </div>
+                        <div class="ep-foot">
+                            <button class="ep-cancel" onclick="TrainingEditPanel.close()">취소</button>
+                            <button class="ep-save" onclick="TrainingEditPanel.save()">저장</button>
+                        </div>
+                    </div>`;
+                document.body.appendChild(this.el);
+            },
+            open(item) {
+                if (!item) return;
+                this.idx = (PORTFOLIO_DATA.trainingList || []).findIndex(t => t.id === item.id);
+                document.getElementById('tep-category').value = item.category || '';
+                document.getElementById('tep-dates').value = item.dates || '';
+                document.getElementById('tep-title').value = item.title || '';
+                document.getElementById('tep-org').value = item.org || '';
+                document.getElementById('tep-desc').value = item.desc || '';
+                document.getElementById('tep-status').value = item.status || '';
+                document.getElementById('tep-modalid').value = item.modalId || '';
+                this.el.style.display = 'flex';
+            },
+            close() { this.el.style.display = 'none'; },
+            save() {
+                const item = (PORTFOLIO_DATA.trainingList || [])[this.idx];
+                if (!item) return;
+                item.category = document.getElementById('tep-category').value;
+                item.dates = document.getElementById('tep-dates').value;
+                item.title = document.getElementById('tep-title').value;
+                item.org = document.getElementById('tep-org').value;
+                item.desc = document.getElementById('tep-desc').value;
+                item.status = document.getElementById('tep-status').value;
+                item.modalId = document.getElementById('tep-modalid').value;
+                App.renderTrainingList();
+                this.close();
+                InlineEditor._toast('교육 저장됨. 전체 저장 ✓ 버튼을 잊지 마세요!');
+            }
+        };
+
+        // ── ACTIVITY EDIT PANEL ──
+        const ActivityEditPanel = {
+            el: null, idx: -1,
+            init() {
+                this.el = document.createElement('div');
+                this.el.id = 'activity-edit-panel';
+                this.el.style.cssText = 'position:fixed;inset:0;z-index:3000;display:none;align-items:center;justify-content:center;padding:16px;';
+                this.el.innerHTML = `
+                    <div class="ep-bg" onclick="ActivityEditPanel.close()"></div>
+                    <div class="ep-box">
+                        <div class="ep-head"><h3>🏅 활동 편집</h3><button onclick="ActivityEditPanel.close()">✕</button></div>
+                        <div class="ep-body">
+                            <span class="ep-label">아이콘 (이모지)</span>
+                            <input id="aep-icon" class="ep-input" placeholder="예: 🪖 🏛️ ✈️">
+                            <span class="ep-label">활동명</span>
+                            <input id="aep-title" class="ep-input" placeholder="활동 / 기관명">
+                            <span class="ep-label">역할</span>
+                            <input id="aep-role" class="ep-input" placeholder="예: 부대훈련총괄담당">
+                            <span class="ep-label">기간</span>
+                            <input id="aep-period" class="ep-input" placeholder="예: 2023.12 ~ 2025.02">
+                            <span class="ep-label">직급 / 성과</span>
+                            <input id="aep-rank" class="ep-input" placeholder="예: 대위(진) ~ 대위">
+                            <div class="ep-section">
+                                <div class="ep-section-head">📋 상세 내용 (HTML 허용)</div>
+                                <textarea id="aep-content" class="ep-textarea" rows="6" placeholder="상세 내용 입력..."></textarea>
+                            </div>
+                        </div>
+                        <div class="ep-foot">
+                            <button class="ep-cancel" onclick="ActivityEditPanel.close()">취소</button>
+                            <button class="ep-save" onclick="ActivityEditPanel.save()">저장</button>
+                        </div>
+                    </div>`;
+                document.body.appendChild(this.el);
+            },
+            open(item) {
+                if (!item) return;
+                this.idx = PORTFOLIO_DATA.activitiesList.findIndex(a => a.id === item.id);
+                document.getElementById('aep-icon').value = item.icon || '';
+                document.getElementById('aep-title').value = item.title || '';
+                document.getElementById('aep-role').value = item.role || '';
+                document.getElementById('aep-period').value = item.period || '';
+                document.getElementById('aep-rank').value = item.rank || '';
+                document.getElementById('aep-content').value = item.content || '';
+                this.el.style.display = 'flex';
+            },
+            close() { this.el.style.display = 'none'; },
+            save() {
+                const item = PORTFOLIO_DATA.activitiesList[this.idx];
+                if (!item) return;
+                item.icon = document.getElementById('aep-icon').value;
+                item.title = document.getElementById('aep-title').value;
+                item.role = document.getElementById('aep-role').value;
+                item.period = document.getElementById('aep-period').value;
+                item.rank = document.getElementById('aep-rank').value;
+                item.content = document.getElementById('aep-content').value;
+                App.renderActivitiesList();
+                this.close();
+                InlineEditor._toast('활동 저장됨. 전체 저장 ✓ 버튼을 잊지 마세요!');
+            }
+        };
+
         // ── MAIN INLINE EDITOR ──
         const InlineEditor = {
             active: false, snapshot: null,
@@ -1432,6 +1712,7 @@ counters.forEach(counter => {
                 Object.assign(PORTFOLIO_DATA, this.snapshot);
                 this.disable();
                 App.renderCareerGrid(); App.renderDxNav(); App.ui.showDx('dx1'); App.ui.showEdu('academic');
+                if (!PORTFOLIO_DATA.trainingList) PORTFOLIO_DATA.trainingList = [];
                 this._toast('취소되었습니다.');
             },
 
@@ -1534,6 +1815,8 @@ counters.forEach(counter => {
         FloatBar.init();
         CareerEditPanel.init();
         ImageEditor.init();
+        TrainingEditPanel.init();
+        ActivityEditPanel.init();
 
         // 전역 노출 (HTML inline onclick에서 접근 가능하도록)
         window.AuthModal = AuthModal;
@@ -1541,6 +1824,9 @@ counters.forEach(counter => {
         window.ImageEditor = ImageEditor;
         window.FloatBar = FloatBar;
         window.InlineEditor = InlineEditor;
+        window.TrainingEditPanel = TrainingEditPanel;
+        window.ActivityEditPanel = ActivityEditPanel;
+        window.App = App;
     });
     </script>
 </body>
