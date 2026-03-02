@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>포트폴리오 관리자</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Pretendard', 'sans-serif'] },
+                    colors: { brand: { 50:'#eff6ff', 100:'#dbeafe', 500:'#2563eb', 600:'#1d4ed8' } }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="content.js"></script>
+    <style>
+        body { font-family: 'Pretendard', sans-serif; letter-spacing: -0.02em; word-break: keep-all; }
+        .tab-btn.active { background: white; color: #2563eb; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        textarea { resize: vertical; }
+        .field-label { display: block; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.375rem; }
+        .field-input { width: 100%; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.875rem; color: #1e293b; background: white; transition: border-color 0.15s; outline: none; }
+        .field-input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+        textarea.field-input { min-height: 80px; }
+        textarea.field-input.tall { min-height: 160px; }
+        .card-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.25rem; margin-bottom: 1rem; }
+        .card-section h3 { font-size: 0.8rem; font-weight: 800; color: #2563eb; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; }
+        #toast { transition: opacity 0.3s, transform 0.3s; }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+
+<!-- Top Bar -->
+<header class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <span class="text-lg font-black text-slate-900">포트폴리오 관리자</span>
+            <span id="save-status" class="text-xs font-medium text-slate-400">미저장</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="previewSite()" class="px-3 py-1.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition">미리보기 ↗</button>
+            <button onclick="exportContent()" class="px-3 py-1.5 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition">content.js 내보내기</button>
+            <button onclick="resetAll()" class="px-3 py-1.5 text-xs font-bold text-red-500 bg-red-50 hover:bg-red-100 rounded-lg transition">초기화</button>
+            <button onclick="saveAll()" class="px-4 py-1.5 text-xs font-black text-white bg-brand-600 hover:bg-brand-500 rounded-lg transition shadow-sm">저장</button>
+        </div>
+    </div>
+</header>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] opacity-0 translate-y-4 pointer-events-none">
+    <div class="bg-slate-900 text-white text-sm font-bold px-5 py-3 rounded-full shadow-xl flex items-center gap-2">
+        <span id="toast-icon">✓</span>
+        <span id="toast-msg">저장되었습니다</span>
+    </div>
+</div>
+
+<div class="max-w-6xl mx-auto px-4 py-6">
+
+    <!-- Tab Navigation -->
+    <div class="bg-slate-200 p-1 rounded-xl flex gap-1 overflow-x-auto mb-6 no-scrollbar">
+        <button class="tab-btn active flex-shrink-0 px-4 py-2 rounded-lg text-sm font-bold text-slate-500 transition" data-tab="profile" onclick="showTab('profile', this)">기본 정보</button>
+        <button class="tab-btn flex-shrink-0 px-4 py-2 rounded-lg text-sm font-bold text-slate-500 transition" data-tab="career" onclick="showTab('career', this)">경력 프로젝트</button>
+        <button class="tab-btn flex-shrink-0 px-4 py-2 rounded-lg text-sm font-bold text-slate-500 transition" data-tab="dx" onclick="showTab('dx', this)">DX 사례</button>
+        <button class="tab-btn flex-shrink-0 px-4 py-2 rounded-lg text-sm font-bold text-slate-500 transition" data-tab="education" onclick="showTab('education', this)">교육</button>
+        <button class="tab-btn flex-shrink-0 px-4 py-2 rounded-lg text-sm font-bold text-slate-500 transition" data-tab="activities" onclick="showTab('activities', this)">활동</button>
+        <button class="tab-btn flex-shrink-0 px-4 py-2 rounded-lg text-sm font-bold text-slate-500 transition" data-tab="downloads" onclick="showTab('downloads', this)">다운로드</button>
+    </div>
+
+    <!-- ===== TAB: 기본 정보 ===== -->
+    <div id="tab-profile" class="tab-content">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="card-section">
+                <h3>프로필</h3>
+                <div class="space-y-3">
+                    <div><label class="field-label">이름 (한국어)</label><input id="profileName" class="field-input" type="text"></div>
+                    <div><label class="field-label">이름 (영어)</label><input id="profileNameEn" class="field-input" type="text"></div>
+                    <div><label class="field-label">직함/직책</label><input id="profileTitle" class="field-input" type="text"></div>
+                    <div><label class="field-label">이메일</label><input id="email" class="field-input" type="email"></div>
+                </div>
+            </div>
+            <div class="card-section">
+                <h3>대시보드 표기</h3>
+                <div class="space-y-3">
+                    <div><label class="field-label">회사명</label><input id="companyName" class="field-input" type="text"><p class="text-xs text-slate-400 mt-1">대시보드 상단에 "[회사명] 실무 성과"로 표시됩니다</p></div>
+                    <div><label class="field-label">마지막 업데이트</label><input id="lastUpdated" class="field-input" type="text" placeholder="예: 2025.12"></div>
+                </div>
+            </div>
+            <div class="card-section md:col-span-2">
+                <h3>히어로 섹션</h3>
+                <div class="space-y-3">
+                    <div><label class="field-label">헤드라인 (HTML 허용)</label><textarea id="heroHeadlineHTML" class="field-input tall"></textarea><p class="text-xs text-slate-400 mt-1">예: HR의 문제를 &lt;span class="text-brand-600"&gt;수치로&lt;/span&gt; 증명하고,...</p></div>
+                    <div><label class="field-label">부제목</label><input id="heroSubtitle" class="field-input" type="text"></div>
+                    <div><label class="field-label">소개 문장 (HTML 허용)</label><textarea id="heroDescription" class="field-input"></textarea></div>
+                    <div><label class="field-label">임팩트 결과 (HTML 허용)</label><textarea id="heroImpactHTML" class="field-input"></textarea></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TAB: 경력 프로젝트 ===== -->
+    <div id="tab-career" class="tab-content hidden">
+        <div id="career-fields" class="space-y-4"></div>
+    </div>
+
+    <!-- ===== TAB: DX 사례 ===== -->
+    <div id="tab-dx" class="tab-content hidden">
+        <div id="dx-fields" class="space-y-4"></div>
+    </div>
+
+    <!-- ===== TAB: 교육 ===== -->
+    <div id="tab-education" class="tab-content hidden">
+        <div class="space-y-4">
+            <div class="card-section">
+                <h3>학력 (HTML)</h3>
+                <textarea id="edu-academic" class="field-input tall"></textarea>
+            </div>
+            <div class="card-section">
+                <h3>직무 교육 (HTML)</h3>
+                <textarea id="edu-training" class="field-input tall"></textarea>
+                <p class="text-xs text-slate-400 mt-2">참고: 상세 모달 내용은 아래 "교육 모달" 에서 별도 편집하세요.</p>
+            </div>
+            <div class="card-section">
+                <h3>보유 기술 (HTML)</h3>
+                <textarea id="edu-skills" class="field-input tall"></textarea>
+            </div>
+            <div class="bg-white border-2 border-brand-100 rounded-xl p-5">
+                <h3 class="text-xs font-black text-brand-600 uppercase tracking-widest mb-4">교육 모달 - Tableau</h3>
+                <div class="space-y-3">
+                    <div><label class="field-label">제목</label><input id="modal-tableau-title" class="field-input" type="text"></div>
+                    <div><label class="field-label">부제목</label><input id="modal-tableau-subtitle" class="field-input" type="text"></div>
+                    <div><label class="field-label">내용 (HTML)</label><textarea id="modal-tableau-content" class="field-input tall"></textarea></div>
+                </div>
+            </div>
+            <div class="bg-white border-2 border-brand-100 rounded-xl p-5">
+                <h3 class="text-xs font-black text-brand-600 uppercase tracking-widest mb-4">교육 모달 - 인사관리 기본과정</h3>
+                <div class="space-y-3">
+                    <div><label class="field-label">제목</label><input id="modal-hr_basic-title" class="field-input" type="text"></div>
+                    <div><label class="field-label">부제목</label><input id="modal-hr_basic-subtitle" class="field-input" type="text"></div>
+                    <div><label class="field-label">내용 (HTML)</label><textarea id="modal-hr_basic-content" class="field-input tall"></textarea></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TAB: 활동 ===== -->
+    <div id="tab-activities" class="tab-content hidden">
+        <div id="activities-fields" class="space-y-4"></div>
+    </div>
+
+    <!-- ===== TAB: 다운로드 ===== -->
+    <div id="tab-downloads" class="tab-content hidden">
+        <div class="card-section max-w-2xl">
+            <h3>다운로드 링크</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="field-label">이력서 (국문) URL</label>
+                    <input id="dl-resume-kr" class="field-input" type="url" placeholder="https://drive.google.com/uc?export=download&id=...">
+                </div>
+                <div>
+                    <label class="field-label">이력서 (영문) URL</label>
+                    <input id="dl-resume-en" class="field-input" type="url" placeholder="https://drive.google.com/uc?export=download&id=...">
+                </div>
+                <div>
+                    <label class="field-label">경력기술서 (국문) URL</label>
+                    <input id="dl-portfolio-kr" class="field-input" type="url" placeholder="https://drive.google.com/uc?export=download&id=...">
+                </div>
+                <div>
+                    <label class="field-label">경력기술서 (영문) URL</label>
+                    <input id="dl-portfolio-en" class="field-input" type="url" placeholder="https://drive.google.com/uc?export=download&id=...">
+                </div>
+                <div class="bg-blue-50 rounded-lg p-4 text-xs text-blue-700 leading-relaxed">
+                    <strong>Google Drive URL 변환 방법:</strong><br>
+                    공유 링크: <code>https://drive.google.com/file/d/<strong>파일ID</strong>/view</code><br>
+                    다운로드 링크: <code>https://drive.google.com/uc?export=download&amp;id=<strong>파일ID</strong></code>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save Button (Bottom) -->
+    <div class="mt-8 flex justify-end gap-3">
+        <button onclick="previewSite()" class="px-5 py-2.5 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition">미리보기 ↗</button>
+        <button onclick="saveAll()" class="px-8 py-2.5 text-sm font-black text-white bg-brand-600 hover:bg-brand-500 rounded-xl transition shadow-sm">저장하기</button>
+    </div>
+
+</div>
+
+<script>
+// ===== 데이터 로딩 =====
+let currentData;
+
+function loadData() {
+    const saved = localStorage.getItem('portfolio_content');
+    currentData = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(SITE_CONTENT));
+}
+
+// ===== 폼에 데이터 채우기 =====
+function populateForms() {
+    const d = currentData;
+
+    // 기본 정보
+    setValue('profileName', d.profileName);
+    setValue('profileNameEn', d.profileNameEn);
+    setValue('profileTitle', d.profileTitle);
+    setValue('email', d.email);
+    setValue('companyName', d.companyName);
+    setValue('lastUpdated', d.lastUpdated);
+    setValue('heroHeadlineHTML', d.heroHeadlineHTML);
+    setValue('heroSubtitle', d.heroSubtitle);
+    setValue('heroDescription', d.heroDescription);
+    setValue('heroImpactHTML', d.heroImpactHTML);
+
+    // 경력 프로젝트
+    renderCareerFields(d.careerProjects);
+
+    // DX 사례
+    renderDxFields(d.dxCases);
+
+    // 교육
+    setValue('edu-academic', d.education ? d.education.academic : '');
+    setValue('edu-training', d.education ? d.education.training : '');
+    setValue('edu-skills', d.education ? d.education.skills : '');
+
+    // 교육 모달
+    if (d.modalDetails) {
+        ['tableau', 'hr_basic'].forEach(key => {
+            const m = d.modalDetails[key] || {};
+            setValue(`modal-${key}-title`, m.title || '');
+            setValue(`modal-${key}-subtitle`, m.subtitle || '');
+            setValue(`modal-${key}-content`, m.content || '');
+        });
+    }
+
+    // 활동
+    renderActivitiesFields(d.activitiesList);
+
+    // 다운로드
+    if (d.downloads) {
+        setValue('dl-resume-kr', d.downloads.resume_kr || '');
+        setValue('dl-resume-en', d.downloads.resume_en || '');
+        setValue('dl-portfolio-kr', d.downloads.portfolio_kr || '');
+        setValue('dl-portfolio-en', d.downloads.portfolio_en || '');
+    }
+}
+
+function setValue(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.value = val || '';
+}
+
+// ===== 경력 프로젝트 렌더링 =====
+function renderCareerFields(projects) {
+    const container = document.getElementById('career-fields');
+    if (!container || !projects) return;
+    container.innerHTML = projects.map((proj, i) => `
+        <div class="card-section">
+            <h3>프로젝트 ${String(i+1).padStart(2,'0')} — <span class="text-slate-700 normal-case font-semibold">${proj.title}</span></h3>
+            <div class="space-y-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div><label class="field-label">제목</label><input data-career="${i}" data-field="title" class="field-input" type="text" value="${esc(proj.title)}"></div>
+                    <div><label class="field-label">부제목</label><input data-career="${i}" data-field="sub" class="field-input" type="text" value="${esc(proj.sub)}"></div>
+                </div>
+                <div><label class="field-label">카드 요약 설명</label><input data-career="${i}" data-field="desc" class="field-input" type="text" value="${esc(proj.desc)}"></div>
+                <div><label class="field-label">모달 상세 내용 (HTML)</label><textarea data-career="${i}" data-field="modalContent" class="field-input tall">${esc(proj.modalContent)}</textarea></div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ===== DX 사례 렌더링 =====
+function renderDxFields(dxCases) {
+    const container = document.getElementById('dx-fields');
+    if (!container || !dxCases) return;
+    container.innerHTML = Object.entries(dxCases).map(([key, val]) => `
+        <div class="card-section">
+            <h3>DX 사례 — ${key.toUpperCase()}</h3>
+            <div class="space-y-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div><label class="field-label">제목</label><input data-dx="${key}" data-field="title" class="field-input" type="text" value="${esc(val.title)}"></div>
+                    <div><label class="field-label">배지 (기술스택)</label><input data-dx="${key}" data-field="badge" class="field-input" type="text" value="${esc(val.badge)}"></div>
+                </div>
+                <div><label class="field-label">내용 (HTML)</label><textarea data-dx="${key}" data-field="content" class="field-input tall">${esc(val.content)}</textarea></div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ===== 활동 렌더링 =====
+function renderActivitiesFields(activities) {
+    const container = document.getElementById('activities-fields');
+    if (!container || !activities) return;
+    container.innerHTML = activities.map((act, i) => `
+        <div class="card-section">
+            <h3>활동 ${String(i+1).padStart(2,'0')} — <span class="text-slate-700 normal-case font-semibold">${act.title}</span></h3>
+            <div class="space-y-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div><label class="field-label">제목</label><input data-act="${i}" data-field="title" class="field-input" type="text" value="${esc(act.title)}"></div>
+                    <div><label class="field-label">역할</label><input data-act="${i}" data-field="role" class="field-input" type="text" value="${esc(act.role)}"></div>
+                    <div><label class="field-label">기간</label><input data-act="${i}" data-field="period" class="field-input" type="text" value="${esc(act.period)}"></div>
+                    <div><label class="field-label">직급/수상</label><input data-act="${i}" data-field="rank" class="field-input" type="text" value="${esc(act.rank)}"></div>
+                    <div><label class="field-label">아이콘 (이모지)</label><input data-act="${i}" data-field="icon" class="field-input" type="text" value="${esc(act.icon)}"></div>
+                </div>
+                <div><label class="field-label">상세 내용 (HTML)</label><textarea data-act="${i}" data-field="content" class="field-input tall">${esc(act.content)}</textarea></div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ===== HTML 이스케이프 (속성값용) =====
+function esc(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ===== 탭 전환 =====
+function showTab(tabId, btn) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab-' + tabId).classList.remove('hidden');
+    if (btn) btn.classList.add('active');
+}
+
+// ===== 저장 =====
+function saveAll() {
+    const d = currentData;
+
+    // 기본 정보
+    d.profileName = getValue('profileName');
+    d.profileNameEn = getValue('profileNameEn');
+    d.profileTitle = getValue('profileTitle');
+    d.email = getValue('email');
+    d.companyName = getValue('companyName');
+    d.lastUpdated = getValue('lastUpdated');
+    d.heroHeadlineHTML = getValue('heroHeadlineHTML');
+    d.heroSubtitle = getValue('heroSubtitle');
+    d.heroDescription = getValue('heroDescription');
+    d.heroImpactHTML = getValue('heroImpactHTML');
+
+    // 경력 프로젝트
+    document.querySelectorAll('[data-career]').forEach(el => {
+        const i = parseInt(el.dataset.career);
+        const field = el.dataset.field;
+        if (d.careerProjects[i]) d.careerProjects[i][field] = el.value;
+    });
+
+    // DX 사례
+    document.querySelectorAll('[data-dx]').forEach(el => {
+        const key = el.dataset.dx;
+        const field = el.dataset.field;
+        if (d.dxCases[key]) d.dxCases[key][field] = el.value;
+    });
+
+    // 교육
+    if (!d.education) d.education = {};
+    d.education.academic = getValue('edu-academic');
+    d.education.training = getValue('edu-training');
+    d.education.activities = ''; // 항상 재생성
+    d.education.skills = getValue('edu-skills');
+
+    // 교육 모달
+    if (!d.modalDetails) d.modalDetails = {};
+    ['tableau', 'hr_basic'].forEach(key => {
+        if (!d.modalDetails[key]) d.modalDetails[key] = {};
+        d.modalDetails[key].title = getValue(`modal-${key}-title`);
+        d.modalDetails[key].subtitle = getValue(`modal-${key}-subtitle`);
+        d.modalDetails[key].content = getValue(`modal-${key}-content`);
+    });
+
+    // 활동
+    document.querySelectorAll('[data-act]').forEach(el => {
+        const i = parseInt(el.dataset.act);
+        const field = el.dataset.field;
+        if (d.activitiesList && d.activitiesList[i]) d.activitiesList[i][field] = el.value;
+    });
+
+    // 다운로드
+    if (!d.downloads) d.downloads = {};
+    d.downloads.resume_kr = getValue('dl-resume-kr');
+    d.downloads.resume_en = getValue('dl-resume-en');
+    d.downloads.portfolio_kr = getValue('dl-portfolio-kr');
+    d.downloads.portfolio_en = getValue('dl-portfolio-en');
+
+    localStorage.setItem('portfolio_content', JSON.stringify(d));
+    showToast('✓', '저장되었습니다. 포트폴리오에 즉시 반영됩니다.');
+    document.getElementById('save-status').textContent = '저장됨 ' + new Date().toLocaleTimeString('ko-KR', {hour:'2-digit',minute:'2-digit'});
+}
+
+function getValue(id) {
+    const el = document.getElementById(id);
+    return el ? el.value : '';
+}
+
+// ===== 미리보기 =====
+function previewSite() {
+    window.open('index.html', '_blank');
+}
+
+// ===== 내보내기 (content.js 다운로드) =====
+function exportContent() {
+    saveAll();
+    const data = JSON.parse(localStorage.getItem('portfolio_content') || JSON.stringify(SITE_CONTENT));
+
+    const jsContent = `// content.js - 포트폴리오 기본 콘텐츠 데이터
+// 관리자 패널(admin.html)에서 내보낸 파일입니다. ${new Date().toLocaleString('ko-KR')}
+// 이 파일을 프로젝트 폴더의 content.js와 교체하면 영구 반영됩니다.
+
+const SITE_CONTENT = ${JSON.stringify(data, null, 2)};
+`;
+    const blob = new Blob([jsContent], { type: 'text/javascript' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'content.js';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('⬇', 'content.js 다운로드 완료. 프로젝트 폴더에 덮어쓰기 하세요.');
+}
+
+// ===== 초기화 =====
+function resetAll() {
+    if (!confirm('모든 수정사항을 초기화하고 기본값(content.js)으로 되돌리겠습니까?')) return;
+    localStorage.removeItem('portfolio_content');
+    currentData = JSON.parse(JSON.stringify(SITE_CONTENT));
+    populateForms();
+    document.getElementById('save-status').textContent = '초기화됨';
+    showToast('↺', '기본값으로 초기화되었습니다.');
+}
+
+// ===== 토스트 알림 =====
+function showToast(icon, msg) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toast-icon').textContent = icon;
+    document.getElementById('toast-msg').textContent = msg;
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateY(0)';
+    toast.style.pointerEvents = 'auto';
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(1rem)';
+        toast.style.pointerEvents = 'none';
+    }, 3000);
+}
+
+// ===== 초기화 =====
+loadData();
+populateForms();
+</script>
+
+</body>
+</html>
