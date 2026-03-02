@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>포트폴리오 인쇄용 — 성명재</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="content.js"></script>
+    <style>
+        /* ===== 기본 스타일 ===== */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --brand: #2563eb; --brand-light: #dbeafe; --brand-text: #1d4ed8;
+            --gray-900: #0f172a; --gray-700: #334155; --gray-500: #64748b; --gray-300: #cbd5e1; --gray-100: #f1f5f9;
+        }
+        body {
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            font-size: 11pt; color: var(--gray-900); background: white;
+            line-height: 1.6; word-break: keep-all;
+        }
+        .page { max-width: 794px; margin: 0 auto; padding: 20px 40px; }
+        h2 { font-size: 13pt; font-weight: 800; color: var(--brand); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid var(--brand-light); }
+        h3 { font-size: 11pt; font-weight: 700; color: var(--gray-900); margin-bottom: 6px; }
+        h4 { font-size: 10pt; font-weight: 700; color: var(--brand); margin: 10px 0 4px; }
+        p, li { font-size: 10pt; color: var(--gray-700); line-height: 1.65; }
+        ul { padding-left: 16px; }
+        li { margin-bottom: 3px; }
+        strong { font-weight: 700; color: var(--gray-900); }
+
+        /* ===== 화면 전용 ===== */
+        @media screen {
+            body { background: #f1f5f9; }
+            .page { background: white; margin: 20px auto; box-shadow: 0 4px 24px rgba(0,0,0,0.1); border-radius: 8px; }
+            .print-toolbar {
+                position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+                background: #1e293b; color: white; padding: 10px 24px;
+                display: flex; align-items: center; justify-content: space-between;
+            }
+            .print-toolbar h1 { font-size: 14px; font-weight: 700; }
+            .print-toolbar-btns { display: flex; gap: 8px; }
+            .btn-print { background: #4f46e5; color: white; border: none; padding: 7px 18px; border-radius: 7px; font-size: 13px; font-weight: 700; cursor: pointer; }
+            .btn-print:hover { background: #4338ca; }
+            .btn-back { background: rgba(255,255,255,0.1); color: white; border: none; padding: 7px 14px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; }
+            .btn-back:hover { background: rgba(255,255,255,0.2); }
+            body { padding-top: 54px; }
+        }
+
+        /* ===== 인쇄 전용 ===== */
+        @media print {
+            .print-toolbar { display: none !important; }
+            body { background: white; font-size: 10.5pt; }
+            .page { max-width: 100%; padding: 12mm 14mm; }
+            .page-break { page-break-before: always; }
+            h2 { font-size: 12pt; }
+            * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+
+        /* ===== 헤더 / 프로필 ===== */
+        .print-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 16px; border-bottom: 3px solid var(--brand); margin-bottom: 24px; }
+        .ph-name { font-size: 22pt; font-weight: 900; color: var(--gray-900); }
+        .ph-title { font-size: 11pt; font-weight: 600; color: var(--brand); margin-top: 2px; }
+        .ph-contact { text-align: right; font-size: 9.5pt; color: var(--gray-500); line-height: 1.8; }
+        .ph-contact a { color: var(--brand); text-decoration: none; }
+        .badge-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+        .badge { background: var(--brand-light); color: var(--brand-text); font-size: 8.5pt; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
+
+        /* ===== 임팩트 박스 ===== */
+        .impact-box { background: var(--brand-light); border-left: 4px solid var(--brand); padding: 10px 16px; border-radius: 0 8px 8px 0; margin-bottom: 20px; }
+        .impact-box .impact-label { font-size: 8pt; font-weight: 800; color: var(--brand); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+        .impact-box .impact-text { font-size: 10.5pt; font-weight: 700; color: var(--gray-900); }
+
+        /* ===== 경력 프로젝트 ===== */
+        .career-item { margin-bottom: 18px; padding: 14px; background: var(--gray-100); border-radius: 8px; break-inside: avoid; }
+        .career-item-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .career-title { font-size: 11pt; font-weight: 800; color: var(--gray-900); }
+        .career-sub { font-size: 9pt; color: var(--gray-500); margin-top: 1px; }
+        .career-modal { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--gray-300); font-size: 9.5pt; }
+
+        /* ===== DX 사례 ===== */
+        .dx-item { margin-bottom: 18px; break-inside: avoid; }
+        .dx-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .dx-badge { background: #e0f2fe; color: #0369a1; font-size: 8pt; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
+        .dx-content-wrap { padding-left: 0; font-size: 9.5pt; }
+        .dx-content-wrap h4 { font-size: 9.5pt; }
+
+        /* ===== 교육/활동 그리드 ===== */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .edu-section { margin-bottom: 16px; }
+        .edu-section h3 { font-size: 10pt; font-weight: 800; color: var(--brand); margin-bottom: 6px; }
+
+        /* ===== 섹션 간격 ===== */
+        .print-section { margin-bottom: 28px; }
+    </style>
+</head>
+<body>
+
+<!-- 화면 툴바 (인쇄 시 숨김) -->
+<div class="print-toolbar">
+    <h1>🖨️ 인쇄용 포트폴리오 — 성명재</h1>
+    <div class="print-toolbar-btns">
+        <button class="btn-back" onclick="history.back()">← 돌아가기</button>
+        <button class="btn-print" onclick="window.print()">PDF로 저장 / 인쇄</button>
+    </div>
+</div>
+
+<div class="page" id="print-page">
+    <!-- 콘텐츠는 JS로 렌더링 -->
+    <div id="loading" style="text-align:center;padding:40px;color:#64748b;">불러오는 중...</div>
+</div>
+
+<script>
+(async function() {
+    // 콘텐츠 로드: KV API → localStorage → content.js
+    async function loadData() {
+        const defaults = typeof SITE_CONTENT !== 'undefined' ? JSON.parse(JSON.stringify(SITE_CONTENT)) : {};
+        try {
+            const r = await fetch('/api/content', { cache: 'no-store' });
+            if (r.ok) { const d = await r.json(); if (d && typeof d === 'object') return Object.assign(defaults, d); }
+        } catch(e) {}
+        const saved = localStorage.getItem('portfolio_content');
+        if (saved) { try { return Object.assign(defaults, JSON.parse(saved)); } catch(e) {} }
+        return defaults;
+    }
+
+    const D = await loadData();
+    const page = document.getElementById('print-page');
+
+    // ── 헤더 렌더
+    function renderHeader() {
+        return `<div class="print-header">
+            <div>
+                <div class="ph-name">${D.profileName || '성명재'}</div>
+                <div class="ph-title">${D.profileTitle || 'HR/GA Generalist'}</div>
+                <div class="badge-row">
+                    <span class="badge">HR Ops</span>
+                    <span class="badge">Recruiter</span>
+                    <span class="badge">GA</span>
+                    <span class="badge">Tableau</span>
+                </div>
+            </div>
+            <div class="ph-contact">
+                <div>${D.email || ''}</div>
+                <div><a href="https://smjportfolio.com">smjportfolio.com</a></div>
+                <div>최종 업데이트: ${D.lastUpdated || ''}</div>
+            </div>
+        </div>`;
+    }
+
+    // ── 임팩트 박스
+    function renderImpact() {
+        const txt = (D.heroImpactHTML || '').replace(/<[^>]+>/g, ' ').trim();
+        return `<div class="impact-box">
+            <div class="impact-label">대표 임팩트 결과</div>
+            <div class="impact-text">${txt}</div>
+        </div>`;
+    }
+
+    // ── 경력 프로젝트
+    function renderCareers() {
+        if (!D.careerProjects?.length) return '';
+        const items = D.careerProjects.map(p => `
+            <div class="career-item">
+                <div class="career-item-head">
+                    <div>
+                        <div class="career-title">${p.title || ''}</div>
+                        <div class="career-sub">${p.sub || ''}</div>
+                    </div>
+                </div>
+                <p style="font-size:9.5pt;color:#475569;margin-bottom:6px;">${p.desc || ''}</p>
+                <div class="career-modal prose">${p.modalContent || ''}</div>
+            </div>`).join('');
+        return `<div class="print-section"><h2>경력 프로젝트</h2>${items}</div>`;
+    }
+
+    // ── DX 사례
+    function renderDx() {
+        if (!D.dxCases) return '';
+        const cases = Object.values(D.dxCases);
+        if (!cases.length) return '';
+        const items = cases.map(c => `
+            <div class="dx-item">
+                <div class="dx-head">
+                    <h3>${c.title || ''}</h3>
+                    <span class="dx-badge">${c.badge || ''}</span>
+                </div>
+                <div class="dx-content-wrap prose">${c.content || ''}</div>
+            </div>`).join('');
+        return `<div class="print-section"><h2>DX / 업무 자동화 사례</h2>${items}</div>`;
+    }
+
+    // ── 교육/스킬
+    function renderEducation() {
+        if (!D.education) return '';
+        const { academic, training, skills } = D.education;
+        return `<div class="print-section two-col">
+            <div>
+                <div class="edu-section"><h3>학력</h3><div class="prose">${academic || ''}</div></div>
+                <div class="edu-section"><h3>보유 기술</h3><div class="prose">${skills || ''}</div></div>
+            </div>
+            <div>
+                <div class="edu-section"><h3>직무 교육 이수</h3><div class="prose">${training || ''}</div></div>
+            </div>
+        </div>`;
+    }
+
+    // ── 활동
+    function renderActivities() {
+        if (!D.activitiesList?.length) return '';
+        const items = D.activitiesList.map(a => `
+            <div style="margin-bottom:10px;padding:10px 12px;background:#f8fafc;border-radius:8px;break-inside:avoid;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                    <div>
+                        <strong>${a.icon || ''} ${a.title || ''}</strong>
+                        <div style="font-size:9pt;color:#64748b;">${a.role || ''} · ${a.period || ''}</div>
+                    </div>
+                    ${a.rank ? `<span style="font-size:8.5pt;font-weight:700;color:#4f46e5;background:#ede9fe;padding:2px 8px;border-radius:99px;">${a.rank}</span>` : ''}
+                </div>
+            </div>`).join('');
+        return `<div class="print-section"><h2>외부 활동</h2>${items}</div>`;
+    }
+
+    // ── 전체 렌더
+    page.innerHTML = `
+        ${renderHeader()}
+        ${renderImpact()}
+        <div class="print-section">
+            <h2>소개</h2>
+            <p>${(D.heroHeadlineHTML||'').replace(/<[^>]+>/g,' ').trim()}</p>
+            <p style="margin-top:6px;">${(D.heroDescription||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim()}</p>
+        </div>
+        ${renderCareers()}
+        <div class="page-break"></div>
+        ${renderDx()}
+        <div class="page-break"></div>
+        ${renderEducation()}
+        ${renderActivities()}
+        <div style="text-align:center;font-size:8.5pt;color:#94a3b8;margin-top:24px;padding-top:12px;border-top:1px solid #e2e8f0;">
+            ${D.profileName || ''} · ${D.email || ''} · smjportfolio.com · ${D.lastUpdated || ''}
+        </div>
+    `;
+})();
+</script>
+</body>
+</html>

@@ -41,11 +41,14 @@
             <span class="text-lg font-black text-slate-900">포트폴리오 관리자</span>
             <span id="save-status" class="text-xs font-medium text-slate-400">미저장</span>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
             <button onclick="previewSite()" class="px-3 py-1.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition">미리보기 ↗</button>
             <button onclick="exportContent()" class="px-3 py-1.5 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition">content.js 내보내기</button>
             <button onclick="resetAll()" class="px-3 py-1.5 text-xs font-bold text-red-500 bg-red-50 hover:bg-red-100 rounded-lg transition">초기화</button>
             <button onclick="saveAll()" class="px-4 py-1.5 text-xs font-black text-white bg-brand-600 hover:bg-brand-500 rounded-lg transition shadow-sm">저장</button>
+            <div class="w-px h-5 bg-slate-200 mx-1"></div>
+            <input id="kv-token-input" type="password" placeholder="편집자 비밀번호" class="px-2 py-1.5 text-xs border border-slate-200 rounded-lg w-36 outline-none focus:border-brand-500">
+            <button onclick="uploadToKV()" class="px-3 py-1.5 text-xs font-black text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition shadow-sm">☁️ KV 서버에 업로드</button>
         </div>
     </div>
 </header>
@@ -443,6 +446,39 @@ function showToast(icon, msg) {
         toast.style.transform = 'translateY(1rem)';
         toast.style.pointerEvents = 'none';
     }, 3000);
+}
+
+// ===== KV 서버 업로드 =====
+async function uploadToKV() {
+    const token = document.getElementById('kv-token-input').value.trim();
+    if (!token) {
+        showToast('⚠', '편집자 비밀번호를 입력하세요.');
+        return;
+    }
+    // 먼저 로컬 저장
+    saveAll();
+    const body = localStorage.getItem('portfolio_content');
+    if (!body) { showToast('⚠', '저장된 데이터가 없습니다.'); return; }
+
+    showToast('⏳', 'KV 서버에 업로드 중...');
+    try {
+        const r = await fetch('/api/content', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: body
+        });
+        if (r.ok) {
+            showToast('☁️', 'KV 서버 업로드 완료! 모든 방문자에게 즉시 반영됩니다.');
+            document.getElementById('kv-token-input').value = '';
+        } else if (r.status === 401) {
+            showToast('🔒', '비밀번호가 올바르지 않습니다. (401 Unauthorized)');
+        } else {
+            const err = await r.json().catch(() => ({}));
+            showToast('✕', 'KV 업로드 실패: ' + (err.error || r.status));
+        }
+    } catch(e) {
+        showToast('✕', 'KV 서버에 연결할 수 없습니다. (로컬 저장은 완료)');
+    }
 }
 
 // ===== 초기화 =====

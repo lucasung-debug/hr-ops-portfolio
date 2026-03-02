@@ -108,7 +108,41 @@
         .img-edit-btn { position: absolute; inset: 0; background: rgba(79,70,229,0.6); color: white; font-weight: 700; font-size: 11px; border: 2px dashed rgba(255,255,255,0.8); cursor: pointer; border-radius: 4px; display: none; align-items: center; justify-content: center; z-index: 10; transition: background 0.2s; flex-direction: column; gap: 2px; }
         .img-edit-btn:hover { background: rgba(79,70,229,0.88); }
         body.edit-mode .img-edit-btn { display: flex; }
-    </style>
+        /* AUTH MODAL */
+        #auth-modal { position: fixed; inset: 0; z-index: 9000; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); padding: 16px; }
+        .auth-box { background: white; border-radius: 20px; padding: 32px; width: 100%; max-width: 360px; box-shadow: 0 25px 60px rgba(0,0,0,0.3); }
+        .auth-box h3 { font-size: 18px; font-weight: 800; color: #1e293b; margin: 0 0 8px; }
+        .auth-box p { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+        .auth-input { width: 100%; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 10px 14px; font-size: 15px; outline: none; font-family: inherit; transition: border-color 0.15s; box-sizing: border-box; }
+        .auth-input:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+        .auth-error { color: #ef4444; font-size: 12px; font-weight: 600; margin-top: 6px; min-height: 18px; }
+        .auth-btn-row { display: flex; gap: 8px; margin-top: 16px; }
+        .auth-cancel { flex: 1; background: #f1f5f9; color: #64748b; border: none; padding: 10px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 700; }
+        .auth-cancel:hover { background: #e2e8f0; }
+        .auth-confirm { flex: 2; background: #4f46e5; color: white; border: none; padding: 10px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 700; }
+        .auth-confirm:hover:not(:disabled) { background: #4338ca; }
+        .auth-confirm:disabled { opacity: 0.6; cursor: not-allowed; }
+        /* STRUCTURED CAREER EDIT PANEL */
+        .ep-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+        .ep-section-head { font-size: 12px; font-weight: 800; color: #4f46e5; text-transform: uppercase; letter-spacing: 0.06em; }
+        .ep-textarea { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; font-size: 13px; color: #475569; outline: none; font-family: inherit; resize: vertical; min-height: 70px; line-height: 1.6; transition: border-color 0.15s; }
+        .ep-textarea:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+        .ep-bullet-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+        .ep-bullet-dot { color: #4f46e5; font-size: 16px; flex-shrink: 0; line-height: 1; }
+        .ep-bullet-input { flex: 1; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 10px; font-size: 13px; color: #1e293b; outline: none; font-family: inherit; transition: border-color 0.15s; }
+        .ep-bullet-input:focus { border-color: #4f46e5; }
+        .ep-bullet-del { background: #fee2e2; color: #ef4444; border: none; width: 22px; height: 22px; border-radius: 50%; cursor: pointer; font-size: 10px; flex-shrink: 0; }
+        .ep-bullet-del:hover { background: #fecaca; }
+        .ep-add-btn { background: transparent; color: #4f46e5; border: 1.5px dashed #c7d2fe; border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer; width: 100%; transition: background 0.15s; }
+        .ep-add-btn:hover { background: #f5f3ff; }
+        /* MEDIA EDITOR TABS */
+        .med-tabs { display: flex; gap: 2px; background: #f1f5f9; padding: 3px; border-radius: 10px; margin-bottom: 12px; }
+        .med-tab { flex: 1; text-align: center; padding: 6px; border-radius: 7px; font-size: 12px; font-weight: 700; color: #64748b; cursor: pointer; border: none; background: transparent; transition: all 0.15s; }
+        .med-tab.active { background: white; color: #4f46e5; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+        .med-pane { display: none; flex-direction: column; gap: 10px; }
+        .med-pane.active { display: flex; }
+        .med-preview { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; max-height: 200px; display: none; }
+        .med-preview iframe, .med-preview img { width: 100%; display: block; max-height: 200px; }
 </head>
 <body class="bg-slate-50 text-slate-900 selection:bg-brand-500 selection:text-white">
 
@@ -530,8 +564,26 @@ class="bg-white text-slate-900 px-8 py-4 rounded-full font-bold
 
     <footer class="py-8 bg-slate-100 text-center border-t border-slate-200/50">
         <p class="text-[10px] text-slate-400 font-mono">© 2026 Sung Myeong-jae. Designed for Gemini.</p>
-        <a href="admin.html" class="mt-3 inline-block text-[10px] text-slate-300 hover:text-slate-400 transition font-mono">관리자</a>
+        <div class="mt-3 flex items-center justify-center gap-4">
+            <a href="print.html" target="_blank" class="text-[10px] text-slate-400 hover:text-slate-600 transition font-mono">🖨️ 인쇄용 PDF</a>
+            <span class="text-slate-300 text-[10px]">|</span>
+            <a href="admin.html" class="text-[10px] text-slate-300 hover:text-slate-400 transition font-mono">관리자</a>
+        </div>
     </footer>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal">
+        <div class="auth-box">
+            <h3>🔐 편집자 로그인</h3>
+            <p>포트폴리오 편집 권한을 확인합니다.<br>Cloudflare Pages에서 설정한 EDITOR_TOKEN을 입력하세요.</p>
+            <input type="password" id="auth-input" class="auth-input" placeholder="비밀번호(토큰) 입력" autocomplete="current-password">
+            <div id="auth-error" class="auth-error"></div>
+            <div class="auth-btn-row">
+                <button class="auth-cancel" onclick="AuthModal.close()">취소</button>
+                <button class="auth-confirm" id="auth-confirm-btn" onclick="AuthModal.submit()">편집 시작</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Inline Edit FAB -->
     <div id="inline-edit-fab" class="fixed bottom-6 right-6 z-[500] flex flex-col items-end gap-2">
@@ -541,27 +593,38 @@ class="bg-white text-slate-900 px-8 py-4 rounded-full font-bold
 
     <!-- Scripts -->
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
 
-        // ── 콘텐츠 로드: content.js 기본값 + localStorage 덮어쓰기 (빈값 보호) ──
-        const _saved = localStorage.getItem('portfolio_content');
-        let PORTFOLIO_DATA;
-        try {
-            if (typeof SITE_CONTENT === 'undefined') throw new Error('content.js not loaded');
-            const _defaults = JSON.parse(JSON.stringify(SITE_CONTENT));
+        // ── 콘텐츠 로드: KV API → localStorage → content.js 순으로 폴백 ──
+        async function _loadData() {
+            const _defaults = typeof SITE_CONTENT !== 'undefined' ? JSON.parse(JSON.stringify(SITE_CONTENT)) : {};
+            // 1순위: Cloudflare KV (Pages Function)
+            try {
+                const resp = await fetch('/api/content', { cache: 'no-store' });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+                        localStorage.setItem('portfolio_content', JSON.stringify(data));
+                        return Object.assign(_defaults, data);
+                    }
+                }
+            } catch(e) { /* 오프라인 or Pages Function 미설정 */ }
+            // 2순위: localStorage (캐시)
+            const _saved = localStorage.getItem('portfolio_content');
             if (_saved) {
-                // Merge: saved 우선, 단 비어있는 핵심 필드는 기본값 유지
-                PORTFOLIO_DATA = Object.assign(_defaults, JSON.parse(_saved));
-                ['heroHeadlineHTML','heroSubtitle','heroDescription','heroImpactHTML'].forEach(k => {
-                    if (!PORTFOLIO_DATA[k] && _defaults[k]) PORTFOLIO_DATA[k] = _defaults[k];
-                });
-            } else {
-                PORTFOLIO_DATA = _defaults;
+                try {
+                    const pd = Object.assign(_defaults, JSON.parse(_saved));
+                    ['heroHeadlineHTML','heroSubtitle','heroDescription','heroImpactHTML'].forEach(k => {
+                        if (!pd[k] && _defaults[k]) pd[k] = _defaults[k];
+                    });
+                    return pd;
+                } catch(e) { /* 파싱 오류 */ }
             }
-        } catch(e) {
-            console.warn('content.js 로드 오류, localStorage 사용:', e);
-            PORTFOLIO_DATA = _saved ? JSON.parse(_saved) : {};
+            // 3순위: content.js 기본값
+            return _defaults;
         }
+
+        let PORTFOLIO_DATA = await _loadData();
         const modalDetails = PORTFOLIO_DATA.modalDetails || {};
 
 
@@ -928,8 +991,39 @@ counters.forEach(counter => {
         }
 
         // =====================================================================
-        // COMPREHENSIVE VISUAL EDITOR
+        // COMPREHENSIVE VISUAL EDITOR v2
         // =====================================================================
+
+        // ── AUTH MODAL ──
+        const AuthModal = {
+            _cb: null,
+            show(cb) {
+                this._cb = cb;
+                document.getElementById('auth-modal').style.display = 'flex';
+                document.getElementById('auth-input').value = '';
+                document.getElementById('auth-error').textContent = '';
+                document.getElementById('auth-confirm-btn').disabled = false;
+                setTimeout(() => document.getElementById('auth-input').focus(), 80);
+            },
+            close() {
+                document.getElementById('auth-modal').style.display = 'none';
+                this._cb = null;
+            },
+            showError(msg) {
+                document.getElementById('auth-error').textContent = msg;
+                document.getElementById('auth-confirm-btn').disabled = false;
+            },
+            submit() {
+                const token = document.getElementById('auth-input').value.trim();
+                if (!token) { this.showError('비밀번호를 입력하세요.'); return; }
+                document.getElementById('auth-confirm-btn').disabled = true;
+                document.getElementById('auth-error').textContent = '확인 중…';
+                if (this._cb) this._cb(token);
+            }
+        };
+        document.getElementById('auth-input').addEventListener('keydown', e => {
+            if (e.key === 'Enter') AuthModal.submit();
+        });
 
         // ── FLOATING RICH TEXT TOOLBAR ──
         const FloatBar = {
@@ -979,7 +1073,29 @@ counters.forEach(counter => {
             exec(cmd, val) { document.execCommand(cmd, false, val !== undefined ? val : null); }
         };
 
-        // ── CAREER EDIT PANEL ──
+        // ── CAREER EDIT PANEL (구조화 폼 — 코드 없이 편집) ──
+        function _parseCareerModal(html) {
+            const d = document.createElement('div'); d.innerHTML = html;
+            const r = { problem: '', actions: [], results: [] };
+            d.querySelectorAll('h4').forEach(h4 => {
+                const sec = h4.closest('div'); if (!sec) return;
+                const t = h4.textContent;
+                if (t.includes('문제')) {
+                    r.problem = (sec.querySelector('p')?.innerHTML || '').trim();
+                } else if (t.includes('실행') || t.includes('Action')) {
+                    sec.querySelectorAll('li').forEach(li => r.actions.push(li.innerHTML.trim()));
+                } else if (t.includes('결과') || t.includes('Result')) {
+                    sec.querySelectorAll('li').forEach(li => r.results.push(li.innerHTML.trim()));
+                }
+            });
+            return r;
+        }
+        function _buildCareerModal(r) {
+            const ai = r.actions.map(a=>`<li>${a}</li>`).join('');
+            const ri = r.results.map(x=>`<li>${x}</li>`).join('');
+            return `<div class="space-y-6"><div><h4 class="text-brand-600">🔍 문제 상황</h4><p class="text-slate-600 text-sm leading-relaxed">${r.problem}</p></div><div><h4 class="text-brand-600">🛠️ 실행 (Action)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2">${ai}</ul></div><div><h4 class="text-brand-600">📈 결과 (Result)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2">${ri}</ul></div></div>`;
+        }
+
         const CareerEditPanel = {
             el: null, idx: -1,
             init() {
@@ -993,8 +1109,20 @@ counters.forEach(counter => {
                             <span class="ep-label">제목</span><input id="ep-title" class="ep-input">
                             <span class="ep-label">부제목</span><input id="ep-sub" class="ep-input">
                             <span class="ep-label">카드 요약</span><input id="ep-desc" class="ep-input">
-                            <span class="ep-label">모달 상세 내용 — 텍스트 선택 후 상단 서식 도구 사용 가능</span>
-                            <div id="ep-content" class="ep-rich" contenteditable="true" spellcheck="false"></div>
+                            <div class="ep-section">
+                                <div class="ep-section-head">🔍 문제 상황</div>
+                                <textarea id="ep-problem" class="ep-textarea" placeholder="기존 근태기가 직원 동선과 멀리 배치되어..."></textarea>
+                            </div>
+                            <div class="ep-section">
+                                <div class="ep-section-head">🛠️ 실행 내용 (항목별)</div>
+                                <div id="ep-actions-list"></div>
+                                <button class="ep-add-btn" onclick="CareerEditPanel.addBullet('ep-actions-list')">+ 항목 추가</button>
+                            </div>
+                            <div class="ep-section">
+                                <div class="ep-section-head">📈 결과 (항목별)</div>
+                                <div id="ep-results-list"></div>
+                                <button class="ep-add-btn" onclick="CareerEditPanel.addBullet('ep-results-list')">+ 항목 추가</button>
+                            </div>
                         </div>
                         <div class="ep-foot">
                             <button class="ep-cancel" onclick="CareerEditPanel.close()">취소</button>
@@ -1003,13 +1131,35 @@ counters.forEach(counter => {
                     </div>`;
                 document.body.appendChild(this.el);
             },
+            addBullet(listId) {
+                const list = document.getElementById(listId);
+                const row = document.createElement('div'); row.className = 'ep-bullet-row';
+                row.innerHTML = `<span class="ep-bullet-dot">•</span><input type="text" class="ep-input ep-bullet-input" placeholder="항목 내용 입력..."><button class="ep-bullet-del" onclick="this.parentElement.remove()">✕</button>`;
+                list.appendChild(row);
+                row.querySelector('.ep-bullet-input').focus();
+            },
+            _fillBullets(listId, items) {
+                document.getElementById(listId).innerHTML = '';
+                (items||[]).forEach(text => {
+                    const row = document.createElement('div'); row.className = 'ep-bullet-row';
+                    row.innerHTML = `<span class="ep-bullet-dot">•</span><input type="text" class="ep-input ep-bullet-input" value="${text.replace(/"/g,'&quot;').replace(/<[^>]+>/g,'')}"><button class="ep-bullet-del" onclick="this.parentElement.remove()">✕</button>`;
+                    document.getElementById(listId).appendChild(row);
+                });
+            },
+            _collectBullets(listId) {
+                return [...document.querySelectorAll(`#${listId} .ep-bullet-input`)].map(i=>i.value.trim()).filter(Boolean);
+            },
             open(proj) {
                 if (!proj) return;
                 this.idx = PORTFOLIO_DATA.careerProjects.findIndex(p => p.id === proj.id);
                 document.getElementById('ep-title').value = proj.title || '';
                 document.getElementById('ep-sub').value = proj.sub || '';
                 document.getElementById('ep-desc').value = proj.desc || '';
-                document.getElementById('ep-content').innerHTML = proj.modalContent || '';
+                const parsed = _parseCareerModal(proj.modalContent || '');
+                // Strip HTML tags for problem field (textarea shows plain text)
+                document.getElementById('ep-problem').value = parsed.problem.replace(/<[^>]+>/g, '') || '';
+                this._fillBullets('ep-actions-list', parsed.actions);
+                this._fillBullets('ep-results-list', parsed.results);
                 this.el.style.display = 'flex';
             },
             close() { this.el.style.display = 'none'; },
@@ -1019,14 +1169,32 @@ counters.forEach(counter => {
                 proj.title = document.getElementById('ep-title').value;
                 proj.sub = document.getElementById('ep-sub').value;
                 proj.desc = document.getElementById('ep-desc').value;
-                proj.modalContent = document.getElementById('ep-content').innerHTML;
+                proj.modalContent = _buildCareerModal({
+                    problem: document.getElementById('ep-problem').value,
+                    actions: this._collectBullets('ep-actions-list'),
+                    results: this._collectBullets('ep-results-list')
+                });
                 App.renderCareerGrid();
                 this.close();
                 InlineEditor._toast('프로젝트 저장됨. 전체 저장 ✓ 버튼을 잊지 마세요!');
             }
         };
 
-        // ── IMAGE EDITOR ──
+        // ── MEDIA EDITOR (이미지 / 영상 / PDF URL) ──
+        function _createMediaEmbed(url) {
+            // YouTube
+            const yt = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([^&?\s]{11})/);
+            if (yt) return `<div style="position:relative;padding-top:56.25%;border-radius:12px;overflow:hidden;"><iframe style="position:absolute;inset:0;width:100%;height:100%;border:0;" src="https://www.youtube.com/embed/${yt[1]}" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe></div>`;
+            // Vimeo
+            const vm = url.match(/vimeo\.com\/(\d+)/);
+            if (vm) return `<div style="position:relative;padding-top:56.25%;border-radius:12px;overflow:hidden;"><iframe style="position:absolute;inset:0;width:100%;height:100%;border:0;" src="https://player.vimeo.com/video/${vm[1]}" allow="autoplay;fullscreen" allowfullscreen></iframe></div>`;
+            // Google Drive PDF
+            const gd = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
+            if (gd) return `<iframe src="https://drive.google.com/file/d/${gd[1]}/preview" width="100%" height="520" style="border:1px solid #e2e8f0;border-radius:12px;" allow="autoplay"></iframe>`;
+            // 일반 이미지/GIF
+            return `<img src="${url}" style="max-width:100%;border-radius:8px;" alt="">`;
+        }
+
         const ImageEditor = {
             el: null, current: null,
             init() {
@@ -1034,14 +1202,31 @@ counters.forEach(counter => {
                 this.el.id = 'image-editor';
                 this.el.innerHTML = `
                     <div class="ep-bg" onclick="ImageEditor.close()"></div>
-                    <div class="ep-box" style="max-width:440px;">
-                        <div class="ep-head"><h3>🖼️ 이미지 / GIF 변경</h3><button onclick="ImageEditor.close()">✕</button></div>
+                    <div class="ep-box" style="max-width:460px;">
+                        <div class="ep-head"><h3>🖼️ 미디어 변경</h3><button onclick="ImageEditor.close()">✕</button></div>
                         <div class="ep-body" style="gap:12px;">
-                            <span class="ep-label">이미지 URL 직접 입력</span>
-                            <input id="ie-url" class="ep-input" type="url" placeholder="https://...이미지주소.jpg">
-                            <div style="text-align:center;color:#94a3b8;font-size:12px;font-weight:600;padding:4px 0;">— 또는 —</div>
-                            <label class="ie-filebtn">📁 파일 선택 (JPG, PNG, GIF 등)<input type="file" accept="image/*,.gif" onchange="ImageEditor.fromFile(this)" style="display:none;"></label>
-                            <div id="ie-preview" style="display:none;text-align:center;margin-top:4px;"><img style="max-width:100%;max-height:200px;border-radius:8px;border:1px solid #e2e8f0;"></div>
+                            <div class="med-tabs">
+                                <button class="med-tab active" onclick="ImageEditor.switchTab('img',this)">🖼️ 이미지</button>
+                                <button class="med-tab" onclick="ImageEditor.switchTab('vid',this)">▶️ 영상</button>
+                                <button class="med-tab" onclick="ImageEditor.switchTab('pdf',this)">📄 PDF</button>
+                            </div>
+                            <div id="med-pane-img" class="med-pane active">
+                                <span class="ep-label">이미지 URL</span>
+                                <input id="ie-url" class="ep-input" type="url" placeholder="https://...이미지.jpg">
+                                <div style="text-align:center;color:#94a3b8;font-size:11px;font-weight:600;">— 또는 —</div>
+                                <label class="ie-filebtn">📁 파일 선택 (JPG·PNG·GIF)<input type="file" accept="image/*,.gif" onchange="ImageEditor.fromFile(this)" style="display:none;"></label>
+                            </div>
+                            <div id="med-pane-vid" class="med-pane">
+                                <span class="ep-label">YouTube / Vimeo URL</span>
+                                <input id="ie-vid-url" class="ep-input" type="url" placeholder="https://youtube.com/watch?v=...">
+                                <p style="font-size:11px;color:#94a3b8;margin:0;">YouTube 또는 Vimeo URL을 붙여넣으면 자동으로 영상이 삽입됩니다.</p>
+                            </div>
+                            <div id="med-pane-pdf" class="med-pane">
+                                <span class="ep-label">Google Drive PDF URL</span>
+                                <input id="ie-pdf-url" class="ep-input" type="url" placeholder="https://drive.google.com/file/d/.../view">
+                                <p style="font-size:11px;color:#94a3b8;margin:0;">공유 가능한 Google Drive 링크를 붙여넣으세요.</p>
+                            </div>
+                            <div id="ie-preview" class="med-preview"></div>
                         </div>
                         <div class="ep-foot">
                             <button class="ep-cancel" onclick="ImageEditor.close()">취소</button>
@@ -1049,36 +1234,77 @@ counters.forEach(counter => {
                         </div>
                     </div>`;
                 document.body.appendChild(this.el);
+                // Live preview on input
+                ['ie-url','ie-vid-url','ie-pdf-url'].forEach(id => {
+                    document.getElementById(id)?.addEventListener('input', () => this._updatePreview());
+                });
+            },
+            _activeTab: 'img',
+            switchTab(tab, btn) {
+                this._activeTab = tab;
+                document.querySelectorAll('.med-tab').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.querySelectorAll('.med-pane').forEach(p => p.classList.remove('active'));
+                document.getElementById('med-pane-' + tab).classList.add('active');
+                document.getElementById('ie-preview').style.display = 'none';
+                document.getElementById('ie-preview').innerHTML = '';
+            },
+            _updatePreview() {
+                const url = this._getUrl().trim();
+                if (!url) { document.getElementById('ie-preview').style.display='none'; return; }
+                const preview = document.getElementById('ie-preview');
+                preview.innerHTML = _createMediaEmbed(url);
+                preview.style.display = 'block';
+            },
+            _getUrl() {
+                if (this._activeTab === 'vid') return document.getElementById('ie-vid-url').value;
+                if (this._activeTab === 'pdf') return document.getElementById('ie-pdf-url').value;
+                return document.getElementById('ie-url').value;
             },
             open(img) {
                 this.current = img;
-                document.getElementById('ie-url').value = img.getAttribute('src') || '';
+                this._activeTab = 'img';
+                document.querySelectorAll('.med-tab').forEach((b,i) => b.classList.toggle('active', i===0));
+                document.querySelectorAll('.med-pane').forEach((p,i) => p.classList.toggle('active', i===0));
+                document.getElementById('ie-url').value = img?.getAttribute('src') || '';
+                document.getElementById('ie-vid-url').value = '';
+                document.getElementById('ie-pdf-url').value = '';
                 document.getElementById('ie-preview').style.display = 'none';
+                document.getElementById('ie-preview').innerHTML = '';
                 this.el.style.display = 'flex';
             },
             close() { this.el.style.display = 'none'; this.current = null; },
             fromFile(input) {
-                const f = input.files[0];
-                if (!f) return;
+                const f = input.files[0]; if (!f) return;
                 const reader = new FileReader();
                 reader.onload = e => {
                     document.getElementById('ie-url').value = e.target.result;
-                    const p = document.getElementById('ie-preview');
-                    p.querySelector('img').src = e.target.result;
-                    p.style.display = 'block';
+                    this._updatePreview();
                 };
                 reader.readAsDataURL(f);
             },
             apply() {
-                const url = document.getElementById('ie-url').value.trim();
-                if (!url || !this.current) { alert('URL을 입력하거나 파일을 선택하세요.'); return; }
-                this.current.src = url;
-                if (!PORTFOLIO_DATA._images) PORTFOLIO_DATA._images = {};
-                const key = this.current.id || ('img_' + Date.now());
-                if (!this.current.id) this.current.id = key;
-                PORTFOLIO_DATA._images[key] = url;
+                const url = this._getUrl().trim();
+                if (!url) { alert('URL을 입력하거나 파일을 선택하세요.'); return; }
+                if (this._activeTab === 'img' && this.current) {
+                    // Replace image src
+                    this.current.src = url;
+                    if (!PORTFOLIO_DATA._images) PORTFOLIO_DATA._images = {};
+                    const key = this.current.id || ('img_' + Date.now());
+                    if (!this.current.id) this.current.id = key;
+                    PORTFOLIO_DATA._images[key] = url;
+                } else {
+                    // Insert media embed after current element (or at body if no context)
+                    const embed = document.createElement('div');
+                    embed.innerHTML = _createMediaEmbed(url);
+                    if (this.current?.parentNode) {
+                        this.current.parentNode.insertBefore(embed.firstChild, this.current.nextSibling);
+                    } else {
+                        document.getElementById('education-content')?.appendChild(embed.firstChild);
+                    }
+                }
                 this.close();
-                InlineEditor._toast('이미지 변경됨. 전체 저장 ✓ 버튼을 잊지 마세요!');
+                InlineEditor._toast('미디어 변경됨. 전체 저장 ✓ 버튼을 잊지 마세요!');
             }
         };
 
@@ -1088,6 +1314,35 @@ counters.forEach(counter => {
 
             enable() {
                 if (this.active) return;
+                // 세션 인증 확인 → 없으면 비밀번호 요청
+                const token = sessionStorage.getItem('editor_auth');
+                if (!token) {
+                    AuthModal.show(t => {
+                        fetch('/api/content', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + t },
+                            body: JSON.stringify(PORTFOLIO_DATA)
+                        }).then(r => {
+                            if (r.ok) {
+                                sessionStorage.setItem('editor_auth', t);
+                                AuthModal.close();
+                                this._activateEdit();
+                            } else {
+                                AuthModal.showError('비밀번호가 올바르지 않습니다. 다시 입력하세요.');
+                            }
+                        }).catch(() => {
+                            // /api/content 없음 (개발 환경) → 인증 없이 허용
+                            sessionStorage.setItem('editor_auth', '__dev__');
+                            AuthModal.close();
+                            this._activateEdit();
+                        });
+                    });
+                    return;
+                }
+                this._activateEdit();
+            },
+
+            _activateEdit() {
                 this.active = true;
                 this.snapshot = JSON.parse(JSON.stringify(PORTFOLIO_DATA));
                 document.body.classList.add('edit-mode');
@@ -1192,7 +1447,20 @@ counters.forEach(counter => {
                 if (compEl && PORTFOLIO_DATA.companyName) compEl.textContent = PORTFOLIO_DATA.companyName + ' 실무 성과';
                 localStorage.setItem('portfolio_content', JSON.stringify(PORTFOLIO_DATA));
                 this.disable();
-                this._toast('✓ 전체 저장 완료!');
+                // KV에도 저장 (Cloudflare Pages Function)
+                const token = sessionStorage.getItem('editor_auth');
+                if (token && token !== '__dev__') {
+                    fetch('/api/content', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                        body: JSON.stringify(PORTFOLIO_DATA)
+                    }).then(r => {
+                        if (r.ok) this._toast('✓ 전체 저장 완료! 모든 기기에 반영됩니다.');
+                        else this._toast('⚠️ 서버 저장 실패. 로컬에만 저장됨.');
+                    }).catch(() => this._toast('✓ 로컬 저장 완료 (서버 미연결)'));
+                } else {
+                    this._toast('✓ 저장 완료');
+                }
             },
 
             _toast(msg) {
