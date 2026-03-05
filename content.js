@@ -14,9 +14,9 @@ const SITE_CONTENT = {
 
   // ===== 히어로 섹션 =====
   heroSubtitle: "HR Operations",
-  heroDescription: `근태·채용·현장 데이터를 정리해 임직원이 실제로 이용할 수 있는<br>인사 운영 시스템으로 정리·구현해온 HR Ops입니다.`,
-  heroHeadlineHTML: `HR의 문제를 <span class="text-brand-600">수치로</span> 증명하고,<br><span class="relative inline-block px-2 py-1 bg-brand-100 text-slate-900 rounded-lg font-black">시스템으로</span> 안착시킵니다.`,
-  heroImpactHTML: `동선 분석 기반 근태기 재배치로<br>근태기 인식률 <span class="text-brand-600">+12%p</span>, 수기 정정율 <span class="text-brand-600">–8%p</span> 개선`,
+  heroDescription: `ATS 도입 · 근태 시스템 재편 · 52시간 관리 · 업무 자동화<br>1년 안에 4개 영역을 직접 설계하고 작동시켰습니다.`,
+  heroHeadlineHTML: `'원래 이랬어'를 <span class="text-brand-600">바꾸는</span> HR입니다.`,
+  heroImpactHTML: `700명 규모 사업장 근태 시스템 재설계 →<br>인식률 <span class="text-brand-600">+12%p</span>, 수기 정정 <span class="text-brand-600">–8%p</span>, 클레임 <span class="text-brand-600">0건</span>`,
 
   // ===== 다운로드 링크 =====
   downloads: {
