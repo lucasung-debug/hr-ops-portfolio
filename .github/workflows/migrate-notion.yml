@@ -1,0 +1,28 @@
+name: Migrate content.js → Notion (1회성)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install --prefix scripts
+
+      - name: Run migration
+        run: node scripts/migrate-to-notion.js
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_DB_ID_CASES: ${{ secrets.NOTION_DB_ID_CASES }}
+          NOTION_DB_ID_GROWTH: ${{ secrets.NOTION_DB_ID_GROWTH }}
+          NOTION_DB_ID_SKILLS: ${{ secrets.NOTION_DB_ID_SKILLS }}
+          NOTION_PAGE_ID_SETTINGS: ${{ secrets.NOTION_PAGE_ID_SETTINGS }}

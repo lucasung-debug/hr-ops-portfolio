@@ -341,7 +341,11 @@ async function main() {
   console.log('=== Notion 마이그레이션 시작 ===');
   console.log('주의: 각 DB에 중복 데이터가 생기지 않도록 처음 1회만 실행하세요.\n');
 
-  await migrateSettings();
+  try {
+    await migrateSettings();
+  } catch (e) {
+    console.warn('  [skip] 설정 페이지 업데이트 실패 (일반 페이지인 경우 정상):', e.message);
+  }
   await migrateCases();
   await migrateGrowth();
   await migrateSkills();
