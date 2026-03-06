@@ -320,7 +320,7 @@ async function migrateSkills() {
   for (const s of SKILLS_LIST) {
     await createPage(DB_SKILLS, {
       '스킬명':   { title: txt(s.name) },
-      '카테고리': { select: { name: s.category } },
+      '카테코리': { select: { name: s.category } },
       '레벨':     { rich_text: txt(s.level) },
       '레벨색상': { select: { name: s.color } },
       '선택':     { select: { name: '발행' } },

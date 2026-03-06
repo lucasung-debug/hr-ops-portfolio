@@ -338,7 +338,7 @@ async function fetchSkills() {
 
   const byCategory = {};
   for (const row of rows) {
-    const cat = prop(row, '카테고리');
+    const cat = prop(row, '카테코리');
     if (!byCategory[cat]) byCategory[cat] = [];
     byCategory[cat].push({
       name:  prop(row, '스킬명'),
