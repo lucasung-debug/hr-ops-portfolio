@@ -7,10 +7,10 @@ const SITE_CONTENT = {
   // ===== 기본 정보 =====
   profileName: "성명재",
   profileNameEn: "Sung Myeong Jae",
-  profileTitle: "HR/GA Generalist",
+  profileTitle: "HR Operations",
   email: "proposition97@gmail.com",
   companyName: "오뚜기라면 인사팀",
-  lastUpdated: "2025.12",
+  lastUpdated: "2026.03",
 
   // ===== 히어로 섹션 =====
   heroSubtitle: "HR Operations",
@@ -40,21 +40,21 @@ const SITE_CONTENT = {
     }
   },
 
-  // ===== 경력 프로젝트 =====
+  // ===== 경력 프로젝트 (채용 전문가 기준 우선순위 순) =====
   careerProjects: [
-    {
-      id: 'career_1',
-      title: '근태기 루트 효율화',
-      sub: '동선 분석 기반 기기 재배치 프로젝트',
-      desc: '동선 데이터 분석을 통한 기기 재배치 및 인식률 개선',
-      modalContent: `<div class="space-y-6"><div><h4 class="text-brand-600">🔍 문제 상황</h4><p class="text-slate-600 text-sm leading-relaxed">기존 근태기가 직원들의 주 이동 동선과 동떨어진 곳에 위치하여, 출퇴근 시 태깅 누락이 빈번하게 발생했습니다. 이로 인해 월말 수기 수정 요청 건수가 급증하여 행정 업무 효율 감소 및 급여 신뢰도 하락 리스크 지속.</p></div><div><h4 class="text-brand-600">🛠️ 실행 (Action)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>동선 히트맵 분석:</strong> 노조와 협의하여 CCTV, 근태로그 기반 식당, 주차장, 탈의실 등 주요 거점과 작업장 간의 이동 경로를 2주간 추적 분석.</li><li><strong>병목 구간 식별:</strong> 출퇴근 피크 타임에 대기 줄이 길어지는 구역과 아예 사용되지 않는 기기 식별.</li><li><strong>기기 재배치:</strong> 유휴 기기 3대를 주 동선 교차점으로 이동 설치하고, 인식 속도가 느린 구형 기기 교체.</li></ul></div><div><h4 class="text-brand-600">📈 결과 (Result)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>인식률 개선:</strong> 전체 근태 태깅률 73% → 85% (12%p 개선)</li><li><strong>오류 감소:</strong> 월 평균 수기 수정 요청 건수 8%p 감소</li><li><strong>현장 만족도:</strong> 출퇴근 대기 시간 단축으로 현장 직원 불만 해소</li></ul></div></div>`
-    },
     {
       id: 'career_2',
       title: 'ATS(채용관리솔루션) 도입',
       sub: '나인하이어 도입을 통한 채용 프로세스 디지털 전환',
       desc: 'Ninehire 도입 및 채용 프로세스 디지털 전환',
       modalContent: `<div class="space-y-6"><div><h4 class="text-brand-600">🔍 문제 상황</h4><p class="text-slate-600 text-sm leading-relaxed">이메일과 엑셀로 지원자를 관리하여 서류 분실 위험이 높고, 탈락 지원자 서류 폐기에 대한 법률 위반 리스크 상존. 전형 안내 지연으로 지원자 이탈이 발생하며 데이터 집계가 불가능.</p></div><div><h4 class="text-brand-600">🛠️ 실행 (Action)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>솔루션 선정:</strong> 비용 대비 효율성이 높은 '나인하이어' 선정 및 도입 추진.</li><li><strong>프로세스 표준화:</strong> 서류-면접-처우협의-입사 단계별 평가표 및 알림 템플릿 전산화.</li><li><strong>협업 구조 개선:</strong> 현업 면접관에게 평가 링크를 자동 발송하여 실시간 평가 취합 구조 마련.</li></ul></div><div><h4 class="text-brand-600">📈 결과 (Result)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>지원자 경험 개선:</strong> 전형 결과 통보 리드타임 단축 (관리직 8주→6주, 생산직 6주→4주).</li><li><strong>지원자 수 증가:</strong> 채용 포털과 자체 홈페이지 연동으로 직무별 지원자 평균 27% 증가.</li><li><strong>데이터 자산화:</strong> 채용 채널별 ROI, 리드타임 등 데이터 분석 대시보드화.</li><li><strong>커뮤니케이션 강화:</strong> 알림톡/이메일을 활용한 단계별 커뮤니케이션 횟수 증가로 긍정적 채용 리뷰가 증가(0건→6건)하고 부정 리뷰가 감소(28건→2건)했습니다.</li><li><strong>법적 리스크 해소:</strong> 탈락자 개인정보 자동 파기 프로세스 구축.</li></ul></div></div>`
+    },
+    {
+      id: 'career_4',
+      title: '근태 리스크 예방 프로세스',
+      sub: '주 52시간 근무제 준수 모니터링 시스템',
+      desc: '주 52시간 초과 예상자 사전 알림 및 모니터링',
+      modalContent: `<div class="space-y-6"><div><h4 class="text-brand-600">🔍 문제 상황</h4><p class="text-slate-600 text-sm leading-relaxed">생산 물량 급증 시 특정 직무/라인의 연장 근로가 법적 한도(52시간)에 육박. 중간 관리 실패로 사후 대응만 가능하여 법적 리스크에 노출됨.</p></div><div><h4 class="text-brand-600">🛠️ 실행 (Action)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>사전 알림 체계:</strong> 주 45시간 도달 시 해당 직원 및 부서장에게 경고 메일/알림 자동 발송.</li><li><strong>유연근무 도입:</strong> 생산 라인별 2주 단위 탄력근무제를 테스트 시행하여 효과성 검증.</li><li><strong>모니터링 대시보드:</strong> 전사 근로시간 현황을 부서별/개인별로 시각화하여 매주 경영진 공유.</li><li><strong>대체 휴무 활성화:</strong> 초과 근무 불가피 시 사전 대체휴무 지정을 권고하는 전자 신청 프로세스 개선.</li></ul></div><div><h4 class="text-brand-600">📈 결과 (Result)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>법적 리스크 감소:</strong> 초과 예상 인원 144명→21명 감소, 특별연장근로 승인 건수 2건→0건 개선.</li><li><strong>관리자 인식 개선:</strong> 연장/휴일 근무 시간이 5% 감소했음에도 생산량이 보전됨을 증명하여 인식 개선.</li><li><strong>제도 개선 근거:</strong> 4조 3교대 개편 및 유연근무제 도입의 논리적 근거 강화.</li></ul></div></div>`
     },
     {
       id: 'career_3',
@@ -64,11 +64,11 @@ const SITE_CONTENT = {
       modalContent: `<div class="space-y-6"><div><h4 class="text-brand-600">🔍 문제 상황</h4><p class="text-slate-600 text-sm leading-relaxed">단순 개요식 채용 공고로 직무에 대한 명확한 인사이트 제공이 불가하여 오해 발생. 우수 인재(MZ 세대)의 관심을 끌지 못하고 허수 지원자가 다수 발생.</p></div><div><h4 class="text-brand-600">🛠️ 실행 (Action)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>직무 인터뷰:</strong> 현직자 인터뷰를 통해 실제 업무 내용과 필요 역량(Keyword) 도출.</li><li><strong>데이터 기반 분석:</strong> 텍스트 마이닝으로 직무별 필요 스킬을 도출하고, 이를 기반으로 공고 문구 고도화.</li><li><strong>채널 최적화:</strong> 직무별 타겟이 모이는 특화 커뮤니티 및 학교 취업센터로 홍보 채널 확장.</li></ul></div><div><h4 class="text-brand-600">📈 결과 (Result)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>적합성 향상:</strong> 서류→1차 면접 전환율 6%→15% 상승, 최종 합격률 0.3%→0.5% 개선.</li><li><strong>채용 효율화:</strong> 동일 직무 재공고 횟수가 13회에서 2회로 대폭 감소.</li><li><strong>브랜딩:</strong> 보수적인 제조 기업 이미지를 탈피하고 소통하는 조직 이미지 구축.</li></ul></div></div>`
     },
     {
-      id: 'career_4',
-      title: '근태 리스크 예방 프로세스',
-      sub: '주 52시간 근무제 준수 모니터링 시스템',
-      desc: '주 52시간 초과 예상자 사전 알림 및 모니터링',
-      modalContent: `<div class="space-y-6"><div><h4 class="text-brand-600">🔍 문제 상황</h4><p class="text-slate-600 text-sm leading-relaxed">생산 물량 급증 시 특정 직무/라인의 연장 근로가 법적 한도(52시간)에 육박. 중간 관리 실패로 사후 대응만 가능하여 법적 리스크에 노출됨.</p></div><div><h4 class="text-brand-600">🛠️ 실행 (Action)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>사전 알림 체계:</strong> 주 45시간 도달 시 해당 직원 및 부서장에게 경고 메일/알림 자동 발송.</li><li><strong>유연근무 도입:</strong> 생산 라인별 2주 단위 탄력근무제를 테스트 시행하여 효과성 검증.</li><li><strong>모니터링 대시보드:</strong> 전사 근로시간 현황을 부서별/개인별로 시각화하여 매주 경영진 공유.</li><li><strong>대체 휴무 활성화:</strong> 초과 근무 불가피 시 사전 대체휴무 지정을 권고하는 전자 신청 프로세스 개선.</li></ul></div><div><h4 class="text-brand-600">📈 결과 (Result)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>법적 리스크 감소:</strong> 초과 예상 인원 144명→21명 감소, 특별연장근로 승인 건수 2건→0건 개선.</li><li><strong>관리자 인식 개선:</strong> 연장/휴일 근무 시간이 5% 감소했음에도 생산량이 보전됨을 증명하여 인식 개선.</li><li><strong>제도 개선 근거:</strong> 4조 3교대 개편 및 유연근무제 도입의 논리적 근거 강화.</li></ul></div></div>`
+      id: 'career_1',
+      title: '근태기 루트 효율화',
+      sub: '동선 분석 기반 기기 재배치 프로젝트',
+      desc: '동선 데이터 분석을 통한 기기 재배치 및 인식률 개선',
+      modalContent: `<div class="space-y-6"><div><h4 class="text-brand-600">🔍 문제 상황</h4><p class="text-slate-600 text-sm leading-relaxed">기존 근태기가 직원들의 주 이동 동선과 동떨어진 곳에 위치하여, 출퇴근 시 태깅 누락이 빈번하게 발생했습니다. 이로 인해 월말 수기 수정 요청 건수가 급증하여 행정 업무 효율 감소 및 급여 신뢰도 하락 리스크 지속.</p></div><div><h4 class="text-brand-600">🛠️ 실행 (Action)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>동선 히트맵 분석:</strong> 노조와 협의하여 CCTV, 근태로그 기반 식당, 주차장, 탈의실 등 주요 거점과 작업장 간의 이동 경로를 2주간 추적 분석.</li><li><strong>병목 구간 식별:</strong> 출퇴근 피크 타임에 대기 줄이 길어지는 구역과 아예 사용되지 않는 기기 식별.</li><li><strong>기기 재배치:</strong> 유휴 기기 3대를 주 동선 교차점으로 이동 설치하고, 인식 속도가 느린 구형 기기 교체.</li></ul></div><div><h4 class="text-brand-600">📈 결과 (Result)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2"><li><strong>인식률 개선:</strong> 전체 근태 태깅률 73% → 85% (12%p 개선)</li><li><strong>오류 감소:</strong> 월 평균 수기 수정 요청 건수 8%p 감소</li><li><strong>현장 만족도:</strong> 출퇴근 대기 시간 단축으로 현장 직원 불만 해소</li></ul></div></div>`
     },
     {
       id: 'career_5',

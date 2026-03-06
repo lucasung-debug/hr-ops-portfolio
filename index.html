@@ -180,7 +180,6 @@
                         <div class="flex gap-1">
                             <span class="text-[10px] md:text-xs font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full border border-brand-100">HR Ops (Primary)</span>
                             <span class="text-[10px] md:text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">Recruiter (Experience)</span>
-                            <span class="text-[10px] md:text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">GA (Experience)</span>
                         </div>
                     </div>
                 </a>
@@ -310,64 +309,105 @@
                         <p class="text-xs text-slate-400 mt-1">Updated: <span id="dashboard-updated" data-inline-editable data-inline-key="lastUpdated" data-inline-type="text">2025.12</span></p>
                     </div>
                 </div>
+                <!-- 카드 우선 그리드 -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <article class="reveal glass-card p-8 rounded-3xl bg-slate-50/50">
-                        <div class="flex justify-between items-start mb-6">
+                    <!-- 카드 1: 근태 리스크 예방 -->
+                    <article class="reveal glass-card p-8 rounded-3xl bg-slate-50/50 flex flex-col">
+                        <div class="flex justify-between items-start mb-5">
                             <div>
                                 <p class="text-xs font-bold text-blue-500 mb-1 uppercase tracking-wider">Risk Mgmt</p>
                                 <h4 class="text-xl font-bold break-keep">근태 리스크 예방</h4>
-                                <p class="text-[10px] text-slate-400 mt-1">52시간 초과예상자 관리 개선</p>
                             </div>
-                            <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600">
+                            <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 shrink-0">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             </div>
                         </div>
-                        <div class="h-48 relative"><canvas id="riskChart"></canvas></div>
-                        <div class="mt-6 pt-6 border-t border-slate-200 flex justify-between items-end">
-                            <span class="text-slate-400 text-sm font-semibold">Risk Reduction</span>
-                            <div class="flex items-baseline text-blue-600">
-                                <span class="text-3xl font-black counter" data-target="85" data-prefix="-">0</span><span class="text-xl font-bold ml-0.5">%</span>
+                        <!-- 문제 -->
+                        <p class="text-sm text-slate-500 border-l-2 border-blue-300 pl-3 mb-6 break-keep leading-relaxed">생산 물량 급증 시 52시간 법적 한도 초과 위험 — 사후 대응만 가능</p>
+                        <!-- 결과 수치 -->
+                        <div class="mt-auto">
+                            <div class="flex items-baseline text-blue-600 mb-3">
+                                <span class="text-5xl font-black counter" data-target="85" data-prefix="-">0</span><span class="text-2xl font-bold ml-1">%</span>
+                                <span class="text-slate-400 text-sm font-semibold ml-3">Risk Reduction</span>
+                            </div>
+                            <!-- 보조 수치 -->
+                            <div class="flex flex-wrap gap-2 pt-4 border-t border-slate-200">
+                                <span class="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full font-medium">초과예상 144명 → 21명</span>
+                                <span class="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full font-medium">특별연장 2건 → 0건</span>
                             </div>
                         </div>
                     </article>
-                    <article class="reveal glass-card p-8 rounded-3xl bg-slate-50/50" style="transition-delay: 100ms;">
-                        <div class="flex justify-between items-start mb-6">
+                    <!-- 카드 2: 채용 지원자풀 확대 -->
+                    <article class="reveal glass-card p-8 rounded-3xl bg-slate-50/50 flex flex-col" style="transition-delay: 100ms;">
+                        <div class="flex justify-between items-start mb-5">
                             <div>
                                 <p class="text-xs font-bold text-emerald-500 mb-1 uppercase tracking-wider">Recruiting</p>
                                 <h4 class="text-xl font-bold break-keep">채용 지원자풀 확대</h4>
-                                <p class="text-[10px] text-slate-400 mt-1">*생산직 오퍼레이터 지원자수 변화</p>
                             </div>
-                            <div class="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-600">
+                            <div class="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-600 shrink-0">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                             </div>
                         </div>
-                        <div class="h-48 relative"><canvas id="recruitChart"></canvas></div>
-                        <div class="mt-6 pt-6 border-t border-slate-200 flex justify-between items-end">
-                            <span class="text-slate-400 text-sm font-semibold">Growth Rate</span>
-                            <div class="flex items-baseline text-emerald-600">
-                                <span class="text-3xl font-black counter" data-target="217" data-prefix="+">0</span><span class="text-xl font-bold ml-0.5">%</span>
+                        <!-- 문제 -->
+                        <p class="text-sm text-slate-500 border-l-2 border-emerald-300 pl-3 mb-6 break-keep leading-relaxed">허수 지원자 다수, 전형 안내 지연으로 우수 인재 이탈</p>
+                        <!-- 결과 수치 -->
+                        <div class="mt-auto">
+                            <div class="flex items-baseline text-emerald-600 mb-3">
+                                <span class="text-5xl font-black counter" data-target="217" data-prefix="+">0</span><span class="text-2xl font-bold ml-1">%</span>
+                                <span class="text-slate-400 text-sm font-semibold ml-3">Growth Rate</span>
+                            </div>
+                            <!-- 보조 수치 -->
+                            <div class="flex flex-wrap gap-2 pt-4 border-t border-slate-200">
+                                <span class="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-medium">직무별 지원자 평균 +27%</span>
+                                <span class="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-medium">긍정 리뷰 0건 → 6건</span>
                             </div>
                         </div>
                     </article>
-                    <article class="reveal glass-card p-8 rounded-3xl bg-slate-50/50" style="transition-delay: 200ms;">
-                        <div class="flex justify-between items-start mb-6">
+                    <!-- 카드 3: 근태기 인식률 개선 -->
+                    <article class="reveal glass-card p-8 rounded-3xl bg-slate-50/50 flex flex-col" style="transition-delay: 200ms;">
+                        <div class="flex justify-between items-start mb-5">
                             <div>
                                 <p class="text-xs font-bold text-indigo-500 mb-1 uppercase tracking-wider">Efficiency</p>
                                 <h4 class="text-xl font-bold break-keep">근태기 인식률 개선</h4>
-                                <p class="text-[10px] text-slate-400 mt-1">공장 현장 550명 · 아날로그 환경에서</p>
                             </div>
-                            <div class="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600">
+                            <div class="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 shrink-0">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                             </div>
                         </div>
-                        <div class="h-48 relative"><canvas id="efficiencyChart"></canvas></div>
-                        <div class="mt-6 pt-6 border-t border-slate-200 flex justify-between items-end">
-                            <span class="text-slate-400 text-sm font-semibold">Tagging Rate</span>
-                            <div class="flex items-baseline text-indigo-600">
-                                <span class="text-xl font-bold mr-1">+</span><span class="text-3xl font-black counter" data-target="12" data-suffix="">0</span><span class="text-xl font-bold ml-0.5">%p</span>
+                        <!-- 문제 -->
+                        <p class="text-sm text-slate-500 border-l-2 border-indigo-300 pl-3 mb-6 break-keep leading-relaxed">기기 위치 불량으로 출퇴근 태깅 누락, 수기 수정 급증</p>
+                        <!-- 결과 수치 -->
+                        <div class="mt-auto">
+                            <div class="flex items-baseline text-indigo-600 mb-3">
+                                <span class="text-5xl font-black">+</span><span class="text-5xl font-black counter" data-target="12" data-suffix="">0</span><span class="text-2xl font-bold ml-1">%p</span>
+                                <span class="text-slate-400 text-sm font-semibold ml-3">Tagging Rate</span>
+                            </div>
+                            <!-- 보조 수치 -->
+                            <div class="flex flex-wrap gap-2 pt-4 border-t border-slate-200">
+                                <span class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full font-medium">인식률 73% → 85%</span>
+                                <span class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full font-medium">수기 수정 요청 -8%p</span>
                             </div>
                         </div>
                     </article>
+                </div>
+
+                <!-- 하단 차트 보조 섹션 -->
+                <div class="mt-16 pt-12 border-t border-slate-100 reveal">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-8 text-center">상세 데이터</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="flex flex-col items-center">
+                            <p class="text-xs text-slate-400 mb-3 font-medium">52시간 초과예상자 추이</p>
+                            <div class="h-32 w-full relative"><canvas id="riskChart"></canvas></div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <p class="text-xs text-slate-400 mb-3 font-medium">생산직 지원자 증감 추이</p>
+                            <div class="h-32 w-full relative"><canvas id="recruitChart"></canvas></div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <p class="text-xs text-slate-400 mb-3 font-medium">태깅 인식률 변화</p>
+                            <div class="h-32 w-full relative"><canvas id="efficiencyChart"></canvas></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

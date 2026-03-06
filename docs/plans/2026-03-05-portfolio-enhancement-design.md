@@ -30,7 +30,7 @@ PDF + QR코드
 
 ---
 
-## Phase 1 — 채용담당자 설득 구조 재편
+## ✅ Phase 1 — 채용담당자 설득 구조 재편 (완료)
 
 ### 채용담당자 여정 설계
 ```
@@ -55,7 +55,7 @@ PDF + QR코드
 
 ---
 
-## Phase 2 — PDF + QR 완성
+## ✅ Phase 2 — PDF + QR 완성 (완료)
 
 - `print.html` A4 인쇄 전용 CSS 재설계
 - 인쇄 시 QR코드 자동 삽입 (qrcode.js, 웹 포트폴리오 URL)
