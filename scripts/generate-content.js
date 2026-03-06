@@ -194,8 +194,23 @@ function buildAcademicHtml(s) {
 async function queryAll(dbId, filter, sorts) {
   const rows = [];
   let cursor;
+  // 필터 없이 먼저 시도, 실패 시 필터 제거하고 재시도
+  const params = { database_id: dbId, sorts, page_size: 100 };
+  if (filter) params.filter = filter;
   do {
-    const resp = await notion.databases.query({ database_id: dbId, filter, sorts, start_cursor: cursor, page_size: 100 });
+    let resp;
+    try {
+      resp = await notion.databases.query({ ...params, start_cursor: cursor });
+    } catch (e) {
+      if (e.code === 'validation_error' && filter) {
+        // 프로퍼티명 불일치 → 필터 없이 전체 조회
+        console.warn(`  [warn] filter 오류, 전체 조회로 전환: ${e.message}`);
+        delete params.filter;
+        resp = await notion.databases.query({ ...params, start_cursor: cursor });
+      } else {
+        throw e;
+      }
+    }
     rows.push(...resp.results);
     cursor = resp.next_cursor;
   } while (cursor);
