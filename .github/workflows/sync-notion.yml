@@ -1,0 +1,41 @@
+name: Sync Notion → content.js
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # UTC 00:00 = KST 09:00
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install --prefix scripts
+
+      - name: Generate content.js
+        run: node scripts/generate-content.js
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_DB_ID_CASES: ${{ secrets.NOTION_DB_ID_CASES }}
+          NOTION_DB_ID_GROWTH: ${{ secrets.NOTION_DB_ID_GROWTH }}
+          NOTION_DB_ID_SKILLS: ${{ secrets.NOTION_DB_ID_SKILLS }}
+          NOTION_PAGE_ID_SETTINGS: ${{ secrets.NOTION_PAGE_ID_SETTINGS }}
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add content.js
+          git diff --staged --quiet || (git commit -m "chore: auto-sync content from Notion [skip ci]" && git push)

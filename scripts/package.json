@@ -1,0 +1,12 @@
+{
+  "name": "notion-sync-scripts",
+  "version": "1.0.0",
+  "description": "Notion → content.js sync scripts",
+  "scripts": {
+    "generate": "node generate-content.js",
+    "migrate": "node migrate-to-notion.js"
+  },
+  "dependencies": {
+    "@notionhq/client": "^2.2.15"
+  }
+}
