@@ -19,7 +19,7 @@
             font-size: 11pt; color: var(--gray-900); background: white;
             line-height: 1.6; word-break: keep-all;
         }
-        .page { max-width: 794px; margin: 0 auto; padding: 20px 40px; }
+        .page { max-width: 794px; margin: 0 auto; padding: 20px 0; }
         h2 { font-size: 13pt; font-weight: 800; color: var(--brand); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid var(--brand-light); }
         h3 { font-size: 11pt; font-weight: 700; color: var(--gray-900); margin-bottom: 6px; }
         h4 { font-size: 10pt; font-weight: 700; color: var(--brand); margin: 10px 0 4px; }
@@ -31,7 +31,14 @@
         /* ===== 화면 전용 ===== */
         @media screen {
             body { background: #f1f5f9; }
-            .page { background: white; margin: 20px auto; box-shadow: 0 4px 24px rgba(0,0,0,0.1); border-radius: 8px; }
+            .a4-page {
+                background: white;
+                margin: 0 auto 32px;
+                box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+                border-radius: 8px;
+                padding: 28px 40px;
+                max-width: 794px;
+            }
             .print-toolbar {
                 position: fixed; top: 0; left: 0; right: 0; z-index: 100;
                 background: #1e293b; color: white; padding: 10px 24px;
@@ -48,11 +55,22 @@
 
         /* ===== 인쇄 전용 ===== */
         @media print {
+            @page { size: A4; margin: 14mm 16mm; }
             .print-toolbar { display: none !important; }
-            body { background: white; font-size: 10.5pt; }
-            .page { max-width: 100%; padding: 12mm 14mm; }
-            .page-break { page-break-before: always; }
-            h2 { font-size: 12pt; }
+            body { background: white; font-size: 9.5pt; padding-top: 0 !important; }
+            .page { max-width: 100%; padding: 0; }
+            .a4-page { page-break-after: always; }
+            .a4-page:last-child { page-break-after: auto; }
+            /* 섹션 제목이 고아로 남지 않도록 */
+            h2 { break-after: avoid; font-size: 11pt; }
+            h3 { break-after: avoid; }
+            /* 개별 항목 내부에서 페이지 넘김 방지 */
+            .career-item { break-inside: avoid; page-break-inside: avoid; }
+            .dx-item { break-inside: avoid; page-break-inside: avoid; }
+            .act-item { break-inside: avoid; page-break-inside: avoid; }
+            /* 2단 그리드 → 인쇄 시 단일 컬럼 */
+            .two-col { display: block; }
+            .two-col > div { margin-bottom: 16px; }
             * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
 
@@ -85,12 +103,21 @@
         .dx-content-wrap h4 { font-size: 9.5pt; }
 
         /* ===== 교육/활동 그리드 ===== */
-        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
         .edu-section { margin-bottom: 16px; }
         .edu-section h3 { font-size: 10pt; font-weight: 800; color: var(--brand); margin-bottom: 6px; }
 
         /* ===== 섹션 간격 ===== */
         .print-section { margin-bottom: 28px; }
+
+        /* ===== Tailwind shim (content.js 인라인 HTML 대응) ===== */
+        .flex { display: flex !important; }
+        .justify-between { justify-content: space-between !important; }
+        .items-center { align-items: center !important; }
+        .gap-8 { gap: 2rem !important; }
+        .gap-3 { gap: 0.75rem !important; }
+        .space-y-3 > * + * { margin-top: 0.75rem; }
+        .edu-section { break-inside: avoid; page-break-inside: avoid; }
     </style>
 </head>
 <body>
@@ -99,8 +126,10 @@
 <div class="print-toolbar">
     <h1>🖨️ 인쇄용 포트폴리오 — 성명재</h1>
     <div class="print-toolbar-btns">
+        <input id="company-input" type="text" placeholder="채용 회사명 입력 (선택)" oninput="applyCompany(this.value)"
+            style="padding:7px 12px;border-radius:7px;border:none;font-size:13px;width:200px;outline:none;color:#1e293b;">
         <button class="btn-back" onclick="history.back()">← 돌아가기</button>
-        <button class="btn-print" onclick="window.print()">PDF로 저장 / 인쇄</button>
+        <button class="btn-print" onclick="window.print()">PDF 저장 / 인쇄</button>
     </div>
 </div>
 
@@ -128,24 +157,45 @@
 
     // ── 헤더 렌더
     function renderHeader() {
-        return `<div class="print-header">
+        const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://smjportfolio.com&bgcolor=ffffff&color=1e293b&margin=4';
+        return `
+        <div id="company-label" style="display:none;font-size:9pt;font-weight:700;color:#2563eb;margin-bottom:8px;letter-spacing:0.04em;"></div>
+        <div class="print-header">
             <div>
                 <div class="ph-name">${D.profileName || '성명재'}</div>
-                <div class="ph-title">${D.profileTitle || 'HR/GA Generalist'}</div>
+                <div class="ph-title">${D.profileTitle || 'HR Operations'}</div>
                 <div class="badge-row">
                     <span class="badge">HR Ops</span>
                     <span class="badge">Recruiter</span>
-                    <span class="badge">GA</span>
                     <span class="badge">Tableau</span>
+                    <span class="badge">자동화</span>
                 </div>
             </div>
-            <div class="ph-contact">
-                <div>${D.email || ''}</div>
-                <div><a href="https://smjportfolio.com">smjportfolio.com</a></div>
-                <div>최종 업데이트: ${D.lastUpdated || ''}</div>
+            <div style="display:flex;gap:16px;align-items:flex-start;">
+                <div class="ph-contact">
+                    <div>${D.email || ''}</div>
+                    <div><a href="https://smjportfolio.com">smjportfolio.com</a></div>
+                    <div>최종 업데이트: ${D.lastUpdated || ''}</div>
+                </div>
+                <div style="text-align:center;">
+                    <img src="${qrUrl}" width="72" height="72" alt="QR" style="display:block;border:1px solid #e2e8f0;border-radius:6px;">
+                    <div style="font-size:7pt;color:#94a3b8;margin-top:3px;">포트폴리오</div>
+                </div>
             </div>
         </div>`;
     }
+
+    // ── 회사명 개인화
+    window.applyCompany = function(name) {
+        const el = document.getElementById('company-label');
+        if (!el) return;
+        if (name.trim()) {
+            el.textContent = `📌 ${name.trim()} 채용담당자님께 제출합니다.`;
+            el.style.display = 'block';
+        } else {
+            el.style.display = 'none';
+        }
+    };
 
     // ── 임팩트 박스
     function renderImpact() {
@@ -156,50 +206,155 @@
         </div>`;
     }
 
-    // ── 경력 프로젝트
-    function renderCareers() {
+    // ── 결과 불릿 추출
+    function extractResults(html) {
+        if (!html) return '';
+        const m = html.match(/결과[^<]*<\/h4>([\s\S]*?)<\/div>/);
+        if (!m) return '';
+        const ul = m[1].match(/<ul[\s\S]*?<\/ul>/);
+        return ul ? ul[0] : '';
+    }
+    // ── 경력 프로젝트 (번호 + Result만)
+    function renderCareers(start = 0, end = undefined, compact = false) {
         if (!D.careerProjects?.length) return '';
-        const items = D.careerProjects.map(p => `
+        const projects = D.careerProjects.slice(start, end);
+        const sectionMargin = compact ? '18px' : '28px';
+        const items = projects.map((p, i) => {
+            const num = start + i + 1;
+            return `
             <div class="career-item">
                 <div class="career-item-head">
                     <div>
-                        <div class="career-title">${p.title || ''}</div>
+                        <div class="career-title">
+                            <span style="color:var(--brand);margin-right:6px;">${num}.</span>${p.title || ''}
+                        </div>
                         <div class="career-sub">${p.sub || ''}</div>
                     </div>
                 </div>
-                <p style="font-size:9.5pt;color:#475569;margin-bottom:6px;">${p.desc || ''}</p>
-                <div class="career-modal prose">${p.modalContent || ''}</div>
-            </div>`).join('');
-        return `<div class="print-section"><h2>경력 프로젝트</h2>${items}</div>`;
+                <div class="career-modal" style="font-size:9pt;">
+                    <span style="font-size:8pt;font-weight:800;color:var(--brand);text-transform:uppercase;letter-spacing:0.06em;">Result</span>
+                    ${extractResults(p.modalContent)}
+                </div>
+            </div>`;
+        }).join('');
+        return `<div class="print-section" style="margin-bottom:${sectionMargin}"><h2>경력 프로젝트</h2>${items}</div>`;
     }
 
-    // ── DX 사례
-    function renderDx() {
+    // ── DX 사례 (Background + Result만 파싱 추출)
+    function extractDxSection(html, keyword) {
+        if (!html) return '';
+        const m = html.match(new RegExp(keyword + '[\\s\\S]*?<\\/strong>([\\s\\S]*?)<\\/div>'));
+        if (!m) return '';
+        return m[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+    function renderDx(compact = false) {
         if (!D.dxCases) return '';
         const cases = Object.values(D.dxCases);
         if (!cases.length) return '';
-        const items = cases.map(c => `
-            <div class="dx-item">
+        const itemMargin = compact ? '14px' : '18px';
+        const items = cases.map((c, i) => {
+            const bg = extractDxSection(c.content, 'Background');
+            const result = extractDxSection(c.content, 'Result') || extractDxSection(c.content, 'Future Plan');
+            return `<div class="dx-item" style="margin-bottom:${itemMargin}">
                 <div class="dx-head">
-                    <h3>${c.title || ''}</h3>
+                    <strong style="font-size:10.5pt;color:var(--gray-900);">
+                        <span style="color:var(--brand);margin-right:6px;">${i + 1}.</span>${c.title || ''}
+                    </strong>
                     <span class="dx-badge">${c.badge || ''}</span>
                 </div>
-                <div class="dx-content-wrap prose">${c.content || ''}</div>
-            </div>`).join('');
+                ${bg ? `<div style="margin:4px 0 6px;">
+                    <span style="font-size:7.5pt;font-weight:800;color:var(--gray-500);text-transform:uppercase;letter-spacing:0.07em;">Background</span>
+                    <p style="font-size:9pt;color:var(--gray-700);margin-top:2px;line-height:1.5;">${bg}</p>
+                </div>` : ''}
+                ${result ? `<div>
+                    <span style="font-size:7.5pt;font-weight:800;color:var(--brand);text-transform:uppercase;letter-spacing:0.07em;">Result</span>
+                    <p style="font-size:9pt;font-weight:700;color:var(--gray-900);margin-top:2px;">${result}</p>
+                </div>` : ''}
+            </div>`;
+        }).join('');
         return `<div class="print-section"><h2>DX / 업무 자동화 사례</h2>${items}</div>`;
     }
 
     // ── 교육/스킬
     function renderEducation() {
         if (!D.education) return '';
-        const { academic, training, skills } = D.education;
-        return `<div class="print-section two-col">
-            <div>
-                <div class="edu-section"><h3>학력</h3><div class="prose">${academic || ''}</div></div>
-                <div class="edu-section"><h3>보유 기술</h3><div class="prose">${skills || ''}</div></div>
+        const { academic, skills } = D.education;
+        // trainingList 배열로 직무교육 렌더
+        const trainingHtml = (D.trainingList || []).map(t => `
+            <div style="margin-bottom:8px;padding:8px 10px;background:var(--gray-100);border-radius:6px;break-inside:avoid;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+                    <div>
+                        <strong style="font-size:9.5pt;">${t.title || ''}</strong>
+                        <div style="font-size:8.5pt;color:var(--gray-500);margin-top:1px;">${t.org || ''} · ${t.dates || ''}</div>
+                        <div style="font-size:8.5pt;color:var(--gray-700);margin-top:2px;">${t.desc || ''}</div>
+                    </div>
+                    <span style="font-size:8pt;font-weight:700;color:var(--brand);white-space:nowrap;">${t.status || ''}</span>
+                </div>
+            </div>`).join('');
+        const certsHtml = `
+            <div style="margin-bottom:8px;padding:8px 10px;background:var(--gray-100);border-radius:6px;break-inside:avoid;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+                    <div>
+                        <strong style="font-size:9.5pt;">Google Analytics Certification</strong>
+                        <div style="font-size:8.5pt;color:var(--gray-500);margin-top:1px;">Google · 2026.01.11</div>
+                    </div>
+                    <span style="font-size:8pt;font-weight:700;color:var(--brand);white-space:nowrap;">취득</span>
+                </div>
             </div>
-            <div>
-                <div class="edu-section"><h3>직무 교육 이수</h3><div class="prose">${training || ''}</div></div>
+            <div style="margin-bottom:8px;padding:8px 10px;background:var(--gray-100);border-radius:6px;break-inside:avoid;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+                    <div>
+                        <strong style="font-size:9.5pt;">TOEIC Speaking IM2</strong>
+                        <div style="font-size:8.5pt;color:var(--gray-500);margin-top:1px;">ETS · 2024.09.21</div>
+                    </div>
+                    <span style="font-size:8pt;font-weight:700;color:var(--brand);white-space:nowrap;">취득</span>
+                </div>
+            </div>`;
+        // 학력 텍스트 간략 파싱 (인라인 HTML → 플레인 텍스트 카드)
+        const academicText = (academic || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+        const academicHtml = `
+            <div style="padding:10px 12px;background:var(--gray-100);border-radius:8px;">
+                <div style="font-weight:800;font-size:10pt;color:var(--gray-900);">한국항공대학교</div>
+                <div style="font-size:8.5pt;color:var(--brand);font-weight:700;margin:2px 0;">경영학부 경영학 전공 · 2017.03 ~ 2021.02</div>
+                <div style="font-size:8.5pt;color:var(--gray-700);margin-top:4px;">
+                    전체 평점 3.67 / 4.5 (133학점) &nbsp;|&nbsp; 전공 평점 3.78 / 4.5 (67학점)
+                </div>
+            </div>`;
+        // 보유기술 텍스트 파싱 → 깔끔한 테이블 형태
+        const skillGroups = [
+            { icon: '📊', name: 'Data & Analytics', items: [['Tableau','Intermediate'],['Google Analytics 4','Certified'],['Python (Text Mining)','Basic']] },
+            { icon: '⚙️', name: 'Automation & Dev',  items: [['Google Apps Script','Intermediate'],['MAKE (Integromat)','Workflow'],['HTML / CSS','Basic']] },
+            { icon: '🤖', name: 'HR Tech & AI',       items: [['Ninehire (ATS)','Admin'],['GPT Agent Design','Prompt Eng.'],['Slack / Notion / Teams','Collaboration']] },
+            { icon: '📝', name: 'Office & Docs',      items: [['Excel / Google Sheets','Advanced'],['PowerPoint','Proficient'],['Word / HWP','Proficient']] }
+        ];
+        const skillsHtml = skillGroups.map(g => `
+            <div style="margin-bottom:5px;">
+                <div style="font-size:8.5pt;font-weight:800;color:var(--brand);margin-bottom:2px;">${g.icon} ${g.name}</div>
+                <table style="width:100%;border-collapse:collapse;">
+                    ${g.items.map(([name, level]) => `
+                    <tr>
+                        <td style="font-size:8pt;color:var(--gray-700);padding:1px 0;">${name}</td>
+                        <td style="font-size:7.5pt;font-weight:700;color:var(--gray-500);text-align:right;white-space:nowrap;">${level}</td>
+                    </tr>`).join('')}
+                </table>
+            </div>`).join('');
+        return `<div class="print-section">
+            <h2>교육 · 기술 · 자격증</h2>
+            <!-- 2열: 왼쪽(학력+자격증) | 오른쪽(보유기술), 직무교육은 아래 full-width -->
+            <div class="two-col" style="align-items:start;">
+                <div>
+                    <div class="edu-section"><h3>학력</h3>${academicHtml}</div>
+                    <div class="edu-section" style="margin-top:12px;"><h3>자격증</h3>${certsHtml}</div>
+                </div>
+                <div>
+                    <div class="edu-section"><h3>보유 기술</h3>${skillsHtml}</div>
+                </div>
+            </div>
+            <!-- 직무교육: full-width 2-column flex row -->
+            <div style="margin-top:14px;">
+                <div class="edu-section"><h3>직무 교육 이수</h3>
+                <div style="display:flex;gap:12px;">${trainingHtml}</div>
+                </div>
             </div>
         </div>`;
     }
@@ -208,7 +363,7 @@
     function renderActivities() {
         if (!D.activitiesList?.length) return '';
         const items = D.activitiesList.map(a => `
-            <div style="margin-bottom:10px;padding:10px 12px;background:#f8fafc;border-radius:8px;break-inside:avoid;">
+            <div class="act-item" style="margin-bottom:10px;padding:10px 12px;background:#f8fafc;border-radius:8px;break-inside:avoid;page-break-inside:avoid;">
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;">
                     <div>
                         <strong>${a.icon || ''} ${a.title || ''}</strong>
@@ -220,23 +375,28 @@
         return `<div class="print-section"><h2>외부 활동</h2>${items}</div>`;
     }
 
-    // ── 전체 렌더
+    // ── 전체 렌더 (3개 명시적 A4 페이지)
     page.innerHTML = `
-        ${renderHeader()}
-        ${renderImpact()}
-        <div class="print-section">
-            <h2>소개</h2>
-            <p>${(D.heroHeadlineHTML||'').replace(/<[^>]+>/g,' ').trim()}</p>
-            <p style="margin-top:6px;">${(D.heroDescription||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim()}</p>
+        <div class="a4-page">
+            ${renderHeader()}
+            ${renderImpact()}
+            <div class="print-section">
+                <h2>소개</h2>
+                <p>${(D.heroHeadlineHTML||'').replace(/<[^>]+>/g,' ').trim()}</p>
+                <p style="margin-top:6px;">${(D.heroDescription||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim()}</p>
+            </div>
+            ${renderCareers(0, 3)}
         </div>
-        ${renderCareers()}
-        <div class="page-break"></div>
-        ${renderDx()}
-        <div class="page-break"></div>
-        ${renderEducation()}
-        ${renderActivities()}
-        <div style="text-align:center;font-size:8.5pt;color:#94a3b8;margin-top:24px;padding-top:12px;border-top:1px solid #e2e8f0;">
-            ${D.profileName || ''} · ${D.email || ''} · smjportfolio.com · ${D.lastUpdated || ''}
+        <div class="a4-page">
+            ${renderCareers(3, 6, true)}
+            ${renderDx(true)}
+        </div>
+        <div class="a4-page">
+            ${renderEducation()}
+            ${renderActivities()}
+            <div style="text-align:center;font-size:8.5pt;color:#94a3b8;margin-top:24px;padding-top:12px;border-top:1px solid #e2e8f0;">
+                ${D.profileName || ''} · ${D.email || ''} · smjportfolio.com · ${D.lastUpdated || ''}
+            </div>
         </div>
     `;
 })();
