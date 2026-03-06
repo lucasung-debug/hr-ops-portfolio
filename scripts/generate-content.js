@@ -332,7 +332,7 @@ async function fetchGrowth() {
 async function fetchSkills() {
   const rows = await queryAll(
     DB_SKILLS,
-    { property: '상태', select: { equals: '발행' } },
+    { property: '선택', select: { equals: '발행' } },
     [{ property: '순서', direction: 'ascending' }]
   );
 

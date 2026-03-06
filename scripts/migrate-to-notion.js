@@ -320,7 +320,7 @@ async function migrateSkills() {
       '카테고리': { select: { name: s.category } },
       '레벨':     { rich_text: txt(s.level) },
       '레벨색상': { select: { name: s.color } },
-      '상태':     { select: { name: '발행' } },
+      '선택':     { select: { name: '발행' } },
       '순서':     { number: s.order },
     });
     console.log(`  ✓ ${s.name}`);
