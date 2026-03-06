@@ -314,6 +314,9 @@ async function migrateGrowth() {
 
 async function migrateSkills() {
   console.log('\n[5/5] 스킬 DB...');
+  // DB 스키마 확인
+  const dbInfo = await notion.databases.retrieve({ database_id: DB_SKILLS });
+  console.log('  스킬 DB 프로퍼티:', Object.keys(dbInfo.properties).join(', '));
   for (const s of SKILLS_LIST) {
     await createPage(DB_SKILLS, {
       '스킬명':   { title: txt(s.name) },
