@@ -206,14 +206,186 @@ const SETTINGS = {
 };
 
 // ──────────────────────────────────────────────
-// 유틸
+// 블록 빌더
 // ──────────────────────────────────────────────
-function txt(text) {
-  return [{ type: 'text', text: { content: String(text) } }];
+function txt(text, bold = false) {
+  return [{ type: 'text', text: { content: String(text) }, annotations: bold ? { bold: true } : undefined }].map(t => {
+    if (!t.annotations) delete t.annotations;
+    return t;
+  });
 }
 
+const blk = {
+  h2:     t => ({ object: 'block', type: 'heading_2',           heading_2:           { rich_text: txt(t) } }),
+  h3:     t => ({ object: 'block', type: 'heading_3',           heading_3:           { rich_text: txt(t) } }),
+  para:   t => ({ object: 'block', type: 'paragraph',           paragraph:           { rich_text: txt(t) } }),
+  bullet: t => ({ object: 'block', type: 'bulleted_list_item',  bulleted_list_item:  { rich_text: txt(t) } }),
+  divider:  () => ({ object: 'block', type: 'divider', divider: {} }),
+  callout:(t, emoji='💡') => ({ object: 'block', type: 'callout', callout: { rich_text: txt(t), icon: { type: 'emoji', emoji } } }),
+  table:  (headers, rows) => ({
+    object: 'block', type: 'table',
+    table: {
+      table_width: headers.length,
+      has_column_header: true,
+      has_row_header: false,
+      children: [
+        { object: 'block', type: 'table_row', table_row: { cells: headers.map(h => txt(h)) } },
+        ...rows.map(r => ({ object: 'block', type: 'table_row', table_row: { cells: r.map(c => txt(c)) } })),
+      ],
+    },
+  }),
+};
+
+// ──────────────────────────────────────────────
+// 모달 상세 내용 (training 항목 페이지 본문)
+// ──────────────────────────────────────────────
+const MODAL_BODY_BLOCKS = {
+  hr_basic: [
+    blk.h3('📚 Key Learning: HR 체계의 이해'),
+    blk.bullet('📌 직무관리: 직무분석 절차, 직무기술서/명세서 작성, 직무평가'),
+    blk.bullet('📌 채용관리: 역량 중심 면접(BEI) 설계 및 채용 브랜딩 변화'),
+    blk.bullet('📌 성과관리: MBO vs OKR, 성과책임(Accountability) 규명'),
+    blk.bullet('📌 보상관리: 직무급/역할급 설계 논리, Merit Increase 매트릭스'),
+    blk.bullet('📌 노동법: 근로시간, 연차, 모성보호, 퇴직 관리 등 필수 법규'),
+    blk.divider(),
+    blk.h3('💡 My Perspective: 인사이트'),
+    blk.h2('직무 기준(Job Value)이 HR의 시작점이다'),
+    blk.para('직무 가치가 불명확하면 채용-평가-보상의 논리가 모두 어긋남. \'사람\'이 아닌 \'역할\'에 집중하는 것이 공정성의 핵심.'),
+    blk.h2('보상은 \'금액\'보다 \'설득 논리\'가 중요하다'),
+    blk.para('구성원은 결과값 자체보다 "왜 내가 이 평가/보상을 받았는가"에 대한 설명에 반응함. HR은 이 논리를 설계하고 전달하는 역할.'),
+    blk.h2('리스크 관리는 \'절차적 정당성\'에서 온다'),
+    blk.para('퇴직, 징계 등 민감 이슈는 결과보다 \'사전 예고-소명 기회-일관된 기준\'이라는 절차를 준수했는가가 법적/조직적 리스크를 결정함.'),
+    blk.divider(),
+    blk.h3('🚀 Next Step: 현업 적용 계획'),
+    blk.bullet('✅ 직무 기반 HR 체계 재점검 — 현행 직무기술서의 실효성 점검 및 채용 JD와의 정합성 검증'),
+    blk.bullet('✅ 보상 수용성 강화 모델링 — 평가 등급별 인상률 시뮬레이션(Top/Mid/Low) 및 커뮤니케이션 가이드 마련'),
+    blk.bullet('✅ 노무 리스크 대응 매뉴얼화 — 반복되는 이슈(연차, 근로시간, 도급) 중심의 Case Study 루틴화'),
+  ],
+  tableau: [
+    blk.h3('📊 Key Learning: 기능과 활용'),
+    blk.h2('1. 시각화 기초 & 차트'),
+    blk.bullet('차원 vs 측정값, 집계 원리 이해'),
+    blk.bullet('이중축/콤보 차트, 트리맵, 산점도 구현'),
+    blk.bullet('맵 시각화(레이어/필터) 및 대시보드 배치'),
+    blk.h2('2. 계산식 & 고급 분석'),
+    blk.bullet('LOD(FIXED)를 활용한 전국 기준 비율 산출'),
+    blk.bullet('테이블 계산(전일 대비 등락, 구성비)'),
+    blk.bullet('매개변수를 활용한 동적 측정값 전환'),
+    blk.h2('3. 특수 차트 & 디자인'),
+    blk.bullet('도넛, 워터폴(수익 누계), 범프(순위 변동)'),
+    blk.bullet('퍼널, 간트 차트(영업시간 시각화)'),
+    blk.bullet('대시보드 디자인 10원칙 적용 (Z형 배치 등)'),
+    blk.h2('4. 데이터 전처리 (Prep)'),
+    blk.bullet('Union/Join을 통한 데이터 결합 및 정제'),
+    blk.bullet('값 그룹핑 및 불필요 필드 정리'),
+    blk.bullet('분석용 데이터셋 출력 및 자동화'),
+    blk.divider(),
+    blk.h3('💡 My Perspective: HR 데이터 관점'),
+    blk.bullet('01 \'감\'이 아닌 \'근거\' 기반의 결정: 인사 운영을 근태/채용 Pipeline/인력 투입 현황 등 실시간 데이터 모니터링 체계로 전환 가능함.'),
+    blk.bullet('02 평균의 함정 탈피: 특정 부서나 공정의 과로 위험(Outlier)을 박스플롯 등으로 즉시 시각화하여 선제적 조치 가능.'),
+    blk.bullet('03 전달력 있는 커뮤니케이션: 경영진과 현장 관리자가 직접 필터를 조작하며 인사이트를 얻는 대시보드 구축이 핵심.'),
+    blk.divider(),
+    blk.h3('🚀 Next Step: 현업 적용 계획'),
+    blk.table(
+      ['단계', '실행 목표'],
+      [
+        ['1단계: 모니터링', '부서/공정별 근태 편차 및 위험 구간(52시간 임계) 자동 시각화'],
+        ['2단계: 인력 매칭', '정원(TO) vs 실 투입 인력(직영/도급) 차이 분석 및 경고 시스템'],
+        ['3단계: 채용 분석', '채용 단계별(서류-면접-입사) 전환율 Funnel 및 병목 구간 시각화'],
+        ['4단계: 운영 자동화', 'HR 원천 데이터 표준화 및 Tableau Prep을 활용한 전처리 자동화'],
+      ]
+    ),
+  ],
+};
+
+// ──────────────────────────────────────────────
+// DB별 사용 설명서 블록
+// ──────────────────────────────────────────────
+const GUIDE_CASES = [
+  blk.callout('이 페이지는 사용 설명서입니다. 삭제하지 마세요.', '📖'),
+  blk.h3('케이스 스터디 DB 사용 방법'),
+  blk.para('이 DB는 포트폴리오 사이트의 경력 프로젝트(career)와 DX 사례(dx) 섹션을 관리합니다.'),
+  blk.divider(),
+  blk.h3('📋 프로퍼티 설명'),
+  blk.bullet('제목 — 프로젝트명 (사이트 카드 상단에 표시)'),
+  blk.bullet('유형 — career(경력 케이스) 또는 dx(DX 사례) 중 선택'),
+  blk.bullet('상태 — 발행(사이트 노출) / 초안(숨김)'),
+  blk.bullet('sub — [career 전용] 카드 부제목'),
+  blk.bullet('desc — [career 전용] 카드 짧은 설명'),
+  blk.bullet('뱃지 — [dx 전용] 기술 스택 태그 (예: GAS + MAKE)'),
+  blk.bullet('문제 — 문제 상황 설명'),
+  blk.bullet('액션 — 실행 내용 (줄바꿈으로 항목 구분)'),
+  blk.bullet('결과 — 결과 수치 (줄바꿈으로 항목 구분)'),
+  blk.bullet('순서 — 표시 순서 (숫자가 낮을수록 앞에 표시)'),
+  blk.divider(),
+  blk.h3('✏️ 수정 방법'),
+  blk.bullet('내용 수정 후 GitHub Actions → "Sync Notion → content.js" → Run workflow'),
+  blk.bullet('상태를 초안으로 바꾸면 다음 sync 때 사이트에서 제거됨'),
+  blk.bullet('새 항목 추가 시 순서 번호를 지정해야 정렬이 유지됨'),
+];
+
+const GUIDE_GROWTH = [
+  blk.callout('이 페이지는 사용 설명서입니다. 삭제하지 마세요.', '📖'),
+  blk.h3('성장 기록 DB 사용 방법'),
+  blk.para('이 DB는 직무 교육(training)과 주요 활동(activity) 섹션을 관리합니다.'),
+  blk.divider(),
+  blk.h3('📋 프로퍼티 설명 — 공통'),
+  blk.bullet('제목 — 항목명'),
+  blk.bullet('유형 — training(직무 교육) 또는 activity(주요 활동)'),
+  blk.bullet('상태 — 발행 / 초안'),
+  blk.bullet('설명 — 카드에 표시되는 한줄 설명'),
+  blk.bullet('순서 — 표시 순서'),
+  blk.h3('📋 프로퍼티 설명 — training 전용'),
+  blk.bullet('카테고리 — HRM/HRD, Data Visualization 등'),
+  blk.bullet('날짜 — 기간 문자열 (예: 2025.07.07 ~ 09 (18H))'),
+  blk.bullet('기관 — 교육 기관명'),
+  blk.bullet('상태텍스트 — 수료 완료 등'),
+  blk.bullet('모달ID — 상세 팝업이 있는 경우 고유 ID 입력 (예: tableau, hr_basic)'),
+  blk.callout('모달ID가 있는 training 항목은 이 페이지 본문(아래)에 상세 내용을 Notion 형식으로 작성하세요. h1/h2/h3/단락/불릿/표 모두 지원됩니다.', '✍️'),
+  blk.h3('📋 프로퍼티 설명 — activity 전용'),
+  blk.bullet('역할 — 직책 또는 역할명'),
+  blk.bullet('기간 — 활동 기간 (예: 2023.12 ~ 2025.02)'),
+  blk.bullet('계급 — 계급 또는 수상 내역'),
+  blk.bullet('아이콘 — 카드에 표시될 이모지'),
+  blk.callout('activity 항목도 페이지 본문에 상세 내용을 작성하면 모달 팝업에 표시됩니다.', '✍️'),
+  blk.divider(),
+  blk.h3('✏️ 수정 방법'),
+  blk.bullet('내용 수정 후 GitHub Actions → "Sync Notion → content.js" → Run workflow'),
+];
+
+const GUIDE_SKILLS = [
+  blk.callout('이 페이지는 사용 설명서입니다. 삭제하지 마세요.', '📖'),
+  blk.h3('스킬 DB 사용 방법'),
+  blk.para('이 DB는 포트폴리오 스킬 섹션의 카테고리별 기술 목록을 관리합니다.'),
+  blk.divider(),
+  blk.h3('📋 프로퍼티 설명'),
+  blk.bullet('스킬명 — 기술 이름 (예: Tableau, Python)'),
+  blk.bullet('카테코리 — 아래 4가지 중 정확히 일치하게 입력'),
+  blk.para('  → Data & Analytics / Automation & Dev / HR Tech & AI / Office & Documentation'),
+  blk.bullet('레벨 — 뱃지에 표시될 텍스트 (예: Intermediate, Certified, Basic, Admin)'),
+  blk.bullet('레벨색상 — 뱃지 색상: blue / emerald / purple / indigo / slate'),
+  blk.bullet('선택 — 발행 / 초안'),
+  blk.bullet('순서 — 카테고리 내 표시 순서 (숫자가 낮을수록 앞)'),
+  blk.divider(),
+  blk.h3('🎨 레벨색상 가이드'),
+  blk.table(
+    ['색상값', '표시 색상', '추천 용도'],
+    [
+      ['blue',    '파란색',   'Intermediate, Certified'],
+      ['emerald', '초록색',   'Workflow, 실무 활용'],
+      ['purple',  '보라색',   '특수 기술'],
+      ['indigo',  '남색',     'Advanced, 고급'],
+      ['slate',   '회색',     'Basic, Admin, 기본'],
+    ]
+  ),
+  blk.divider(),
+  blk.h3('✏️ 수정 방법'),
+  blk.bullet('내용 수정 후 GitHub Actions → "Sync Notion → content.js" → Run workflow'),
+  blk.bullet('카테코리 값이 정확히 일치하지 않으면 해당 스킬이 누락될 수 있습니다'),
+];
+
 function noteBlock(text) {
-  return { object: 'block', type: 'callout', callout: { rich_text: txt(text), icon: { type: 'emoji', emoji: '⚠️' } } };
+  return blk.callout(text, '⚠️');
 }
 
 async function createPage(dbId, properties, bodyBlocks = []) {
@@ -279,7 +451,9 @@ async function migrateGrowth() {
   console.log('\n[4/5] 성장 기록 DB (training + activity)...');
 
   for (const t of TRAINING_LIST) {
-    const body = [noteBlock(t.bodyNote)];
+    const body = t.modalId && MODAL_BODY_BLOCKS[t.modalId]
+      ? MODAL_BODY_BLOCKS[t.modalId]
+      : [noteBlock(t.bodyNote)];
     const page = await createPage(DB_GROWTH, {
       '제목':      { title: txt(t.title) },
       '유형':      { select: { name: 'training' } },
@@ -330,6 +504,16 @@ async function migrateSkills() {
   }
 }
 
+async function addGuidePages() {
+  console.log('\n[6/6] 사용 설명서 페이지 추가...');
+  await createPage(DB_CASES,  { '제목': { title: txt('📖 사용 설명서 (읽어주세요)') }, '상태': { select: { name: '초안' } }, '유형': { select: { name: 'career' } }, '순서': { number: 999 } }, GUIDE_CASES);
+  console.log('  ✓ 케이스 스터디 DB');
+  await createPage(DB_GROWTH, { '제목': { title: txt('📖 사용 설명서 (읽어주세요)') }, '유형': { select: { name: 'training' } }, '상태': { select: { name: '초안' } }, '순서': { number: 999 } }, GUIDE_GROWTH);
+  console.log('  ✓ 성장 기록 DB');
+  await createPage(DB_SKILLS, { '스킬명': { title: txt('📖 사용 설명서 (읽어주세요)') }, '선택': { select: { name: '초안' } }, '순서': { number: 999 } }, GUIDE_SKILLS);
+  console.log('  ✓ 스킬 DB');
+}
+
 // ──────────────────────────────────────────────
 // 메인
 // ──────────────────────────────────────────────
@@ -352,12 +536,12 @@ async function main() {
   await migrateCases();
   await migrateGrowth();
   await migrateSkills();
+  await addGuidePages();
 
   console.log('\n=== 완료 ===');
   console.log('다음 단계:');
-  console.log('  1. 노션에서 training 항목의 페이지 본문에 모달 상세 내용 작성');
-  console.log('  2. 노션에서 activity 항목의 페이지 본문에 활동 상세 내용 작성');
-  console.log('  3. node scripts/generate-content.js 로 content.js 재생성 확인');
+  console.log('  1. 노션에서 activity 항목의 페이지 본문에 활동 상세 내용 작성');
+  console.log('  2. GitHub Actions → Sync Notion → Run workflow 로 사이트 반영');
 }
 
 main().catch(err => { console.error(err); process.exit(1); });
