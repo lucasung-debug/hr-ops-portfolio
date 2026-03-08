@@ -1,7 +1,7 @@
 // content.js - 포트폴리오 기본 콘텐츠 데이터
 // !! 이 파일은 GitHub Actions (sync-notion.yml) 이 자동 생성합니다 !!
 // 직접 편집하지 마세요 — Notion DB 에서 수정하세요.
-// 마지막 생성: 2026-03-07T01:03:07.496Z
+// 마지막 생성: 2026-03-08T01:08:14.548Z
 
 const SITE_CONTENT = {
 
