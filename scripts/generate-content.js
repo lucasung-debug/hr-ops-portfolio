@@ -185,7 +185,7 @@ function buildSkillsHtml(skillsByCategory) {
 // HTML 빌더: 학력 섹션
 // ──────────────────────────────────────────────
 function buildAcademicHtml(s) {
-  return `<div class="flex flex-col md:flex-row gap-6 p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:border-brand-100 transition duration-300 animate-[slideIn_0.4s_ease-out]"><div class="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center text-3xl border border-slate-100">🎓</div><div class="flex-1"><div class="flex flex-col md:flex-row md:items-center justify-between mb-2"><h4 class="text-xl font-bold text-slate-900 break-keep">${s.school}</h4><span class="text-xs font-bold text-primary-600 bg-brand-50 px-3 py-1 rounded-full w-fit mt-2 md:mt-0">${s.period}</span></div><p class="text-slate-700 font-bold mb-4 break-keep">${s.major}</p><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="bg-white p-4 rounded-xl border border-slate-100"><span class="text-xs text-slate-400 block mb-1">전체 평점</span><span class="text-lg font-bold text-slate-800">${s.gpaTotal}</span><span class="text-xs text-slate-400 ml-1">(${s.gpaCredits}학점 이수)</span></div><div class="bg-white p-4 rounded-xl border border-slate-100"><span class="text-xs text-slate-400 block mb-1">전공 평점</span><span class="text-lg font-bold text-primary-600">${s.gpaMajor}</span><span class="text-xs text-slate-400 ml-1">(${s.gpaMajorCredits}학점 이수)</span></div></div></div></div>`;
+  return `<div class="flex flex-col md:flex-row gap-6 p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:border-brand-100 transition duration-300 animate-[slideIn_0.4s_ease-out]"><div class="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center text-3xl border border-slate-100">🎓</div><div class="flex-1"><div class="flex flex-col md:flex-row md:items-center justify-between mb-2"><h4 class="text-xl font-bold text-slate-900 break-keep">${s.school}</h4><span class="text-xs font-bold text-primary-600 bg-primary-50 px-3 py-1 rounded-full w-fit mt-2 md:mt-0">${s.period}</span></div><p class="text-slate-700 font-bold mb-4 break-keep">${s.major}</p><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="bg-white p-4 rounded-xl border border-slate-100"><span class="text-xs text-slate-400 block mb-1">전체 평점</span><span class="text-lg font-bold text-slate-800">${s.gpaTotal}</span><span class="text-xs text-slate-400 ml-1">(${s.gpaCredits}학점 이수)</span></div><div class="bg-white p-4 rounded-xl border border-slate-100"><span class="text-xs text-slate-400 block mb-1">전공 평점</span><span class="text-lg font-bold text-primary-600">${s.gpaMajor}</span><span class="text-xs text-slate-400 ml-1">(${s.gpaMajorCredits}학점 이수)</span></div></div></div></div>`;
 }
 
 // ──────────────────────────────────────────────
@@ -219,7 +219,8 @@ async function queryAll(dbId, filter, sorts) {
 
 async function fetchSettings() {
   const page = await notion.pages.retrieve({ page_id: PAGE_SETTINGS });
-  return {
+  // 먼저 페이지 속성에서 읽기
+  const result = {
     resume_kr:             prop(page, 'resume_kr'),
     resume_en:             prop(page, 'resume_en'),
     portfolio_kr:          prop(page, 'portfolio_kr'),
@@ -232,6 +233,29 @@ async function fetchSettings() {
     gpaMajor:              prop(page, 'academic_gpa_major'),
     gpaMajorCredits:       prop(page, 'academic_gpa_major_credits'),
   };
+  // 속성에 학력 데이터가 없으면 본문 텍스트에서 "key: value" 형식 파싱
+  if (!result.school) {
+    const blocks = await fetchBlocks(PAGE_SETTINGS);
+    const keyMap = {
+      academic_school: 'school', academic_major: 'major',
+      academic_period: 'period', academic_gpa_total: 'gpaTotal',
+      academic_gpa_credits: 'gpaCredits', academic_gpa_major: 'gpaMajor',
+      academic_gpa_major_credits: 'gpaMajorCredits',
+      resume_kr: 'resume_kr', resume_en: 'resume_en',
+      portfolio_kr: 'portfolio_kr', portfolio_en: 'portfolio_en',
+    };
+    for (const b of blocks) {
+      const texts = b[b.type]?.rich_text;
+      if (!texts) continue;
+      const line = texts.map(t => t.plain_text).join('').trim();
+      const m = line.match(/^(\w+):\s*(.+)$/);
+      if (m && keyMap[m[1]]) {
+        const key = keyMap[m[1]];
+        if (!result[key]) result[key] = m[2].trim();
+      }
+    }
+  }
+  return result;
 }
 
 async function fetchCases() {
