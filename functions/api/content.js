@@ -9,56 +9,66 @@
  *  - Settings > Environment variables: EDITOR_TOKEN (비밀 토큰)
  */
 
+const ALLOWED_ORIGIN = 'https://smjportfolio.com';
+const MAX_BODY_SIZE = 100 * 1024; // 100KB
+
 const CORS = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
   'Access-Control-Allow-Methods': 'GET, PUT, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
+const SECURITY = {
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+};
+
+function respond(body, status, extra = {}) {
+  return new Response(body, {
+    status,
+    headers: { 'Content-Type': 'application/json', ...CORS, ...SECURITY, ...extra },
+  });
+}
+
 export async function onRequestGet({ env }) {
   try {
     const content = await env.PORTFOLIO_KV.get('portfolio_content');
-    return new Response(content || 'null', {
-      status: 200,
-      headers: { 'Content-Type': 'application/json', ...CORS },
-    });
-  } catch (e) {
-    return new Response('null', {
-      status: 200,
-      headers: { 'Content-Type': 'application/json', ...CORS },
-    });
+    return respond(content || 'null', 200);
+  } catch {
+    return respond('null', 200);
   }
 }
 
 export async function onRequestPut({ request, env }) {
-  // EDITOR_TOKEN 인증
   const authHeader = request.headers.get('Authorization') || '';
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
-
   if (!env.EDITOR_TOKEN || !token || token !== env.EDITOR_TOKEN) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json', ...CORS },
-    });
+    return respond(JSON.stringify({ error: 'Unauthorized' }), 401);
+  }
+
+  const contentType = request.headers.get('Content-Type') || '';
+  if (!contentType.includes('application/json')) {
+    return respond(JSON.stringify({ error: 'Content-Type must be application/json' }), 415);
   }
 
   try {
     const body = await request.text();
-    // 유효한 JSON인지 검증
-    JSON.parse(body);
+    if (body.length > MAX_BODY_SIZE) {
+      return respond(JSON.stringify({ error: 'Payload too large' }), 413);
+    }
+    try {
+      JSON.parse(body);
+    } catch {
+      return respond(JSON.stringify({ error: 'Invalid JSON' }), 400);
+    }
     await env.PORTFOLIO_KV.put('portfolio_content', body);
-    return new Response(JSON.stringify({ ok: true }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json', ...CORS },
-    });
-  } catch (e) {
-    return new Response(JSON.stringify({ error: 'Invalid JSON or KV error' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json', ...CORS },
-    });
+    return respond(JSON.stringify({ ok: true }), 200);
+  } catch {
+    return respond(JSON.stringify({ error: 'Internal server error' }), 500);
   }
 }
 
 export async function onRequestOptions() {
-  return new Response(null, { status: 204, headers: CORS });
+  return new Response(null, { status: 204, headers: { ...CORS, ...SECURITY } });
 }

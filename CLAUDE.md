@@ -3,6 +3,23 @@
 **Stack:** Pure HTML · Vanilla JS · Tailwind CSS (CDN) · Cloudflare Pages (GitHub 자동 배포)
 **No build tools** — 빌드 단계 없음, CDN 링크만 사용
 
+## Run / Deploy
+
+```bash
+# 로컬 미리보기 (빌드 없음)
+# index.html을 브라우저에서 직접 열거나 live-server 사용
+npx live-server .
+```
+
+**배포:** `git push origin main` → GitHub Actions → Cloudflare Pages 자동 배포 (1~2분)
+
+## Branding Rules (변경 금지)
+
+- **헤드라인:** `'원래 이랬어'를 바꾸는 HR입니다.` — 절대 변경 금지
+- **배지:** `HR Ops · 채용 · 자동화 · 구직 중` — "제조 현장 전문" 사용 금지
+- **군 경력:** Hero/배지 노출 금지 → "주요 활동" 섹션에서만 성과 언어로 표현
+- **임팩트 수치:** "700명 규모 사업장" 사용 (550명 특정 강조 금지)
+
 ## Key Files
 
 - `index.html` — 포트폴리오 메인 (히어로 → 성과 → 케이스 스터디 순서)
