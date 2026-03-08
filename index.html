@@ -123,7 +123,12 @@
     }
     #sidebar.collapsed .nav-item {
       justify-content: center;
+      gap: 0;
       padding: 10px;
+      width: 40px;
+      height: 40px;
+      margin: 0 auto;
+      border-radius: 10px;
     }
     .nav-dot {
       width: 6px;
@@ -163,6 +168,13 @@
     .prose ul { list-style-type: disc; padding-left: 1.2em; margin-bottom: 0.8em; color: #475569; font-size: 0.9em; }
     .prose li { margin-bottom: 0.25em; }
     .prose strong { color: #1e293b; font-weight: 600; }
+    /* Override dark-theme DX content styles inside white modal */
+    .prose .text-white { color: #1e293b !important; }
+    .prose .text-slate-300 { color: var(--primary) !important; }
+    .prose .text-slate-400 { color: #64748b !important; }
+    .prose .text-emerald-400 { color: #059669 !important; }
+    .prose .text-brand-400 { color: var(--primary) !important; }
+    .prose .border-slate-700 { border-color: #e2e8f0 !important; }
 
     /* ── Activity accordion ── */
     .activity-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
@@ -809,14 +821,13 @@ function renderDxGrid() {
   }
   if (empty) empty.classList.add('hidden');
   var html = keys.map(function(k) {
-    var c    = cases[k];
-    var tags = (c.tags || []).map(function(t) {
-      return '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wide" style="color: var(--primary); background: #e6f4fa; border-color: #99d3eb">' + t + '</span>';
-    }).join('');
+    var c = cases[k];
+    var badgeHtml = c.badge
+      ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wide" style="color: var(--primary); background: #e6f4fa; border-color: #99d3eb">' + c.badge + '</span>'
+      : '';
     return '<div class="bg-white rounded-3xl border p-6 card-hover cursor-pointer group" data-action="open-dx-modal" data-id="' + k + '" style="border-color: var(--border)">'
-      + '<div class="flex flex-wrap gap-2 mb-4">' + tags + '</div>'
+      + '<div class="flex flex-wrap gap-2 mb-4">' + badgeHtml + '</div>'
       + '<h4 class="font-black text-lg text-slate-900 mb-2 break-keep group-hover:text-primary-600 transition">' + (c.title || k) + '</h4>'
-      + '<p class="text-sm text-slate-500 break-keep line-clamp-3 mb-4">' + (c.summary || '') + '</p>'
       + '<span class="text-xs font-bold flex items-center gap-1" style="color: var(--primary)">자세히 보기 →</span>'
       + '</div>';
   }).join('');
@@ -832,14 +843,17 @@ function renderTraining() {
   if (!list.length) { if (empty) empty.classList.remove('hidden'); return; }
   if (empty) empty.classList.add('hidden');
   var html = list.map(function(t) {
-    return '<div class="bg-white rounded-2xl border p-5 card-hover" style="border-color: var(--border)">'
+    var hasModal = t.modalId && (D.modalDetails || {})[t.modalId];
+    return '<div class="bg-white rounded-2xl border p-5 card-hover' + (hasModal ? ' cursor-pointer' : '') + '"'
+      + ' style="border-color: var(--border)"'
+      + (hasModal ? ' data-action="open-training-modal" data-id="' + t.modalId + '"' : '')
+      + '>'
       + '<div class="flex items-start justify-between gap-3">'
       + '<div>'
-      + '<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">' + (t.type || 'Training') + '</span>'
+      + '<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">' + (t.category || 'Training') + '</span>'
       + '<h5 class="font-black text-slate-900 break-keep text-sm">' + (t.title || '') + '</h5>'
       + '<p class="text-xs text-slate-500 mt-1">' + (t.org || '') + '</p>'
       + '</div>'
-      + (t.date ? '<span class="text-xs font-bold px-2.5 py-1 rounded-full border shrink-0" style="color: var(--primary); background: #e6f4fa; border-color: #99d3eb">' + t.date + '</span>' : '')
       + '</div></div>';
   }).join('');
   setNodeContent(grid, html);
@@ -864,7 +878,11 @@ function renderActivities() {
       + '</div></div>'
       + '<svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform" id="act-icon-' + i + '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>'
       + '</button>'
-      + '<div id="act-' + i + '" class="activity-body"><div class="px-5 pb-5 text-sm text-slate-600 prose">' + (a.detail || a.summary || '') + '</div></div>'
+      + '<div id="act-' + i + '" class="activity-body"><div class="px-5 pb-5 text-sm text-slate-600 prose">'
+      + (a.role ? '<p class="font-semibold text-slate-700 mb-1">' + a.role + '</p>' : '')
+      + (a.period ? '<p class="text-xs text-slate-400 mb-1">' + a.period + (a.rank ? ' · ' + a.rank : '') + '</p>' : '')
+      + (a.content && a.content !== '<div class="space-y-4"></div>' ? a.content : '')
+      + '</div></div>'
       + '</div>';
   }).join('');
   setNodeContent(list, html);
@@ -913,6 +931,16 @@ function openDxModal(id) {
   document.getElementById('modal-tag').textContent   = (c.tags || []).join(' · ');
   document.getElementById('modal-title').textContent = c.title || id;
   setNodeContent(document.getElementById('modal-body'), c.detail || c.content || c.summary || '상세 내용이 없습니다.');
+  document.getElementById('detail-modal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function openTrainingModal(id) {
+  var details = (D.modalDetails || {})[id];
+  if (!details) return;
+  document.getElementById('modal-tag').textContent   = details.subtitle || '';
+  document.getElementById('modal-title').textContent = details.title || '';
+  setNodeContent(document.getElementById('modal-body'), details.content || '상세 내용이 없습니다.');
   document.getElementById('detail-modal').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
 }
@@ -1010,8 +1038,9 @@ document.addEventListener('click', function(e) {
   if (!el) return;
   var action = el.dataset.action;
   var id     = el.dataset.id;
-  if (action === 'open-modal')    openModal(id);
-  if (action === 'open-dx-modal') openDxModal(id);
+  if (action === 'open-modal')          openModal(id);
+  if (action === 'open-dx-modal')       openDxModal(id);
+  if (action === 'open-training-modal') openTrainingModal(id);
 });
 
 // ── Esc closes modal
