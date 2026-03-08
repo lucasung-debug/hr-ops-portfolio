@@ -138,6 +138,28 @@ const SITE_CONTENT = {
     'skills': `<div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-[slideIn_0.4s_ease-out]"><div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-md transition"><div class="flex items-center gap-3 mb-4"><span class="text-2xl bg-white p-2 rounded-lg shadow-sm">📊</span><h4 class="text-lg font-bold text-slate-900">Data & Analytics</h4></div><ul class="space-y-3 text-sm text-slate-600"><li class="flex justify-between items-center"><span>Tableau</span><span class="text-xs font-bold bg-blue-100 text-blue-600 px-2 py-0.5 rounded">Intermediate</span></li><li class="flex justify-between items-center"><span>Google Analytics 4</span><span class="text-xs font-bold bg-blue-100 text-blue-600 px-2 py-0.5 rounded">Certified</span></li><li class="flex justify-between items-center"><span>Python (Text Mining)</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Basic</span></li></ul></div><div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-md transition"><div class="flex items-center gap-3 mb-4"><span class="text-2xl bg-white p-2 rounded-lg shadow-sm">⚙️</span><h4 class="text-lg font-bold text-slate-900">Automation & Dev</h4></div><ul class="space-y-3 text-sm text-slate-600"><li class="flex justify-between items-center"><span>Google Apps Script</span><span class="text-xs font-bold bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded">Intermediate</span></li><li class="flex justify-between items-center"><span>MAKE (Integromat)</span><span class="text-xs font-bold bg-purple-100 text-purple-600 px-2 py-0.5 rounded">Workflow</span></li><li class="flex justify-between items-center"><span>HTML / CSS</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Basic</span></li></ul></div><div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-md transition"><div class="flex items-center gap-3 mb-4"><span class="text-2xl bg-white p-2 rounded-lg shadow-sm">🤖</span><h4 class="text-lg font-bold text-slate-900">HR Tech & AI</h4></div><ul class="space-y-3 text-sm text-slate-600"><li class="flex justify-between items-center"><span>Ninehire (ATS)</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Admin</span></li><li class="flex justify-between items-center"><span>GPT Agent Design</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Prompt Eng.</span></li><li class="flex justify-between items-center"><span>Slack / Notion / Teams</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Collaboration</span></li></ul></div><div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-md transition"><div class="flex items-center gap-3 mb-4"><span class="text-2xl bg-white p-2 rounded-lg shadow-sm">📝</span><h4 class="text-lg font-bold text-slate-900">Office & Documentation</h4></div><ul class="space-y-3 text-sm text-slate-600"><li class="flex justify-between items-center"><span>Excel / Google Sheets</span><span class="text-xs font-bold bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded">Advanced</span></li><li class="flex justify-between items-center"><span>PowerPoint</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Proficient</span></li><li class="flex justify-between items-center"><span>Word / HWP</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Proficient</span></li></ul></div></div>`
   },
 
+  // ===== 자격 & 어학 (Notion: 성장 기록 DB, 유형=certification) =====
+  certificationList: [
+    {
+        "id": "cert_ga4",
+        "title": "Google Analytics Certification",
+        "org": "Google",
+        "date": "2026.01.11",
+        "icon": "📜",
+        "desc": "GA4 인증",
+        "credentialUrl": "https://www.credential.net/e50ea40f-aae0-41d7-b242-d6551212a14f"
+    },
+    {
+        "id": "cert_toeic",
+        "title": "TOEIC Speaking IM2",
+        "org": "ETS",
+        "date": "2024.09.21",
+        "icon": "🗣️",
+        "desc": "Practical Communication",
+        "credentialUrl": null
+    }
+],
+
   // ===== 주요 활동 (Notion: 성장 기록 DB, 유형=activity) =====
   activitiesList: [
     {

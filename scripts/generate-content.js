@@ -309,6 +309,7 @@ async function fetchGrowth() {
 
   const trainingList = [];
   const activitiesList = [];
+  const certificationList = [];
   const modalDetails = {};
 
   for (const row of rows) {
@@ -348,9 +349,38 @@ async function fetchGrowth() {
         icon:    prop(row, '아이콘'),
         content: blocks.length > 0 ? notionBlocksToHtml(blocks) : '',
       });
+    } else if (type === 'certification') {
+      const blocks = await fetchBlocks(row.id);
+      let credentialUrl = null;
+      for (const b of blocks) {
+        if (b.type === 'bookmark' && b.bookmark && b.bookmark.url) {
+          credentialUrl = b.bookmark.url;
+          break;
+        }
+        if (b.type === 'file' || b.type === 'pdf') {
+          const f = b[b.type];
+          credentialUrl = (f && f.url) || null;
+          if (credentialUrl) break;
+        }
+        if (b.type === 'paragraph' && b.paragraph && b.paragraph.rich_text) {
+          for (const t of b.paragraph.rich_text) {
+            if (t.href) { credentialUrl = t.href; break; }
+          }
+          if (credentialUrl) break;
+        }
+      }
+      certificationList.push({
+        id:            `cert_${certificationList.length + 1}`,
+        title:         prop(row, '제목'),
+        org:           prop(row, '기관'),
+        date:          prop(row, '날짜'),
+        icon:          prop(row, '아이콘') || '📜',
+        desc:          prop(row, '설명'),
+        credentialUrl: credentialUrl,
+      });
     }
   }
-  return { trainingList, activitiesList, modalDetails };
+  return { trainingList, activitiesList, certificationList, modalDetails };
 }
 
 async function fetchSkills() {
@@ -377,7 +407,7 @@ async function fetchSkills() {
 // content.js 파일 생성
 // ──────────────────────────────────────────────
 function buildContentJs(data) {
-  const { settings, careerProjects, dxCases, trainingList, activitiesList, modalDetails, skillsHtml, academicHtml } = data;
+  const { settings, careerProjects, dxCases, trainingList, activitiesList, certificationList, modalDetails, skillsHtml, academicHtml } = data;
 
   const serialize = val => JSON.stringify(val, null, 2)
     .replace(/"modalContent":/g, 'modalContent:')
@@ -418,6 +448,9 @@ const SITE_CONTENT = {
 
   // ===== 직무 교육 목록 (Notion: 성장 기록 DB, 유형=training) =====
   trainingList: ${JSON.stringify(trainingList, null, 4)},
+
+  // ===== 자격 & 어학 (Notion: 성장 기록 DB, 유형=certification) =====
+  certificationList: ${JSON.stringify(certificationList, null, 4)},
 
   // ===== 교육 정보 =====
   education: {
@@ -467,9 +500,10 @@ async function main() {
     },
     careerProjects: caseData.careerProjects,
     dxCases:        caseData.dxCases,
-    trainingList:   growthData.trainingList,
-    activitiesList: growthData.activitiesList,
-    modalDetails:   growthData.modalDetails,
+    trainingList:      growthData.trainingList,
+    activitiesList:    growthData.activitiesList,
+    certificationList: growthData.certificationList,
+    modalDetails:      growthData.modalDetails,
     skillsHtml,
     academicHtml,
   });
