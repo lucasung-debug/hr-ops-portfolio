@@ -788,7 +788,7 @@ function renderCareerGrid() {
     return '<div class="bg-gray-50 rounded-2xl border border-gray-200 p-5 card-hover cursor-pointer group" data-action="open-modal" data-id="' + (p.id || '') + '">'
       + '<div class="flex flex-wrap gap-2 mb-3">' + tags + '</div>'
       + '<h5 class="font-black text-slate-900 mb-2 break-keep group-hover:text-primary-600 transition text-sm">' + (p.title || '') + '</h5>'
-      + '<p class="text-sm text-slate-500 break-keep line-clamp-2">' + (p.summary || '') + '</p>'
+      + '<p class="text-sm text-slate-500 break-keep line-clamp-2">' + (p.desc || '') + '</p>'
       + highlight
       + '</div>';
   }).join('');
@@ -901,7 +901,7 @@ function openModal(id) {
   if (!p) return;
   document.getElementById('modal-tag').textContent   = (p.tags || []).join(' · ');
   document.getElementById('modal-title').textContent = p.title || '';
-  setNodeContent(document.getElementById('modal-body'), (D.modalDetails || {})[id] || p.detail || p.summary || '상세 내용이 없습니다.');
+  setNodeContent(document.getElementById('modal-body'), (D.modalDetails || {})[id] || p.modalContent || p.detail || p.desc || '상세 내용이 없습니다.');
   document.getElementById('detail-modal').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
 }
