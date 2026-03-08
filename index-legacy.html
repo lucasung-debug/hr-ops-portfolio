@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="성명재 HR Operations Portfolio - 데이터 기반 인사 운영 전문가">
+    <title>성명재 | HR Operations Portfolio</title>
+    
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: { sans: ['Pretendard', 'sans-serif'] },
+                colors: { brand: { 500: '#2563eb', 600: '#1d4ed8' } }
+            }
+        }
+    }
+</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="content.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+
+    <style>
+        body { font-family: 'Pretendard', sans-serif; letter-spacing: -0.02em; word-break: keep-all; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .break-keep { word-break: keep-all; }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.6); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .glass-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); }
+        .biz-card { background: #ffffff; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .biz-card:hover { transform: rotateX(2deg) rotateY(2deg) translateY(-5px); }
+        #mobile-menu { transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; }
+        #mobile-menu.open { max-height: 400px; opacity: 1; }
+        #detail-modal, #system-modal { transition: opacity 0.3s ease; }
+        #detail-modal.hidden, #system-modal.hidden { opacity: 0; pointer-events: none; }
+        #detail-modal:not(.hidden), #system-modal:not(.hidden) { opacity: 1; pointer-events: auto; }
+        .active-dx { border-color: #2563eb !important; background-color: #1e293b !important; }
+        .active-dx span:first-child { color: white !important; }
+        .active-dx span:last-child { color: #60a5fa !important; }
+        .prose h4 { color: #2563eb; font-weight: 700; margin-top: 1.5em; margin-bottom: 0.5em; font-size: 1.1em; }
+        .prose ul { list-style-type: disc; padding-left: 1.2em; margin-bottom: 1em; color: #475569; font-size: 0.95em; }
+        .prose li { margin-bottom: 0.3em; }
+        .prose strong { color: #1e293b; font-weight: 600; }
+
+        /* === INLINE EDITOR === */
+        #inline-edit-bar { transform: translateY(-100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+        #inline-edit-bar.open { transform: translateY(0); }
+        body.edit-mode { padding-top: 56px !important; }
+        body.edit-mode [data-inline-editable] {
+            outline: 2px dashed #818cf8; outline-offset: 3px;
+            border-radius: 6px; cursor: text;
+            transition: outline-color 0.15s, background 0.15s;
+        }
+        body.edit-mode [data-inline-editable]:hover { outline-color: #4f46e5; background: rgba(99,102,241,0.05); }
+        body.edit-mode [data-inline-editable]:focus { outline: 2px solid #2563eb; background: rgba(37,99,235,0.06); box-shadow: 0 0 0 5px rgba(37,99,235,0.09); }
+        body.edit-mode #dx-content[contenteditable="true"],
+        body.edit-mode #education-content[contenteditable="true"] {
+            outline: 2px dashed #818cf8; outline-offset: 4px; border-radius: 8px; cursor: text;
+        }
+        body.edit-mode #dx-content[contenteditable="true"]:focus,
+        body.edit-mode #education-content[contenteditable="true"]:focus {
+            outline-color: #4f46e5; box-shadow: 0 0 0 5px rgba(79,70,229,0.09);
+        }
+        body.edit-mode #dx-nav button span[contenteditable="true"] {
+            outline: 1px dashed rgba(139,92,246,0.7); padding: 1px 3px; border-radius: 3px; cursor: text; display: inline-block;
+        }
+        #inline-edit-fab { transition: opacity 0.2s, transform 0.2s; }
+        #inline-edit-fab.hidden-fab { opacity: 0; pointer-events: none; transform: scale(0.8); }
+        /* FLOAT BAR (Rich Text) */
+        #float-bar { position: fixed; z-index: 9999; display: none; background: #1e293b; border-radius: 10px; padding: 6px 10px; box-shadow: 0 8px 28px rgba(0,0,0,0.35); pointer-events: auto; white-space: nowrap; }
+        .fb-btn { background: transparent; color: #e2e8f0; border: none; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 700; min-width: 28px; transition: background 0.1s; vertical-align: middle; }
+        .fb-btn:hover { background: rgba(255,255,255,0.15); }
+        .fb-sep { width: 1px; height: 18px; background: rgba(255,255,255,0.2); margin: 0 4px; display: inline-block; vertical-align: middle; }
+        .fb-select { background: rgba(255,255,255,0.1); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 3px 6px; font-size: 12px; cursor: pointer; vertical-align: middle; }
+        .fb-color-label { cursor: pointer; padding: 4px 8px; border-radius: 6px; font-size: 13px; font-weight: 700; position: relative; display: inline-block; vertical-align: middle; color: #e2e8f0; }
+        .fb-color-label:hover { background: rgba(255,255,255,0.15); }
+        .fb-color-label input[type=color] { opacity: 0; position: absolute; inset: 0; cursor: pointer; width: 100%; height: 100%; }
+        /* EDIT PANELS (Career / Image) */
+        #career-edit-panel, #image-editor { position: fixed; inset: 0; z-index: 3000; display: none; align-items: center; justify-content: center; padding: 16px; }
+        .ep-bg { position: absolute; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); }
+        .ep-box { position: relative; background: white; border-radius: 20px; box-shadow: 0 25px 60px rgba(0,0,0,0.3); width: 100%; max-width: 640px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; }
+        .ep-head { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #f1f5f9; background: #fafafa; }
+        .ep-head h3 { font-weight: 800; font-size: 15px; color: #1e293b; margin: 0; }
+        .ep-head > button { background: #f1f5f9; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 12px; color: #64748b; }
+        .ep-head > button:hover { background: #e2e8f0; }
+        .ep-body { padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+        .ep-label { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }
+        .ep-input { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 14px; color: #1e293b; outline: none; font-family: inherit; transition: border-color 0.15s; }
+        .ep-input:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+        .ep-rich { width: 100%; min-height: 180px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; font-size: 14px; color: #475569; outline: none; overflow-y: auto; line-height: 1.7; font-family: inherit; transition: border-color 0.15s; }
+        .ep-rich:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+        .ep-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 20px; border-top: 1px solid #f1f5f9; }
+        .ep-cancel { background: #f1f5f9; color: #64748b; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 700; }
+        .ep-cancel:hover { background: #e2e8f0; }
+        .ep-save { background: #4f46e5; color: white; border: none; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 700; }
+        .ep-save:hover { background: #4338ca; }
+        .ie-filebtn { display: block; text-align: center; padding: 14px; border: 2px dashed #c7d2fe; border-radius: 10px; cursor: pointer; color: #4f46e5; font-weight: 700; font-size: 13px; transition: background 0.15s; }
+        .ie-filebtn:hover { background: #f5f3ff; }
+        /* IMAGE OVERLAYS */
+        .img-edit-wrap { position: relative; display: inline-block; }
+        .img-edit-btn { position: absolute; inset: 0; background: rgba(79,70,229,0.6); color: white; font-weight: 700; font-size: 11px; border: 2px dashed rgba(255,255,255,0.8); cursor: pointer; border-radius: 4px; display: none; align-items: center; justify-content: center; z-index: 10; transition: background 0.2s; flex-direction: column; gap: 2px; }
+        .img-edit-btn:hover { background: rgba(79,70,229,0.88); }
+        body.edit-mode .img-edit-btn { display: flex; }
+        /* AUTH MODAL */
+        #auth-modal { position: fixed; inset: 0; z-index: 9000; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); padding: 16px; }
+        .auth-box { background: white; border-radius: 20px; padding: 32px; width: 100%; max-width: 360px; box-shadow: 0 25px 60px rgba(0,0,0,0.3); }
+        .auth-box h3 { font-size: 18px; font-weight: 800; color: #1e293b; margin: 0 0 8px; }
+        .auth-box p { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+        .auth-input { width: 100%; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 10px 14px; font-size: 15px; outline: none; font-family: inherit; transition: border-color 0.15s; box-sizing: border-box; }
+        .auth-input:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+        .auth-error { color: #ef4444; font-size: 12px; font-weight: 600; margin-top: 6px; min-height: 18px; }
+        .auth-btn-row { display: flex; gap: 8px; margin-top: 16px; }
+        .auth-cancel { flex: 1; background: #f1f5f9; color: #64748b; border: none; padding: 10px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 700; }
+        .auth-cancel:hover { background: #e2e8f0; }
+        .auth-confirm { flex: 2; background: #4f46e5; color: white; border: none; padding: 10px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 700; }
+        .auth-confirm:hover:not(:disabled) { background: #4338ca; }
+        .auth-confirm:disabled { opacity: 0.6; cursor: not-allowed; }
+        /* STRUCTURED CAREER EDIT PANEL */
+        .ep-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+        .ep-section-head { font-size: 12px; font-weight: 800; color: #4f46e5; text-transform: uppercase; letter-spacing: 0.06em; }
+        .ep-textarea { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; font-size: 13px; color: #475569; outline: none; font-family: inherit; resize: vertical; min-height: 70px; line-height: 1.6; transition: border-color 0.15s; }
+        .ep-textarea:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+        .ep-bullet-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+        .ep-bullet-dot { color: #4f46e5; font-size: 16px; flex-shrink: 0; line-height: 1; }
+        .ep-bullet-input { flex: 1; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 10px; font-size: 13px; color: #1e293b; outline: none; font-family: inherit; transition: border-color 0.15s; }
+        .ep-bullet-input:focus { border-color: #4f46e5; }
+        .ep-bullet-del { background: #fee2e2; color: #ef4444; border: none; width: 22px; height: 22px; border-radius: 50%; cursor: pointer; font-size: 10px; flex-shrink: 0; }
+        .ep-bullet-del:hover { background: #fecaca; }
+        .ep-add-btn { background: transparent; color: #4f46e5; border: 1.5px dashed #c7d2fe; border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer; width: 100%; transition: background 0.15s; }
+        .ep-add-btn:hover { background: #f5f3ff; }
+        /* MEDIA EDITOR TABS */
+        .med-tabs { display: flex; gap: 2px; background: #f1f5f9; padding: 3px; border-radius: 10px; margin-bottom: 12px; }
+        .med-tab { flex: 1; text-align: center; padding: 6px; border-radius: 7px; font-size: 12px; font-weight: 700; color: #64748b; cursor: pointer; border: none; background: transparent; transition: all 0.15s; }
+        .med-tab.active { background: white; color: #4f46e5; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+        .med-pane { display: none; flex-direction: column; gap: 10px; }
+        .med-pane.active { display: flex; }
+        .med-preview { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; max-height: 200px; display: none; }
+        .med-preview iframe, .med-preview img { width: 100%; display: block; max-height: 200px; }
+        /* EDIT MODE — ITEM ADD/DELETE CONTROLS */
+        .edit-item-wrap { position: relative; }
+        .edit-del-overlay { position: absolute; top: 7px; right: 7px; background: #fef2f2; border: 1.5px solid #fecaca; color: #ef4444; border-radius: 50%; width: 26px; height: 26px; display: none; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; z-index: 20; padding: 0; }
+        .edit-del-overlay:hover { background: #fee2e2; }
+        body.edit-mode .edit-del-overlay { display: flex; }
+        .edit-add-card { border: 2px dashed #c7d2fe !important; background: #f5f3ff !important; color: #4f46e5; display: none; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 13px; cursor: pointer; transition: background 0.15s; }
+        .edit-add-card:hover { background: #ede9fe !important; }
+        body.edit-mode .edit-add-card { display: flex; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 selection:bg-brand-500 selection:text-white">
+
+    <!-- Inline Edit Bar -->
+    <div id="inline-edit-bar" class="fixed top-0 left-0 right-0 z-[600] bg-indigo-700 text-white px-4 sm:px-6 py-3.5 flex items-center justify-between shadow-xl gap-3">
+        <div class="flex items-center gap-2 min-w-0">
+            <span class="text-base shrink-0">✏️</span>
+            <span class="font-bold text-sm shrink-0">편집 모드</span>
+            <span class="text-indigo-300 text-xs hidden sm:inline truncate">— 파란 테두리 영역을 클릭해서 바로 수정하세요</span>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+            <button id="inline-admin-btn" class="px-3 py-1.5 text-xs rounded-lg bg-indigo-500 hover:bg-indigo-400 font-bold transition" title="상세 편집 (admin.html)">⚙️ 상세편집</button>
+            <button id="inline-cancel-btn" class="px-3 sm:px-4 py-1.5 text-xs sm:text-sm rounded-lg bg-white/20 hover:bg-white/30 font-bold transition">취소</button>
+            <button id="inline-save-btn" class="px-3 sm:px-4 py-1.5 text-xs sm:text-sm rounded-lg bg-white text-indigo-700 hover:bg-indigo-50 font-bold transition shadow-lg">저장 ✓</button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6">
+            <nav class="flex items-center justify-between h-16">
+                <a href="#" class="flex items-center space-x-3 group">
+                    <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-2">
+                        <span id="nav-profile-name" class="font-extrabold text-xl tracking-tight">성명재</span>
+                        <span class="hidden md:inline-block w-px h-4 bg-slate-300"></span>
+                        <div class="flex gap-1">
+                            <span class="text-[10px] md:text-xs font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full border border-brand-100">HR Ops (Primary)</span>
+                            <span class="text-[10px] md:text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">Recruiter (Experience)</span>
+                        </div>
+                    </div>
+                </a>
+                <div class="hidden lg:flex space-x-6 text-sm font-semibold text-slate-500">
+                    <a href="#summary" class="hover:text-brand-600 transition py-2">Intro</a>
+                    <a href="#dashboard" class="hover:text-brand-600 transition py-2">Performance</a>
+                    <a href="#experience" class="hover:text-brand-600 transition py-2">Career</a>
+                    <a href="#automation" class="hover:text-brand-600 transition py-2">DX Case</a>
+                    <a href="#education" class="hover:text-brand-600 transition py-2">Growth</a>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="#contact-card" class="hidden md:inline-flex bg-slate-900 text-white px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-widest hover:bg-slate-800 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0">CONTACT ME</a>
+                    <button id="menu-btn" class="lg:hidden p-2 text-slate-600 hover:text-brand-600 focus:outline-none transition" aria-label="Toggle Menu">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </div>
+        <div id="mobile-menu" class="lg:hidden bg-white border-b border-slate-100 shadow-xl">
+            <nav class="px-6 py-4 space-y-2">
+                <a href="#summary" class="block p-3 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition" data-action="close-menu">Intro</a>
+                <a href="#dashboard" class="block p-3 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition" data-action="close-menu">Performance</a>
+                <a href="#experience" class="block p-3 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition" data-action="close-menu">Career</a>
+                <a href="#automation" class="block p-3 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition" data-action="close-menu">DX Case</a>
+                <a href="#education" class="block p-3 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition" data-action="close-menu">Growth</a>
+                <a href="#contact-card" class="block p-3 mt-2 rounded-lg text-sm font-black text-white bg-slate-900 text-center uppercase tracking-widest" data-action="close-menu">Contact Me</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Detail Modal -->
+    <div id="detail-modal" class="fixed inset-0 z-[100] hidden justify-center items-center px-4" role="dialog" aria-modal="true">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" data-action="close-modal"></div>
+        <div class="relative w-full max-w-3xl max-h-[85vh] bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col transform transition-all">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/80 backdrop-blur sticky top-0 z-10">
+                <div><h3 id="modal-title" class="text-xl font-bold text-slate-900 break-keep"></h3><p id="modal-subtitle" class="text-xs text-slate-500 mt-1"></p></div>
+                <button data-action="close-modal" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition" aria-label="Close modal">✕</button>
+            </div>
+            <div id="modal-content" class="p-8 overflow-y-auto custom-scrollbar prose max-w-none text-slate-600"></div>
+        </div>
+    </div>
+
+    <!-- System Modal -->
+    <div id="system-modal" class="fixed inset-0 z-[110] hidden justify-center items-center px-4" role="dialog" aria-modal="true">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" data-action="close-system-modal"></div>
+        <div id="system-modal-content" class="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl p-6 transform transition-all text-center"></div>
+    </div>
+
+    <main>
+<!-- Hero -->
+<section id="summary" class="pt-40 pb-24 relative overflow-hidden">
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none z-0">
+        <div class="absolute top-20 left-1/4 w-72 h-72 bg-blue-200/40 rounded-full mix-blend-multiply filter blur-3xl animate-float"></div>
+        <div class="absolute bottom-20 right-1/4 w-96 h-96 bg-indigo-200/40 rounded-full mix-blend-multiply filter blur-3xl animate-float" style="animation-delay: 2s"></div>
+    </div>
+    <div class="max-w-5xl mx-auto px-6 text-center relative z-10 reveal active">
+        <div class="inline-flex items-center space-x-2 bg-white/80 backdrop-blur border border-slate-200 px-4 py-1.5 rounded-full text-xs font-bold mb-8 shadow-sm cursor-default">
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            <span class="text-slate-600 uppercase tracking-wider">HR Ops · 채용 · 자동화 · 구직 중</span>
+        </div>
+        <h1 id="hero-headline" data-inline-editable data-inline-key="heroHeadlineHTML" data-inline-type="html" class="text-4xl md:text-6xl font-black mb-8 leading-[1.2] tracking-tight break-keep
+   text-slate-900
+   drop-shadow-[0_2px_6px_rgba(0,0,0,0.25)]">
+'원래 이랬어'를 <span class="text-brand-600">바꾸는</span> HR입니다.
+</h1>
+        <!-- Impact Summary -->
+        <div class="max-w-3xl mx-auto mt-10 mb-10 text-center">
+
+            <p id="hero-subtitle" data-inline-editable data-inline-key="heroSubtitle" data-inline-type="text" class="text-sm font-bold text-brand-600 tracking-widest uppercase mb-3">
+                HR Operations
+            </p>
+
+            <p id="hero-description" data-inline-editable data-inline-key="heroDescription" data-inline-type="html" class="text-xl md:text-xl text-slate-900 break-keep leading-snug">
+                ATS 도입 · 근태 시스템 재편 · 52시간 관리 · 업무 자동화<br>
+                1년 안에 4개 영역을 직접 설계하고 작동시켰습니다.
+            </p>
+
+            <div class="w-12 h-[2px] bg-slate-300 mx-auto my-6"></div>
+
+            <p class="text-base md:text-lg break-keep leading-relaxed">
+                <span class="text-xs font-black text-slate-400 uppercase tracking-widest block mb-2">
+                    대표 성과
+                </span>
+                <span id="hero-impact" data-inline-editable data-inline-key="heroImpactHTML" data-inline-type="html" class="font-bold text-slate-900">
+                    700명 규모 사업장 근태 시스템 재설계 →<br>
+                    인식률 <span class="text-brand-600">+12%p</span>, 수기 정정 <span class="text-brand-600">–8%p</span>, 클레임 <span class="text-brand-600">0건</span>
+                </span>
+            </p>
+        </div>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <a href="https://drive.google.com/uc?export=download&id=1sTqdcd8MPOAjTG9nQo7m2SNFGWzE7Llx"
+               target="_blank" rel="noopener noreferrer"
+               class="bg-brand-600 text-white px-8 py-4 rounded-full font-bold
+                 hover:bg-brand-500 transition shadow-xl
+                 flex items-center justify-center gap-2
+                 transform hover:-translate-y-1">
+                이력서 보기
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+            </a>
+            <a href="#dashboard"
+               class="bg-white text-slate-900 px-8 py-4 rounded-full font-bold
+                 border-2 border-slate-900
+                 hover:bg-slate-900 hover:text-white
+                 transition shadow-xl
+                 flex items-center justify-center gap-2
+                 transform hover:-translate-y-1">
+                포트폴리오 전체 보기
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </a>
+        </div>
+    </div>
+</section>
+        <!-- Performance -->
+        <section id="dashboard" class="py-24 bg-white relative">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6 reveal">
+                    <div>
+                        <h2 class="text-sm font-black text-brand-600 mb-2 uppercase tracking-widest">Performance Dashboard</h2>
+                        <h3 class="text-3xl md:text-4xl font-bold text-slate-900 break-keep">수치로 증명하는 인사 혁신</h3>
+                    </div>
+                    <div class="text-right">
+                        <p id="dashboard-company" class="text-slate-500 font-medium">오뚜기라면 인사팀 실무 성과</p>
+                        <p class="text-xs text-slate-400 mt-1">Updated: <span id="dashboard-updated" data-inline-editable data-inline-key="lastUpdated" data-inline-type="text">2025.12</span></p>
+                    </div>
+                </div>
+                <!-- 카드 우선 그리드 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- 카드 1: 근태 리스크 예방 -->
+                    <article class="reveal glass-card p-8 rounded-3xl bg-slate-50/50 flex flex-col">
+                        <div class="flex justify-between items-start mb-5">
+                            <div>
+                                <p class="text-xs font-bold text-blue-500 mb-1 uppercase tracking-wider">Risk Mgmt</p>
+                                <h4 class="text-xl font-bold break-keep">근태 리스크 예방</h4>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 shrink-0">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                        </div>
+                        <!-- 문제 -->
+                        <p class="text-sm text-slate-500 border-l-2 border-blue-300 pl-3 mb-6 break-keep leading-relaxed">생산 물량 급증 시 52시간 법적 한도 초과 위험 — 사후 대응만 가능</p>
+                        <!-- 결과 수치 -->
+                        <div class="mt-auto">
+                            <div class="flex items-baseline text-blue-600 mb-3">
+                                <span class="text-5xl font-black counter" data-target="85" data-prefix="-">0</span><span class="text-2xl font-bold ml-1">%</span>
+                                <span class="text-slate-400 text-sm font-semibold ml-3">Risk Reduction</span>
+                            </div>
+                            <!-- 보조 수치 -->
+                            <div class="flex flex-wrap gap-2 pt-4 border-t border-slate-200">
+                                <span class="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full font-medium">초과예상 144명 → 21명</span>
+                                <span class="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full font-medium">특별연장 2건 → 0건</span>
+                            </div>
+                        </div>
+                    </article>
+                    <!-- 카드 2: 채용 지원자풀 확대 -->
+                    <article class="reveal glass-card p-8 rounded-3xl bg-slate-50/50 flex flex-col" style="transition-delay: 100ms;">
+                        <div class="flex justify-between items-start mb-5">
+                            <div>
+                                <p class="text-xs font-bold text-emerald-500 mb-1 uppercase tracking-wider">Recruiting</p>
+                                <h4 class="text-xl font-bold break-keep">채용 지원자풀 확대</h4>
+                            </div>
+                            <div class="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-600 shrink-0">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            </div>
+                        </div>
+                        <!-- 문제 -->
+                        <p class="text-sm text-slate-500 border-l-2 border-emerald-300 pl-3 mb-6 break-keep leading-relaxed">허수 지원자 다수, 전형 안내 지연으로 우수 인재 이탈</p>
+                        <!-- 결과 수치 -->
+                        <div class="mt-auto">
+                            <div class="flex items-baseline text-emerald-600 mb-3">
+                                <span class="text-5xl font-black counter" data-target="217" data-prefix="+">0</span><span class="text-2xl font-bold ml-1">%</span>
+                                <span class="text-slate-400 text-sm font-semibold ml-3">Growth Rate</span>
+                            </div>
+                            <!-- 보조 수치 -->
+                            <div class="flex flex-wrap gap-2 pt-4 border-t border-slate-200">
+                                <span class="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-medium">직무별 지원자 평균 +27%</span>
+                                <span class="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-medium">긍정 리뷰 0건 → 6건</span>
+                            </div>
+                        </div>
+                    </article>
+                    <!-- 카드 3: 근태기 인식률 개선 -->
+                    <article class="reveal glass-card p-8 rounded-3xl bg-slate-50/50 flex flex-col" style="transition-delay: 200ms;">
+                        <div class="flex justify-between items-start mb-5">
+                            <div>
+                                <p class="text-xs font-bold text-indigo-500 mb-1 uppercase tracking-wider">Efficiency</p>
+                                <h4 class="text-xl font-bold break-keep">근태기 인식률 개선</h4>
+                            </div>
+                            <div class="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 shrink-0">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            </div>
+                        </div>
+                        <!-- 문제 -->
+                        <p class="text-sm text-slate-500 border-l-2 border-indigo-300 pl-3 mb-6 break-keep leading-relaxed">기기 위치 불량으로 출퇴근 태깅 누락, 수기 수정 급증</p>
+                        <!-- 결과 수치 -->
+                        <div class="mt-auto">
+                            <div class="flex items-baseline text-indigo-600 mb-3">
+                                <span class="text-5xl font-black">+</span><span class="text-5xl font-black counter" data-target="12" data-suffix="">0</span><span class="text-2xl font-bold ml-1">%p</span>
+                                <span class="text-slate-400 text-sm font-semibold ml-3">Tagging Rate</span>
+                            </div>
+                            <!-- 보조 수치 -->
+                            <div class="flex flex-wrap gap-2 pt-4 border-t border-slate-200">
+                                <span class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full font-medium">인식률 73% → 85%</span>
+                                <span class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full font-medium">수기 수정 요청 -8%p</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- 하단 차트 보조 섹션 -->
+                <div class="mt-16 pt-12 border-t border-slate-100 reveal">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-8 text-center">상세 데이터</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="flex flex-col items-center">
+                            <p class="text-xs text-slate-400 mb-3 font-medium">52시간 초과예상자 추이</p>
+                            <div class="h-32 w-full relative"><canvas id="riskChart"></canvas></div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <p class="text-xs text-slate-400 mb-3 font-medium">생산직 지원자 증감 추이</p>
+                            <div class="h-32 w-full relative"><canvas id="recruitChart"></canvas></div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <p class="text-xs text-slate-400 mb-3 font-medium">태깅 인식률 변화</p>
+                            <div class="h-32 w-full relative"><canvas id="efficiencyChart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Career -->
+        <section id="experience" class="py-24 bg-slate-50 border-t border-slate-100">
+            <div class="max-w-6xl mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto mb-16 reveal">
+                    <h2 class="text-sm font-black text-brand-600 mb-4 uppercase tracking-widest">Career</h2>
+                    <h3 class="text-3xl font-bold text-slate-900 mb-4 break-keep">문제를 정의하고, 작동하는 시스템을 만듭니다.</h3>
+                    <p class="text-slate-500 text-lg break-keep">현장의 비효율을 데이터로 정의하고,<br>기술로 작동하는 인사 운영 구조를 만들어 왔습니다.</p>
+                </div>
+                
+                <div class="max-w-5xl mx-auto reveal">
+                    <article class="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-sm border border-slate-100">
+                        <div class="flex flex-col md:flex-row justify-between mb-8 gap-4 border-b border-slate-100 pb-8">
+                            <div>
+                                <div class="flex flex-wrap gap-2 mb-3">
+                                    <span class="text-[10px] font-black text-brand-600 uppercase tracking-widest bg-brand-50 px-3 py-1 rounded-full border border-brand-100">HR Ops</span>
+                                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-full border border-slate-100">Recruiter</span>
+                                </div>
+                                <h4 class="text-3xl font-bold text-slate-900">오뚜기라면(주) | 인사팀 | 사원</h4>
+                                <p class="text-slate-500 text-sm mt-2 break-keep">채용운영, 근태관리, 도급/파견관리, 급여 운영 지원, 정부지원사원 관리 등</p>
+                            </div>
+                            <div class="md:text-right">
+                                <p class="text-slate-400 font-bold text-sm flex items-center md:justify-end gap-1 mb-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    <span id="career-duration">2025.03 ~ 재직 중</span>
+                                </p>
+                                <p class="text-slate-600 font-medium text-sm bg-slate-50 px-3 py-1.5 rounded-lg inline-block break-keep md:text-right text-left">
+                                    "약 700명 규모 제조 현장의 인사 운영 구조를 4명의 인사팀이 효율화 하기 위해<br class="hidden md:inline">
+                                    적극적으로 데이터 기반 재설계 제안 및 운영 담당"
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="mb-8">
+                            <h5 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Key Projects (Click for Detail)</h5>
+                            <p id="career-empty-msg" class="hidden col-span-2 text-center text-slate-400 text-sm py-8">준비 중입니다.</p>
+                            <div id="career-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Dynamic Injection -->
+                            </div>
+                        </div>
+
+                        <div>
+                            <h5 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Operations & Compliance</h5>
+                            <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-slate-600 list-disc pl-4 marker:text-slate-300">
+                                <li>M/H 기반 도급비, 파견비 정산 오류 제로 달성</li>
+                                <li>월별 노무비 분석 대시보드 개발 참여</li>
+                                <li>정부 인건비 지원사업 운영 및 관리</li>
+                                <li>대관업무 지원 (노동부 해석 질의 등)</li>
+                                <li>분기 노사협의회 자료 준비 및 노조 대응 지원</li>
+                                <li>코스트코, BRCGS 등 글로벌 심사 인권 분야 대응</li>
+                                <li>기업 월례/연례 행사 기획 및 운영</li>
+                            </ul>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- DX Case -->
+        <section id="automation" class="py-24 bg-slate-900 text-white relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-brand-900/30 to-transparent"></div>
+            <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+            <div class="max-w-7xl mx-auto px-6 relative z-10">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <div class="lg:col-span-4 reveal">
+                        <span class="text-brand-400 font-bold tracking-wider text-sm mb-4 block">HR 문제를 시스템으로 푼 방법</span>
+                        <h2 class="text-3xl font-bold mb-4 leading-tight break-keep">기술을 쓴 게 아니라,<br><span class="text-brand-500 italic">HR 문제를 풀기 위해</span> 배웠습니다</h2>
+                        <p class="text-slate-400 text-sm mb-8 break-keep leading-relaxed">반복 행정 · 현장 서명 · 채용 언어 분석 — 세 가지 문제 각각에 가장 적합한 도구를 찾아 직접 구현했습니다.</p>
+                        <div id="dx-nav" class="space-y-3">
+                            <!-- Injected -->
+                        </div>
+                        <p id="dx-empty-msg" class="hidden text-slate-500 text-sm py-4">준비 중입니다.</p>
+                    </div>
+                    <div class="lg:col-span-8 reveal relative min-h-[600px]">
+                        <div id="dx-content" class="relative bg-slate-800/90 backdrop-blur p-8 rounded-3xl border border-slate-700 shadow-2xl h-full flex flex-col justify-center">
+                            <!-- Injected -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Growth Section -->
+        <section id="education" class="py-24 bg-white border-t border-slate-100">
+            <div class="max-w-5xl mx-auto px-6">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="text-sm font-black text-brand-600 mb-4 uppercase tracking-widest">Growth & Learning</h2>
+                    <h3 class="text-3xl font-bold text-slate-900 break-keep">학력 및 교육 사항</h3>
+                </div>
+                
+                <div class="flex justify-center mb-12 reveal">
+                    <div class="inline-flex bg-slate-50 p-1.5 rounded-2xl shadow-inner border border-slate-100 overflow-x-auto max-w-full">
+                        <button data-action="show-edu" data-id="academic" id="edu-tab-academic" class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all bg-white text-brand-600 shadow-sm whitespace-nowrap">학력 사항</button>
+                        <button data-action="show-edu" data-id="training" id="edu-tab-training" class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all text-slate-500 hover:text-slate-700 whitespace-nowrap">직무 교육</button>
+                        <button data-action="show-edu" data-id="activities" id="edu-tab-activities" class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all text-slate-500 hover:text-slate-700 whitespace-nowrap">주요 활동</button>
+                        <button data-action="show-edu" data-id="skills" id="edu-tab-skills" class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all text-slate-500 hover:text-slate-700 whitespace-nowrap">보유 기술</button>
+                    </div>
+                </div>
+
+                <div id="education-content" class="min-h-[200px] mb-16 reveal"></div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 reveal">
+                    <a href="https://www.credential.net/e50ea40f-aae0-41d7-b242-d6551212a14f" target="_blank" rel="noopener noreferrer" class="p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:bg-white hover:border-blue-100 hover:shadow-lg transition group">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-2xl shadow-sm border border-slate-100 group-hover:scale-110 transition">📜</div>
+                            <span class="text-xs font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">2026.01.11</span>
+                        </div>
+                        <div class="text-xs font-bold text-slate-400 uppercase mb-1">Certification</div>
+                        <h5 class="text-xl font-bold text-slate-900 mb-1 break-keep">Google Analytics Certification</h5>
+                        <p class="text-sm text-slate-500">Google • Click to Verify ↗</p>
+                    </a>
+                    <div class="p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:bg-white hover:border-indigo-100 hover:shadow-lg transition group">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-2xl shadow-sm border border-slate-100 group-hover:scale-110 transition">🗣️</div>
+                            <span class="text-xs font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded">2024.09.21</span>
+                        </div>
+                        <div class="text-xs font-bold text-slate-400 uppercase mb-1">Language</div>
+                        <h5 class="text-xl font-bold text-slate-900 mb-1 break-keep">TOEIC Speaking IM2</h5>
+                        <p class="text-sm text-slate-500">ETS • Practical Communication</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact -->
+        <section id="contact-card" class="py-24 bg-slate-100 flex flex-col justify-center items-center px-4">
+            <div class="reveal grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12 z-10 w-full max-w-2xl">
+                <a id="dl-resume-kr" href="https://drive.google.com/uc?export=download&id=1sTqdcd8MPOAjTG9nQo7m2SNFGWzE7Llx" target="_blank" class="flex items-center gap-3 bg-white px-5 py-4 rounded-xl shadow-sm hover:shadow-lg border border-slate-200 hover:border-brand-200 transition group hover:-translate-y-1">
+                    <span class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-500 group-hover:bg-brand-50 group-hover:text-brand-600 transition border border-slate-100 shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </span>
+                    <div class="text-left">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Resume (KR)</p>
+                        <p class="text-sm font-bold text-slate-700 group-hover:text-brand-700">입사지원서 (국문)</p>
+                    </div>
+                </a>
+                <a id="dl-resume-en" href="https://drive.google.com/uc?export=download&id=1UhAHgmxX9bQ51uPwV2wTwif1-QNBn5Rh" target="_blank" class="flex items-center gap-3 bg-white px-5 py-4 rounded-xl shadow-sm hover:shadow-lg border border-slate-200 hover:border-brand-200 transition group hover:-translate-y-1">
+                    <span class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-500 group-hover:bg-brand-50 group-hover:text-brand-600 transition border border-slate-100 shrink-0">
+                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </span>
+                    <div class="text-left">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Resume (EN)</p>
+                        <p class="text-sm font-bold text-slate-700 group-hover:text-brand-700">입사지원서 (영문)</p>
+                    </div>
+                </a>
+                <a id="dl-portfolio-kr" href="https://drive.google.com/uc?export=download&id=1FEuhZWT7z_EjbulkEPNe9VksuVzZw4vV" target="_blank" class="flex items-center gap-3 bg-white px-5 py-4 rounded-xl shadow-sm hover:shadow-lg border border-slate-200 hover:border-brand-200 transition group hover:-translate-y-1">
+                    <span class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-500 group-hover:bg-brand-50 group-hover:text-brand-600 transition border border-slate-100 shrink-0">
+                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </span>
+                    <div class="text-left">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Portfolio (KR)</p>
+                        <p class="text-sm font-bold text-slate-700 group-hover:text-brand-700">경력기술서 (국문)</p>
+                    </div>
+                </a>
+                <a id="dl-portfolio-en" href="https://drive.google.com/uc?export=download&id=1YtTpVhKyjNThPHPFAt0_LMbHNd5MIAHm" target="_blank" class="flex items-center gap-3 bg-white px-5 py-4 rounded-xl shadow-sm hover:shadow-lg border border-slate-200 hover:border-brand-200 transition group hover:-translate-y-1">
+                    <span class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-500 group-hover:bg-brand-50 group-hover:text-brand-600 transition border border-slate-100 shrink-0">
+                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </span>
+                    <div class="text-left">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Portfolio (EN)</p>
+                        <p class="text-sm font-bold text-slate-700 group-hover:text-brand-700">경력기술서 (영문)</p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="reveal relative w-full max-w-[500px] aspect-[1.7/1] bg-white rounded-2xl shadow-2xl overflow-hidden biz-card border border-slate-200">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-brand-600 to-brand-400 rounded-bl-[4rem] opacity-90 z-0"></div>
+                <div class="absolute bottom-0 left-0 w-24 h-24 bg-slate-100 rounded-tr-[3rem] z-0"></div>
+                
+                <div class="relative z-10 h-full flex flex-col justify-between p-8 md:p-10">
+                    <div>
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p id="bizcard-title" data-inline-editable data-inline-key="profileTitle" data-inline-type="text" class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">HR/GA Generalist</p>
+                                <h2 id="bizcard-name" data-inline-editable data-inline-key="profileName" data-inline-type="text" class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">성명재</h2>
+                            </div>
+                            <div class="w-10 h-10 md:w-12 md:h-12 bg-white/90 backdrop-blur rounded-full shadow-lg flex items-center justify-center text-brand-600 font-black text-xl border border-slate-100">S</div>
+                        </div>
+                        <p id="bizcard-name-en" data-inline-editable data-inline-key="profileNameEn" data-inline-type="text" class="text-brand-600 font-bold text-sm mt-1">Sung Myeong Jae</p>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="space-y-1.5">
+                            <div class="flex items-center gap-3 text-sm text-slate-600 group cursor-pointer hover:text-brand-600 transition">
+                                <span class="w-5 h-5 flex items-center justify-center bg-slate-50 rounded text-xs">📧</span> 
+                                <span class="font-medium">proposition97@gmail.com</span>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 mt-2 border-t border-slate-100">
+                            <div class="flex items-end gap-2 group">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase mb-1">Company :</span>
+                                <div class="relative flex-1 flex items-center border-b-2 border-slate-300 focus-within:border-brand-500 transition-colors">
+                                    <input type="text" id="company-input" 
+                                        class="w-full bg-transparent border-none focus:ring-0 text-[10px] font-bold text-brand-600 placeholder-slate-300 pb-0.5 outline-none" 
+                                        placeholder="Type Name & Enter" 
+                                        autocomplete="off">
+                                    <button data-action="confirm-download" class="text-slate-400 hover:text-brand-600 transition p-1" aria-label="Download All">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-8 bg-slate-100 text-center border-t border-slate-200/50">
+        <p class="text-[10px] text-slate-400 font-mono">© 2026 Sung Myeong-jae. Designed for Gemini.</p>
+        <div class="mt-3 flex items-center justify-center gap-4">
+            <a href="print.html" target="_blank" class="text-[10px] text-slate-400 hover:text-slate-600 transition font-mono">🖨️ 인쇄용 PDF</a>
+            <span class="text-slate-300 text-[10px]">|</span>
+            <a href="admin.html" class="text-[10px] text-slate-300 hover:text-slate-400 transition font-mono">관리자</a>
+        </div>
+    </footer>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal">
+        <div class="auth-box">
+            <h3>🔐 편집자 로그인</h3>
+            <p>포트폴리오 편집 권한을 확인합니다.<br>Cloudflare Pages에서 설정한 EDITOR_TOKEN을 입력하세요.</p>
+            <input type="password" id="auth-input" class="auth-input" placeholder="비밀번호(토큰) 입력" autocomplete="current-password">
+            <div id="auth-error" class="auth-error"></div>
+            <div class="auth-btn-row">
+                <button class="auth-cancel" onclick="AuthModal.close()">취소</button>
+                <button class="auth-confirm" id="auth-confirm-btn" onclick="AuthModal.submit()">편집 시작</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inline Edit FAB -->
+    <div id="inline-edit-fab" class="fixed bottom-6 right-6 z-[500] flex flex-col items-end gap-2">
+        <div id="inline-edit-tooltip" class="opacity-0 pointer-events-none bg-slate-900 text-white text-xs px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap transition-opacity duration-200">콘텐츠 편집하기</div>
+        <button id="inline-edit-toggle" class="w-14 h-14 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white rounded-full shadow-2xl flex items-center justify-center text-2xl transition-all duration-200 hover:scale-110" title="편집 모드">✏️</button>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+
+        // ── 콘텐츠 로드: KV API → localStorage → content.js 순으로 폴백 ──
+        async function _loadData() {
+            const _defaults = typeof SITE_CONTENT !== 'undefined' ? JSON.parse(JSON.stringify(SITE_CONTENT)) : {};
+            // 1순위: Cloudflare KV (Pages Function)
+            try {
+                const resp = await fetch('/api/content', { cache: 'no-store' });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+                        localStorage.setItem('portfolio_content', JSON.stringify(data));
+                        return Object.assign(_defaults, data);
+                    }
+                }
+            } catch(e) { /* 오프라인 or Pages Function 미설정 */ }
+            // 2순위: localStorage (캐시)
+            const _saved = localStorage.getItem('portfolio_content');
+            if (_saved) {
+                try {
+                    const pd = Object.assign(_defaults, JSON.parse(_saved));
+                    ['heroHeadlineHTML','heroSubtitle','heroDescription','heroImpactHTML'].forEach(k => {
+                        if (!pd[k] && _defaults[k]) pd[k] = _defaults[k];
+                    });
+                    return pd;
+                } catch(e) { /* 파싱 오류 */ }
+            }
+            // 3순위: content.js 기본값
+            return _defaults;
+        }
+
+        let PORTFOLIO_DATA = await _loadData();
+        const modalDetails = PORTFOLIO_DATA.modalDetails || {};
+
+
+
+        /* --- APP LOGIC --- */
+        const App = {
+            init() {
+                this.updateHeroContent();
+                this.renderCareerGrid();
+                this.renderDxNav();
+                this.ui.updateCareerDuration();
+                
+                this.ui.showDx('dx1');
+                this.ui.showEdu('academic');
+
+                document.body.addEventListener('click', this.handlers.handleClick.bind(this));
+                document.getElementById('company-input').addEventListener('keydown', this.handlers.handleEnterKey.bind(this));
+                
+                this.setupObserver();
+            },
+
+            updateHeroContent() {
+                const d = PORTFOLIO_DATA;
+                const si = (id, val) => { const el = document.getElementById(id); if (el && val) el.innerHTML = val; };
+                const st = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+                si('hero-headline', d.heroHeadlineHTML);
+                st('hero-subtitle', d.heroSubtitle);
+                si('hero-description', d.heroDescription);
+                si('hero-impact', d.heroImpactHTML);
+                st('dashboard-company', d.companyName ? d.companyName + ' 실무 성과' : undefined);
+                st('dashboard-updated', d.lastUpdated);
+                st('nav-profile-name', d.profileName);
+                st('bizcard-name', d.profileName);
+                st('bizcard-title', d.profileTitle);
+                st('bizcard-name-en', d.profileNameEn);
+                if (d.downloads) {
+                    const lnk = (id, url) => { const a = document.getElementById(id); if (a && url) a.href = url; };
+                    lnk('dl-resume-kr', d.downloads.resume_kr);
+                    lnk('dl-resume-en', d.downloads.resume_en);
+                    lnk('dl-portfolio-kr', d.downloads.portfolio_kr);
+                    lnk('dl-portfolio-en', d.downloads.portfolio_en);
+                }
+            },
+
+            renderCareerGrid() {
+                const container = document.getElementById('career-grid');
+                if(!container) return;
+                const emptyMsg = document.getElementById('career-empty-msg');
+                const isEdit = document.body.classList.contains('edit-mode');
+                if (!isEdit && !PORTFOLIO_DATA.careerProjects.length) {
+                    if(emptyMsg) emptyMsg.classList.remove('hidden');
+                    return;
+                }
+                if(emptyMsg) emptyMsg.classList.add('hidden');
+                container.innerHTML = PORTFOLIO_DATA.careerProjects.map((proj, i) => `
+                    <div class="edit-item-wrap">
+                        <button class="edit-del-overlay" onclick="event.stopPropagation();App._deleteCareer('${proj.id}')" title="이 프로젝트 삭제">🗑️</button>
+                        <button data-action="open-modal" data-id="${proj.id}" class="p-5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:shadow-md hover:border-brand-200 transition text-left group w-full">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-brand-600 font-bold text-sm">Project ${String(i + 1).padStart(2, '0')}</span>
+                                <span class="text-slate-400 group-hover:text-brand-500 transition">↗</span>
+                            </div>
+                            <h5 class="font-bold text-slate-800 text-lg break-keep group-hover:text-brand-700 transition">${proj.title}</h5>
+                            <p class="text-xs text-slate-500 mt-1">${proj.desc}</p>
+                        </button>
+                    </div>`).join('') + `
+                    <button onclick="App._addCareer()" class="edit-add-card p-5 rounded-xl border" style="min-height:100px;">
+                        <span style="font-size:20px;">➕</span><span>프로젝트 추가</span>
+                    </button>`;
+            },
+
+            _addCareer() {
+                const newProj = { id: 'career_' + Date.now(), title: '새 프로젝트', sub: '부제목', desc: '한 줄 요약', modalContent: '' };
+                PORTFOLIO_DATA.careerProjects.push(newProj);
+                this.renderCareerGrid();
+                window.CareerEditPanel.open(newProj);
+            },
+            _deleteCareer(id) {
+                if (!confirm('이 프로젝트를 삭제하시겠습니까?')) return;
+                PORTFOLIO_DATA.careerProjects = PORTFOLIO_DATA.careerProjects.filter(p => p.id !== id);
+                this.renderCareerGrid();
+                InlineEditor._toast('프로젝트 삭제됨.');
+            },
+
+            renderDxNav() {
+                const nav = document.getElementById('dx-nav');
+                if(!nav) return;
+                const dxEmptyMsg = document.getElementById('dx-empty-msg');
+                const isEdit = document.body.classList.contains('edit-mode');
+                const cases = Object.entries(PORTFOLIO_DATA.dxCases);
+                if (!isEdit && !cases.length) {
+                    if(dxEmptyMsg) dxEmptyMsg.classList.remove('hidden');
+                    return;
+                }
+                if(dxEmptyMsg) dxEmptyMsg.classList.add('hidden');
+                nav.innerHTML = cases.map(([key, val], idx) => `
+                    <div class="edit-item-wrap">
+                        <button class="edit-del-overlay" onclick="event.stopPropagation();App._deleteDx('${key}')" title="이 케이스 삭제" style="top:8px;right:8px;">🗑️</button>
+                        <button data-action="show-dx" data-id="${key}" id="btn-${key}" class="w-full text-left p-4 rounded-xl border border-slate-700 bg-slate-800/50 hover:bg-slate-800 hover:border-brand-500 transition duration-300 group ${idx === 0 ? 'active-dx' : ''}">
+                            <div class="flex items-center justify-between pointer-events-none">
+                                <span class="font-bold text-slate-${idx === 0 ? '200' : '400'} group-hover:text-white break-keep">${idx + 1}. ${val.title}</span>
+                                <span class="text-xs font-mono text-${idx === 0 ? 'brand' : 'slate'}-400 badge">${val.badge}</span>
+                            </div>
+                        </button>
+                    </div>`).join('') + `
+                    <button onclick="App._addDx()" class="edit-add-card w-full p-4 rounded-xl border border-slate-700" style="min-height:52px;border-radius:12px;">
+                        ➕ DX 케이스 추가
+                    </button>`;
+            },
+
+            _addDx() {
+                const newKey = 'dx' + Date.now();
+                PORTFOLIO_DATA.dxCases[newKey] = {
+                    title: '새 DX 케이스',
+                    badge: 'Tool',
+                    content: `<div class="animate-[slideIn_0.3s_ease-out]"><div class="mb-6"><span class="text-xs font-mono text-emerald-400 border border-emerald-500/30 px-2 py-1 rounded bg-emerald-500/10">Tool</span><h3 class="text-2xl font-bold text-white mt-2 mb-2 break-keep">새 DX 케이스</h3></div><div class="space-y-6"><div><strong class="text-slate-300 block mb-1 text-sm uppercase tracking-wider">Background & Problem</strong><p class="text-slate-400 text-sm leading-relaxed break-keep">문제 상황을 입력하세요.</p></div><div><strong class="text-brand-400 block mb-1 text-sm uppercase tracking-wider">Solution Logic</strong><ul class="text-slate-300 text-sm space-y-2 list-disc pl-4 break-keep"><li><span class="text-white font-bold">항목 1:</span> 내용 입력</li></ul></div><div class="pt-4 border-t border-slate-700"><strong class="text-emerald-400 block mb-1 text-sm uppercase tracking-wider">Result</strong><p class="text-white text-sm font-bold break-keep">결과를 입력하세요.</p></div></div></div>`
+                };
+                this.renderDxNav();
+                document.querySelectorAll('#dx-nav button[id^="btn-"] span').forEach(s => s.setAttribute('contenteditable','true'));
+                App.ui.showDx(newKey);
+                InlineEditor._toast('DX 케이스 추가됨. 좌측 제목/배지와 우측 내용을 직접 편집하세요.');
+            },
+            _deleteDx(key) {
+                if (!confirm('이 DX 케이스를 삭제하시겠습니까?')) return;
+                delete PORTFOLIO_DATA.dxCases[key];
+                this.renderDxNav();
+                document.querySelectorAll('#dx-nav button[id^="btn-"] span').forEach(s => s.setAttribute('contenteditable','true'));
+                const firstKey = Object.keys(PORTFOLIO_DATA.dxCases)[0];
+                if (firstKey) App.ui.showDx(firstKey);
+                InlineEditor._toast('DX 케이스 삭제됨.');
+            },
+
+            ui: {
+                showDx(id) {
+                     Object.keys(PORTFOLIO_DATA.dxCases).forEach(key => {
+                        const btn = document.getElementById(`btn-${key}`);
+                        if(!btn) return;
+                        const title = btn.querySelector('span:first-child');
+                        const badge = btn.querySelector('span:last-child');
+                        
+                        if (key === id) {
+                            btn.classList.add('bg-slate-800', 'border-brand-500', 'active-dx'); 
+                            btn.classList.remove('bg-slate-800/50', 'border-slate-700');
+                            title.className = "font-bold text-white break-keep";
+                            badge.className = "text-xs font-mono text-brand-400 badge";
+                        } else {
+                            btn.classList.remove('bg-slate-800', 'border-brand-500', 'active-dx'); 
+                            btn.classList.add('bg-slate-800/50', 'border-slate-700');
+                            title.className = "font-bold text-slate-400 group-hover:text-white break-keep";
+                            badge.className = "text-xs font-mono text-slate-500 group-hover:text-brand-400 badge";
+                        }
+                    });
+                    const content = PORTFOLIO_DATA.dxCases[id].content;
+                    document.getElementById('dx-content').innerHTML = content;
+                },
+
+                showEdu(key) {
+                    ['academic', 'training', 'activities', 'skills'].forEach(id => {
+                        const btn = document.getElementById(`edu-tab-${id}`);
+                        if(!btn) return;
+                        if(id === key) {
+                            btn.className = "px-6 py-2.5 rounded-xl text-sm font-bold transition-all bg-white text-brand-600 shadow-sm whitespace-nowrap border border-slate-100";
+                        } else {
+                            btn.className = "px-6 py-2.5 rounded-xl text-sm font-bold transition-all text-slate-500 hover:text-slate-700 whitespace-nowrap";
+                        }
+                    });
+                    if (key === 'training') {
+                        App.renderTrainingList();
+                        return;
+                    }
+                    let content = PORTFOLIO_DATA.education[key];
+                    if(key === 'activities') {
+                        App.renderActivitiesList();
+                        return;
+                    }
+                    document.getElementById('education-content').innerHTML = content || '';
+                },
+
+                toggleActivity(id) {
+                    const el = document.getElementById(id);
+                    const icon = document.getElementById(`icon-${id}`);
+                    if (!el) return;
+                    if (el.classList.contains('hidden')) { el.classList.remove('hidden'); if(icon) icon.style.transform = 'rotate(180deg)'; } 
+                    else { el.classList.add('hidden'); if(icon) icon.style.transform = 'rotate(0deg)'; }
+                },
+
+                openModal(id) {
+                    let data = PORTFOLIO_DATA.modalDetails[id];
+                    
+                    if(!data && id.startsWith('career_')) {
+                         const proj = PORTFOLIO_DATA.careerProjects.find(p => p.id === id);
+                         if(proj) { data = { title: proj.title, subtitle: proj.sub, content: proj.modalContent }; }
+                    }
+                    if (!data) return;
+                    document.getElementById('modal-title').textContent = data.title;
+                    document.getElementById('modal-subtitle').textContent = data.subtitle;
+                    document.getElementById('modal-content').innerHTML = data.content;
+                    const modal = document.getElementById('detail-modal');
+                    modal.classList.remove('hidden'); modal.classList.add('flex');
+                    setTimeout(() => { modal.style.opacity = '1'; }, 10);
+                    document.body.style.overflow = 'hidden';
+                },
+
+                closeModal() {
+                    const modal = document.getElementById('detail-modal');
+                    modal.style.opacity = '0';
+                    setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); document.body.style.overflow = ''; }, 300);
+                },
+
+                openSystemModal(type, extraData) {
+                    const modal = document.getElementById('system-modal');
+                    const content = document.getElementById('system-modal-content');
+                    
+                    if (type === 'selection') {
+                        content.innerHTML = `
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">언어 선택</h3>
+                            <p class="text-sm text-slate-500 mb-6">다운로드할 문서의 언어를 선택해주세요.</p>
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <button data-action="download-exec" data-lang="KR" data-company="${extraData}" class="py-3 rounded-xl bg-slate-100 text-slate-700 font-bold hover:bg-brand-50 hover:text-brand-600 transition">국문 (KR)</button>
+                                <button data-action="download-exec" data-lang="EN" data-company="${extraData}" class="py-3 rounded-xl bg-slate-100 text-slate-700 font-bold hover:bg-brand-50 hover:text-brand-600 transition">영문 (EN)</button>
+                            </div>
+                            <button data-action="close-system-modal" class="text-xs text-slate-400 hover:text-slate-600">취소</button>
+                        `;
+                    } else if (type === 'thankyou') {
+                        content.innerHTML = `
+                            <div class="text-3xl mb-3">🙌</div>
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">다운로드 감사합니다!</h3>
+                            <p class="text-sm text-slate-500 mb-6 leading-relaxed">좋은 소식으로 다시 뵙기를<br>진심으로 바라겠습니다.</p>
+                            <button data-action="close-system-modal" class="w-full py-3 rounded-xl bg-brand-600 text-white font-bold hover:bg-brand-700 transition">확인</button>
+                        `;
+                    }
+
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    setTimeout(() => { modal.style.opacity = '1'; }, 10);
+                },
+
+                closeSystemModal() {
+                    const modal = document.getElementById('system-modal');
+                    modal.style.opacity = '0';
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                    }, 300);
+                },
+
+                confirmDownload() {
+                    const input = document.getElementById('company-input');
+                    const companyName = input.value.trim();
+                    if (!companyName) {
+                        alert('회사명을 입력해주세요.');
+                        return;
+                    }
+                    this.openSystemModal('selection', companyName);
+                },
+
+executeDownload(lang) {
+    const companyName = document.getElementById('company-input').value.trim();
+    const resumeUrl = lang === 'KR' ? PORTFOLIO_DATA.downloads.resume_kr : PORTFOLIO_DATA.downloads.resume_en;
+    const portfolioUrl = lang === 'KR' ? PORTFOLIO_DATA.downloads.portfolio_kr : PORTFOLIO_DATA.downloads.portfolio_en;
+    
+    const resumeFileName = lang === 'KR' 
+        ? `[${companyName}]_성명재_입사지원서.pdf`
+        : `[${companyName}]_SungMyeongjae_Resume.pdf`;
+    
+    const portfolioFileName = lang === 'KR'
+        ? `[${companyName}]_성명재_경력기술서.pdf`
+        : `[${companyName}]_SungMyeongjae_Portfolio.pdf`;
+    
+    // 첫 번째 파일
+    const link1 = document.createElement('a');
+    link1.href = resumeUrl;
+    link1.download = resumeFileName;
+    link1.style.display = 'none';
+    document.body.appendChild(link1);
+    link1.click();
+    document.body.removeChild(link1);
+
+    // 두 번째 파일
+    setTimeout(() => {
+        const link2 = document.createElement('a');
+        link2.href = portfolioUrl;
+        link2.download = portfolioFileName;
+        link2.style.display = 'none';
+        document.body.appendChild(link2);
+        link2.click();
+        document.body.removeChild(link2);
+    }, 2000);
+
+    setTimeout(() => {
+        this.openSystemModal('thankyou');
+    }, 3000);
+},
+
+                updateCareerDuration() {
+                    const startDate = new Date('2025-03-01');
+                    const today = new Date();
+                    let years = today.getFullYear() - startDate.getFullYear();
+                    let months = today.getMonth() - startDate.getMonth();
+                    if (months < 0) { years--; months += 12; }
+                    if (today < startDate) { document.getElementById('career-duration').innerHTML = `2025.03 ~ 재직 중 <span class='text-brand-500 ml-1'>(입사 예정)</span>`; return; }
+                    const durationText = years > 0 ? `${years}년 ${months}개월` : `${months}개월`;
+                    document.getElementById('career-duration').innerHTML = `2025.03 ~ 재직 중 <span class='text-brand-500 ml-1'>(${durationText})</span>`;
+                }
+            },
+
+            handlers: {
+                handleClick(e) {
+                    const target = e.target.closest('[data-action]');
+                    if (!target) return;
+                    
+                    const action = target.dataset.action;
+                    const id = target.dataset.id;
+                    
+                    if (action === 'show-dx') App.ui.showDx(id);
+                    if (action === 'show-edu') App.ui.showEdu(id);
+                    if (action === 'open-modal') {
+                        const isEdit = document.body.classList.contains('edit-mode');
+                        if (isEdit && id && id.startsWith('career_')) {
+                            const proj = PORTFOLIO_DATA.careerProjects.find(p => p.id === id);
+                            if (proj) window.CareerEditPanel.open(proj);
+                        } else {
+                            App.ui.openModal(id);
+                        }
+                    }
+                    if (action === 'close-modal') App.ui.closeModal();
+                    if (action === 'toggle-activity') App.ui.toggleActivity(id);
+                    if (action === 'close-menu') document.getElementById('mobile-menu').classList.remove('open');
+                    if (action === 'confirm-download') App.ui.confirmDownload();
+                    if (action === 'close-system-modal') App.ui.closeSystemModal();
+                    if (action === 'download-exec') App.ui.executeDownload(target.dataset.lang);
+                },
+
+                handleEnterKey(e) {
+                    if (e.key === 'Enter') {
+                        App.ui.confirmDownload();
+                    }
+                }
+            },
+
+            renderTrainingList() {
+                const container = document.getElementById('education-content');
+                if (!container) return;
+                const list = PORTFOLIO_DATA.trainingList || [];
+                container.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-[slideIn_0.4s_ease-out]">` +
+                    list.map(item => `
+                        <div class="edit-item-wrap">
+                            <button class="edit-del-overlay" onclick="event.stopPropagation();App._deleteTraining('${item.id}')" title="이 교육 삭제">🗑️</button>
+                            <div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-md transition group">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">${item.category}</span>
+                                    <span class="text-xs text-slate-400">${item.dates}</span>
+                                </div>
+                                <h4 class="text-lg font-bold text-slate-900 break-keep">${item.title}</h4>
+                                <p class="text-xs text-brand-600 mb-2 font-bold break-keep">${item.org}</p>
+                                <p class="text-sm text-slate-500 mb-4 leading-relaxed line-clamp-2 break-keep">${item.desc}</p>
+                                <div class="flex items-center justify-between mt-auto">
+                                    <span class="text-xs font-medium text-slate-400 bg-white px-2 py-1 rounded border border-slate-200">${item.status}</span>
+                                    ${item.modalId ? `<button data-action="open-modal" data-id="${item.modalId}" class="text-xs font-bold text-brand-600 hover:underline flex items-center gap-1">상세 내용 보기 →</button>` : ''}
+                                </div>
+                            </div>
+                        </div>`).join('') +
+                    `<div class="edit-item-wrap">
+                        <button onclick="App._addTraining()" class="edit-add-card p-6 rounded-2xl border" style="min-height:120px;">
+                            <span style="font-size:20px;">➕</span><span>교육 추가</span>
+                        </button>
+                    </div></div>`;
+            },
+
+            _addTraining() {
+                const newItem = { id: 'tr_' + Date.now(), category: '카테고리', dates: '날짜', title: '교육명', org: '기관명', desc: '교육 내용 요약', status: '수료 완료', modalId: '' };
+                if (!PORTFOLIO_DATA.trainingList) PORTFOLIO_DATA.trainingList = [];
+                PORTFOLIO_DATA.trainingList.push(newItem);
+                this.renderTrainingList();
+                window.TrainingEditPanel.open(newItem);
+            },
+            _deleteTraining(id) {
+                if (!confirm('이 교육 항목을 삭제하시겠습니까?')) return;
+                PORTFOLIO_DATA.trainingList = (PORTFOLIO_DATA.trainingList || []).filter(t => t.id !== id);
+                this.renderTrainingList();
+                InlineEditor._toast('교육 항목 삭제됨.');
+            },
+
+            renderActivitiesList() {
+                const container = document.getElementById('education-content');
+                if (!container) return;
+                const list = PORTFOLIO_DATA.activitiesList || [];
+                if (!document.body.classList.contains('edit-mode') && !list.length) {
+                    container.textContent = '준비 중입니다.';
+                    return;
+                }
+                container.innerHTML = `<div class="space-y-4 animate-[slideIn_0.4s_ease-out]">` +
+                    list.map(act => `
+                        <div class="edit-item-wrap bg-slate-50 rounded-2xl border border-slate-100 hover:border-brand-200 transition cursor-pointer group">
+                            <button class="edit-del-overlay" onclick="event.stopPropagation();App._deleteActivity('${act.id}')" title="이 활동 삭제">🗑️</button>
+                            <div data-action="toggle-activity" data-id="${act.id}" class="p-6">
+                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                    <div class="flex items-center gap-4">
+                                        <span class="text-3xl bg-white p-2 rounded-xl shadow-sm border border-slate-100">${act.icon}</span>
+                                        <div>
+                                            <h4 class="font-bold text-slate-900 text-lg break-keep">${act.title}</h4>
+                                            <div class="flex flex-wrap items-center gap-2 mt-1 text-sm text-slate-500">
+                                                <span>${act.period}</span>
+                                                <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
+                                                <span class="font-medium text-brand-600">${act.role}</span>
+                                                <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
+                                                <span>${act.rank}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span class="text-slate-300 group-hover:text-brand-500 transition transform rotate-0" id="icon-${act.id}">▼</span>
+                                </div>
+                                <div id="${act.id}" class="hidden mt-6 pt-6 border-t border-slate-200/80 animate-[slideIn_0.3s_ease-out]">
+                                    ${act.content}
+                                </div>
+                            </div>
+                        </div>`).join('') +
+                    `<button onclick="App._addActivity()" class="edit-add-card w-full p-5 rounded-2xl border" style="min-height:64px;">
+                        ➕ 활동 추가
+                    </button></div>`;
+            },
+
+            _addActivity() {
+                const newAct = { id: 'act_' + Date.now(), icon: '⭐', title: '새 활동', role: '역할', period: '기간', rank: '성과', content: '<p class="text-slate-600 text-sm">내용을 입력하세요.</p>' };
+                PORTFOLIO_DATA.activitiesList.push(newAct);
+                this.renderActivitiesList();
+                window.ActivityEditPanel.open(newAct);
+            },
+            _deleteActivity(id) {
+                if (!confirm('이 활동 항목을 삭제하시겠습니까?')) return;
+                PORTFOLIO_DATA.activitiesList = PORTFOLIO_DATA.activitiesList.filter(a => a.id !== id);
+                this.renderActivitiesList();
+                InlineEditor._toast('활동 항목 삭제됨.');
+            },
+
+            utils: {
+                generateActivitiesHTML() {
+                    return `<div class="space-y-4 animate-[slideIn_0.4s_ease-out]">` +
+                    PORTFOLIO_DATA.activitiesList.map(act => `
+                        <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 hover:border-brand-200 transition cursor-pointer group" data-action="toggle-activity" data-id="${act.id}">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <div class="flex items-center gap-4">
+                                    <span class="text-3xl bg-white p-2 rounded-xl shadow-sm border border-slate-100">${act.icon}</span>
+                                    <div>
+                                        <h4 class="font-bold text-slate-900 text-lg break-keep">${act.title}</h4>
+                                        <div class="flex flex-wrap items-center gap-2 mt-1 text-sm text-slate-500">
+                                            <span>${act.period}</span>
+                                            <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
+                                            <span class="font-medium text-brand-600">${act.role}</span>
+                                            <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
+                                            <span>${act.rank}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="text-slate-300 group-hover:text-brand-500 transition transform rotate-0" id="icon-${act.id}">▼</span>
+                            </div>
+                            <div id="${act.id}" class="hidden mt-6 pt-6 border-t border-slate-200/80 animate-[slideIn_0.3s_ease-out]">
+                                ${act.content}
+                            </div>
+                        </div>
+                    `).join('') + `</div>`;
+                }
+            },
+
+            setupObserver() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('active');
+                            const canvases = entry.target.querySelectorAll('canvas');
+                            canvases.forEach(canvas => {
+                                if(!canvas.classList.contains('rendered')) {
+                                    this.initChart(canvas.id);
+                                    canvas.classList.add('rendered');
+                                }
+                            });
+                             const counters = entry.target.querySelectorAll('.counter');
+counters.forEach(counter => {
+    if(counter.classList.contains('counted')) return;
+    const target = +counter.getAttribute('data-target');
+    const prefix = counter.getAttribute('data-prefix') || '';
+    const suffix = counter.getAttribute('data-suffix') || '';
+    let count = 0;
+    const duration = 2000;
+    const startTime = performance.now();
+    const updateCount = (currentTime) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        count = Math.floor(progress * target); // linear 진행
+        counter.innerText = `${prefix}${count}${suffix}`;
+        if (progress < 1) requestAnimationFrame(updateCount);
+        else counter.innerText = `${prefix}${target}${suffix}`;
+    };
+    requestAnimationFrame(updateCount);
+    counter.classList.add('counted');
+});
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.15 });
+                
+                document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+            },
+
+            initChart(id) {
+                if (typeof Chart === 'undefined') return;
+
+                  const ctx = document.getElementById(id).getContext('2d');
+                const commonConfig = {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { enabled: true } },
+                    scales: { x: { display: false }, y: { display: false } },
+                    animation: { duration: 2000, easing: 'easeOutQuart' }
+                };
+
+                if (id === 'riskChart') {
+                    new Chart(ctx, { type: 'bar', data: { labels: ['Before', 'After'], datasets: [{ data: [144, 21], backgroundColor: ['#cbd5e1', '#2563eb'], borderRadius: 12, barThickness: 50 }] }, options: commonConfig });
+                } else if (id === 'recruitChart') {
+                    new Chart(ctx, { type: 'line', data: { labels: ['Q2', 'Q3', 'Q4'], datasets: [{ data: [35, 72, 111], borderColor: '#10b981', borderWidth: 4, backgroundColor: (ctx) => { const g = ctx.chart.ctx.createLinearGradient(0,0,0,200); g.addColorStop(0,"rgba(16,185,129,0.2)"); g.addColorStop(1,"rgba(16,185,129,0)"); return g; }, fill: true, tension: 0.4, pointRadius: 4 }] }, options: { ...commonConfig, scales: { y: { display: false, min: 0 } } } });
+                } else if (id === 'efficiencyChart') {
+                    new Chart(ctx, { type: 'bar', data: { labels: ['기존', '개선'], datasets: [{ data: [73, 85], backgroundColor: ['#cbd5e1', '#4f46e5'], borderRadius: 12, barThickness: 50 }] }, options: { ...commonConfig, scales: { y: { display: false, min: 50 } } } });
+                }
+            }
+        };
+
+        // Boot
+        App.init();
+
+        window.toggleMenu = function() {
+            document.getElementById('mobile-menu').classList.toggle('open');
+        }
+
+        // =====================================================================
+        // COMPREHENSIVE VISUAL EDITOR v2
+        // =====================================================================
+
+        // ── AUTH MODAL ──
+        const AuthModal = {
+            _cb: null,
+            show(cb) {
+                this._cb = cb;
+                document.getElementById('auth-modal').style.display = 'flex';
+                document.getElementById('auth-input').value = '';
+                document.getElementById('auth-error').textContent = '';
+                document.getElementById('auth-confirm-btn').disabled = false;
+                setTimeout(() => document.getElementById('auth-input').focus(), 80);
+            },
+            close() {
+                document.getElementById('auth-modal').style.display = 'none';
+                this._cb = null;
+            },
+            showError(msg) {
+                document.getElementById('auth-error').textContent = msg;
+                document.getElementById('auth-confirm-btn').disabled = false;
+            },
+            submit() {
+                const token = document.getElementById('auth-input').value.trim();
+                if (!token) { this.showError('비밀번호를 입력하세요.'); return; }
+                document.getElementById('auth-confirm-btn').disabled = true;
+                document.getElementById('auth-error').textContent = '확인 중…';
+                if (this._cb) this._cb(token);
+            }
+        };
+        document.getElementById('auth-input').addEventListener('keydown', e => {
+            if (e.key === 'Enter') AuthModal.submit();
+        });
+
+        // ── FLOATING RICH TEXT TOOLBAR ──
+        const FloatBar = {
+            el: null,
+            init() {
+                this.el = document.createElement('div');
+                this.el.id = 'float-bar';
+                this.el.innerHTML = `<div style="display:flex;align-items:center;gap:2px;flex-wrap:nowrap;">
+                    <button class="fb-btn" onmousedown="event.preventDefault();FloatBar.exec('bold')" title="굵게 (Ctrl+B)"><b>B</b></button>
+                    <button class="fb-btn" onmousedown="event.preventDefault();FloatBar.exec('italic')" title="기울기 (Ctrl+I)"><i>I</i></button>
+                    <button class="fb-btn" onmousedown="event.preventDefault();FloatBar.exec('underline')" title="밑줄"><u>U</u></button>
+                    <button class="fb-btn" onmousedown="event.preventDefault();FloatBar.exec('strikeThrough')" title="취소선"><s>S</s></button>
+                    <span class="fb-sep"></span>
+                    <label class="fb-color-label" title="글자 색상"><span style="border-bottom:2px solid #ef4444;">A</span><input type="color" value="#1e293b" onchange="FloatBar.exec('foreColor',this.value)"></label>
+                    <label class="fb-color-label" title="형광펜"><span style="background:#fef08a;padding:0 2px;">H</span><input type="color" value="#fef08a" onchange="FloatBar.exec('hiliteColor',this.value)"></label>
+                    <span class="fb-sep"></span>
+                    <select class="fb-select" onchange="FloatBar.exec('fontSize',this.value)" title="글자 크기">
+                        <option value="1">극소</option><option value="2">소</option>
+                        <option value="3" selected>보통</option><option value="4">대</option><option value="5">특대</option>
+                    </select>
+                    <span class="fb-sep"></span>
+                    <button class="fb-btn" onmousedown="event.preventDefault();FloatBar.exec('removeFormat')" title="서식 제거" style="font-size:10px;letter-spacing:-0.5px;">✕서식</button>
+                </div>`;
+                document.body.appendChild(this.el);
+            },
+            show() {
+                if (!this.el) return;
+                const sel = window.getSelection();
+                if (!sel || !sel.rangeCount || sel.isCollapsed) { this.hide(); return; }
+                const node = sel.anchorNode;
+                if (!node) return;
+                const editable = (node.nodeType === 3 ? node.parentElement : node);
+                if (!editable.closest('[contenteditable="true"]')) { this.hide(); return; }
+                const rect = sel.getRangeAt(0).getBoundingClientRect();
+                if (!rect.width && !rect.height) { this.hide(); return; }
+                this.el.style.display = 'block';
+                const bw = this.el.offsetWidth || 320;
+                const bh = this.el.offsetHeight || 44;
+                let x = rect.left + rect.width / 2 - bw / 2;
+                let y = rect.top - bh - 10;
+                x = Math.max(8, Math.min(x, window.innerWidth - bw - 8));
+                if (y < 8) y = rect.bottom + 10;
+                this.el.style.left = x + 'px';
+                this.el.style.top = y + 'px';
+            },
+            hide() { if (this.el) this.el.style.display = 'none'; },
+            exec(cmd, val) { document.execCommand(cmd, false, val !== undefined ? val : null); }
+        };
+
+        // ── CAREER EDIT PANEL (구조화 폼 — 코드 없이 편집) ──
+        function _parseCareerModal(html) {
+            const d = document.createElement('div'); d.innerHTML = html;
+            const r = { problem: '', actions: [], results: [] };
+            d.querySelectorAll('h4').forEach(h4 => {
+                const sec = h4.closest('div'); if (!sec) return;
+                const t = h4.textContent;
+                if (t.includes('문제')) {
+                    r.problem = (sec.querySelector('p')?.innerHTML || '').trim();
+                } else if (t.includes('실행') || t.includes('Action')) {
+                    sec.querySelectorAll('li').forEach(li => r.actions.push(li.innerHTML.trim()));
+                } else if (t.includes('결과') || t.includes('Result')) {
+                    sec.querySelectorAll('li').forEach(li => r.results.push(li.innerHTML.trim()));
+                }
+            });
+            return r;
+        }
+        function _buildCareerModal(r) {
+            const ai = r.actions.map(a=>`<li>${a}</li>`).join('');
+            const ri = r.results.map(x=>`<li>${x}</li>`).join('');
+            return `<div class="space-y-6"><div><h4 class="text-brand-600">🔍 문제 상황</h4><p class="text-slate-600 text-sm leading-relaxed">${r.problem}</p></div><div><h4 class="text-brand-600">🛠️ 실행 (Action)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2">${ai}</ul></div><div><h4 class="text-brand-600">📈 결과 (Result)</h4><ul class="list-disc pl-4 text-sm text-slate-600 space-y-2">${ri}</ul></div></div>`;
+        }
+
+        const CareerEditPanel = {
+            el: null, idx: -1,
+            init() {
+                this.el = document.createElement('div');
+                this.el.id = 'career-edit-panel';
+                this.el.innerHTML = `
+                    <div class="ep-bg" onclick="CareerEditPanel.close()"></div>
+                    <div class="ep-box">
+                        <div class="ep-head"><h3>📝 프로젝트 편집</h3><button onclick="CareerEditPanel.close()">✕</button></div>
+                        <div class="ep-body">
+                            <span class="ep-label">제목</span><input id="ep-title" class="ep-input">
+                            <span class="ep-label">부제목</span><input id="ep-sub" class="ep-input">
+                            <span class="ep-label">카드 요약</span><input id="ep-desc" class="ep-input">
+                            <div class="ep-section">
+                                <div class="ep-section-head">🔍 문제 상황</div>
+                                <textarea id="ep-problem" class="ep-textarea" placeholder="기존 근태기가 직원 동선과 멀리 배치되어..."></textarea>
+                            </div>
+                            <div class="ep-section">
+                                <div class="ep-section-head">🛠️ 실행 내용 (항목별)</div>
+                                <div id="ep-actions-list"></div>
+                                <button class="ep-add-btn" onclick="CareerEditPanel.addBullet('ep-actions-list')">+ 항목 추가</button>
+                            </div>
+                            <div class="ep-section">
+                                <div class="ep-section-head">📈 결과 (항목별)</div>
+                                <div id="ep-results-list"></div>
+                                <button class="ep-add-btn" onclick="CareerEditPanel.addBullet('ep-results-list')">+ 항목 추가</button>
+                            </div>
+                        </div>
+                        <div class="ep-foot">
+                            <button class="ep-cancel" onclick="CareerEditPanel.close()">취소</button>
+                            <button class="ep-save" onclick="CareerEditPanel.save()">이 프로젝트 저장</button>
+                        </div>
+                    </div>`;
+                document.body.appendChild(this.el);
+            },
+            addBullet(listId) {
+                const list = document.getElementById(listId);
+                const row = document.createElement('div'); row.className = 'ep-bullet-row';
+                row.innerHTML = `<span class="ep-bullet-dot">•</span><input type="text" class="ep-input ep-bullet-input" placeholder="항목 내용 입력..."><button class="ep-bullet-del" onclick="this.parentElement.remove()">✕</button>`;
+                list.appendChild(row);
+                row.querySelector('.ep-bullet-input').focus();
+            },
+            _fillBullets(listId, items) {
+                document.getElementById(listId).innerHTML = '';
+                (items||[]).forEach(text => {
+                    const row = document.createElement('div'); row.className = 'ep-bullet-row';
+                    row.innerHTML = `<span class="ep-bullet-dot">•</span><input type="text" class="ep-input ep-bullet-input" value="${text.replace(/"/g,'&quot;').replace(/<[^>]+>/g,'')}"><button class="ep-bullet-del" onclick="this.parentElement.remove()">✕</button>`;
+                    document.getElementById(listId).appendChild(row);
+                });
+            },
+            _collectBullets(listId) {
+                return [...document.querySelectorAll(`#${listId} .ep-bullet-input`)].map(i=>i.value.trim()).filter(Boolean);
+            },
+            open(proj) {
+                if (!proj) return;
+                this.idx = PORTFOLIO_DATA.careerProjects.findIndex(p => p.id === proj.id);
+                document.getElementById('ep-title').value = proj.title || '';
+                document.getElementById('ep-sub').value = proj.sub || '';
+                document.getElementById('ep-desc').value = proj.desc || '';
+                const parsed = _parseCareerModal(proj.modalContent || '');
+                // Strip HTML tags for problem field (textarea shows plain text)
+                document.getElementById('ep-problem').value = parsed.problem.replace(/<[^>]+>/g, '') || '';
+                this._fillBullets('ep-actions-list', parsed.actions);
+                this._fillBullets('ep-results-list', parsed.results);
+                this.el.style.display = 'flex';
+            },
+            close() { this.el.style.display = 'none'; },
+            save() {
+                const proj = PORTFOLIO_DATA.careerProjects[this.idx];
+                if (!proj) return;
+                proj.title = document.getElementById('ep-title').value;
+                proj.sub = document.getElementById('ep-sub').value;
+                proj.desc = document.getElementById('ep-desc').value;
+                proj.modalContent = _buildCareerModal({
+                    problem: document.getElementById('ep-problem').value,
+                    actions: this._collectBullets('ep-actions-list'),
+                    results: this._collectBullets('ep-results-list')
+                });
+                App.renderCareerGrid();
+                this.close();
+                InlineEditor._toast('프로젝트 저장됨. 전체 저장 ✓ 버튼을 잊지 마세요!');
+            }
+        };
+
+        // ── MEDIA EDITOR (이미지 / 영상 / PDF URL) ──
+        function _createMediaEmbed(url) {
+            // YouTube
+            const yt = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([^&?\s]{11})/);
+            if (yt) return `<div style="position:relative;padding-top:56.25%;border-radius:12px;overflow:hidden;"><iframe style="position:absolute;inset:0;width:100%;height:100%;border:0;" src="https://www.youtube.com/embed/${yt[1]}" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe></div>`;
+            // Vimeo
+            const vm = url.match(/vimeo\.com\/(\d+)/);
+            if (vm) return `<div style="position:relative;padding-top:56.25%;border-radius:12px;overflow:hidden;"><iframe style="position:absolute;inset:0;width:100%;height:100%;border:0;" src="https://player.vimeo.com/video/${vm[1]}" allow="autoplay;fullscreen" allowfullscreen></iframe></div>`;
+            // Google Drive PDF
+            const gd = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
+            if (gd) return `<iframe src="https://drive.google.com/file/d/${gd[1]}/preview" width="100%" height="520" style="border:1px solid #e2e8f0;border-radius:12px;" allow="autoplay"></iframe>`;
+            // 일반 이미지/GIF
+            return `<img src="${url}" style="max-width:100%;border-radius:8px;" alt="">`;
+        }
+
+        const ImageEditor = {
+            el: null, current: null,
+            init() {
+                this.el = document.createElement('div');
+                this.el.id = 'image-editor';
+                this.el.innerHTML = `
+                    <div class="ep-bg" onclick="ImageEditor.close()"></div>
+                    <div class="ep-box" style="max-width:460px;">
+                        <div class="ep-head"><h3>🖼️ 미디어 변경</h3><button onclick="ImageEditor.close()">✕</button></div>
+                        <div class="ep-body" style="gap:12px;">
+                            <div class="med-tabs">
+                                <button class="med-tab active" onclick="ImageEditor.switchTab('img',this)">🖼️ 이미지</button>
+                                <button class="med-tab" onclick="ImageEditor.switchTab('vid',this)">▶️ 영상</button>
+                                <button class="med-tab" onclick="ImageEditor.switchTab('pdf',this)">📄 PDF</button>
+                            </div>
+                            <div id="med-pane-img" class="med-pane active">
+                                <span class="ep-label">이미지 URL</span>
+                                <input id="ie-url" class="ep-input" type="url" placeholder="https://...이미지.jpg">
+                                <div style="text-align:center;color:#94a3b8;font-size:11px;font-weight:600;">— 또는 —</div>
+                                <label class="ie-filebtn">📁 파일 선택 (JPG·PNG·GIF)<input type="file" accept="image/*,.gif" onchange="ImageEditor.fromFile(this)" style="display:none;"></label>
+                            </div>
+                            <div id="med-pane-vid" class="med-pane">
+                                <span class="ep-label">YouTube / Vimeo URL</span>
+                                <input id="ie-vid-url" class="ep-input" type="url" placeholder="https://youtube.com/watch?v=...">
+                                <p style="font-size:11px;color:#94a3b8;margin:0;">YouTube 또는 Vimeo URL을 붙여넣으면 자동으로 영상이 삽입됩니다.</p>
+                            </div>
+                            <div id="med-pane-pdf" class="med-pane">
+                                <span class="ep-label">Google Drive PDF URL</span>
+                                <input id="ie-pdf-url" class="ep-input" type="url" placeholder="https://drive.google.com/file/d/.../view">
+                                <p style="font-size:11px;color:#94a3b8;margin:0;">공유 가능한 Google Drive 링크를 붙여넣으세요.</p>
+                            </div>
+                            <div id="ie-preview" class="med-preview"></div>
+                        </div>
+                        <div class="ep-foot">
+                            <button class="ep-cancel" onclick="ImageEditor.close()">취소</button>
+                            <button class="ep-save" onclick="ImageEditor.apply()">적용</button>
+                        </div>
+                    </div>`;
+                document.body.appendChild(this.el);
+                // Live preview on input
+                ['ie-url','ie-vid-url','ie-pdf-url'].forEach(id => {
+                    document.getElementById(id)?.addEventListener('input', () => this._updatePreview());
+                });
+            },
+            _activeTab: 'img',
+            switchTab(tab, btn) {
+                this._activeTab = tab;
+                document.querySelectorAll('.med-tab').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.querySelectorAll('.med-pane').forEach(p => p.classList.remove('active'));
+                document.getElementById('med-pane-' + tab).classList.add('active');
+                document.getElementById('ie-preview').style.display = 'none';
+                document.getElementById('ie-preview').innerHTML = '';
+            },
+            _updatePreview() {
+                const url = this._getUrl().trim();
+                if (!url) { document.getElementById('ie-preview').style.display='none'; return; }
+                const preview = document.getElementById('ie-preview');
+                preview.innerHTML = _createMediaEmbed(url);
+                preview.style.display = 'block';
+            },
+            _getUrl() {
+                if (this._activeTab === 'vid') return document.getElementById('ie-vid-url').value;
+                if (this._activeTab === 'pdf') return document.getElementById('ie-pdf-url').value;
+                return document.getElementById('ie-url').value;
+            },
+            open(img) {
+                this.current = img;
+                this._activeTab = 'img';
+                document.querySelectorAll('.med-tab').forEach((b,i) => b.classList.toggle('active', i===0));
+                document.querySelectorAll('.med-pane').forEach((p,i) => p.classList.toggle('active', i===0));
+                document.getElementById('ie-url').value = img?.getAttribute('src') || '';
+                document.getElementById('ie-vid-url').value = '';
+                document.getElementById('ie-pdf-url').value = '';
+                document.getElementById('ie-preview').style.display = 'none';
+                document.getElementById('ie-preview').innerHTML = '';
+                this.el.style.display = 'flex';
+            },
+            close() { this.el.style.display = 'none'; this.current = null; },
+            fromFile(input) {
+                const f = input.files[0]; if (!f) return;
+                const reader = new FileReader();
+                reader.onload = e => {
+                    document.getElementById('ie-url').value = e.target.result;
+                    this._updatePreview();
+                };
+                reader.readAsDataURL(f);
+            },
+            apply() {
+                const url = this._getUrl().trim();
+                if (!url) { alert('URL을 입력하거나 파일을 선택하세요.'); return; }
+                if (this._activeTab === 'img' && this.current) {
+                    // Replace image src
+                    this.current.src = url;
+                    if (!PORTFOLIO_DATA._images) PORTFOLIO_DATA._images = {};
+                    const key = this.current.id || ('img_' + Date.now());
+                    if (!this.current.id) this.current.id = key;
+                    PORTFOLIO_DATA._images[key] = url;
+                } else {
+                    // Insert media embed after current element (or at body if no context)
+                    const embed = document.createElement('div');
+                    embed.innerHTML = _createMediaEmbed(url);
+                    if (this.current?.parentNode) {
+                        this.current.parentNode.insertBefore(embed.firstChild, this.current.nextSibling);
+                    } else {
+                        document.getElementById('education-content')?.appendChild(embed.firstChild);
+                    }
+                }
+                this.close();
+                InlineEditor._toast('미디어 변경됨. 전체 저장 ✓ 버튼을 잊지 마세요!');
+            }
+        };
+
+        // ── TRAINING EDIT PANEL ──
+        const TrainingEditPanel = {
+            el: null, idx: -1,
+            init() {
+                this.el = document.createElement('div');
+                this.el.id = 'training-edit-panel';
+                this.el.style.cssText = 'position:fixed;inset:0;z-index:3000;display:none;align-items:center;justify-content:center;padding:16px;';
+                this.el.innerHTML = `
+                    <div class="ep-bg" onclick="TrainingEditPanel.close()"></div>
+                    <div class="ep-box">
+                        <div class="ep-head"><h3>📚 교육 편집</h3><button onclick="TrainingEditPanel.close()">✕</button></div>
+                        <div class="ep-body">
+                            <span class="ep-label">카테고리</span>
+                            <input id="tep-category" class="ep-input" placeholder="예: HRM / HRD">
+                            <span class="ep-label">기간 / 시간</span>
+                            <input id="tep-dates" class="ep-input" placeholder="예: 2025.07.07 ~ 09 (18H)">
+                            <span class="ep-label">교육명</span>
+                            <input id="tep-title" class="ep-input" placeholder="교육 제목">
+                            <span class="ep-label">기관명</span>
+                            <input id="tep-org" class="ep-input" placeholder="예: KPC 한국생산성본부">
+                            <span class="ep-label">설명 (한 줄)</span>
+                            <textarea id="tep-desc" class="ep-textarea" rows="2" placeholder="교육 내용 요약"></textarea>
+                            <span class="ep-label">수료 상태</span>
+                            <input id="tep-status" class="ep-input" placeholder="예: 수료 완료">
+                            <span class="ep-label">상세 모달 ID (선택)</span>
+                            <input id="tep-modalid" class="ep-input" placeholder="예: tableau (상세보기 버튼 연결, 없으면 빈칸)">
+                        </div>
+                        <div class="ep-foot">
+                            <button class="ep-cancel" onclick="TrainingEditPanel.close()">취소</button>
+                            <button class="ep-save" onclick="TrainingEditPanel.save()">저장</button>
+                        </div>
+                    </div>`;
+                document.body.appendChild(this.el);
+            },
+            open(item) {
+                if (!item) return;
+                this.idx = (PORTFOLIO_DATA.trainingList || []).findIndex(t => t.id === item.id);
+                document.getElementById('tep-category').value = item.category || '';
+                document.getElementById('tep-dates').value = item.dates || '';
+                document.getElementById('tep-title').value = item.title || '';
+                document.getElementById('tep-org').value = item.org || '';
+                document.getElementById('tep-desc').value = item.desc || '';
+                document.getElementById('tep-status').value = item.status || '';
+                document.getElementById('tep-modalid').value = item.modalId || '';
+                this.el.style.display = 'flex';
+            },
+            close() { this.el.style.display = 'none'; },
+            save() {
+                const item = (PORTFOLIO_DATA.trainingList || [])[this.idx];
+                if (!item) return;
+                item.category = document.getElementById('tep-category').value;
+                item.dates = document.getElementById('tep-dates').value;
+                item.title = document.getElementById('tep-title').value;
+                item.org = document.getElementById('tep-org').value;
+                item.desc = document.getElementById('tep-desc').value;
+                item.status = document.getElementById('tep-status').value;
+                item.modalId = document.getElementById('tep-modalid').value;
+                App.renderTrainingList();
+                this.close();
+                InlineEditor._toast('교육 저장됨. 전체 저장 ✓ 버튼을 잊지 마세요!');
+            }
+        };
+
+        // ── ACTIVITY EDIT PANEL ──
+        const ActivityEditPanel = {
+            el: null, idx: -1,
+            init() {
+                this.el = document.createElement('div');
+                this.el.id = 'activity-edit-panel';
+                this.el.style.cssText = 'position:fixed;inset:0;z-index:3000;display:none;align-items:center;justify-content:center;padding:16px;';
+                this.el.innerHTML = `
+                    <div class="ep-bg" onclick="ActivityEditPanel.close()"></div>
+                    <div class="ep-box">
+                        <div class="ep-head"><h3>🏅 활동 편집</h3><button onclick="ActivityEditPanel.close()">✕</button></div>
+                        <div class="ep-body">
+                            <span class="ep-label">아이콘 (이모지)</span>
+                            <input id="aep-icon" class="ep-input" placeholder="예: 🪖 🏛️ ✈️">
+                            <span class="ep-label">활동명</span>
+                            <input id="aep-title" class="ep-input" placeholder="활동 / 기관명">
+                            <span class="ep-label">역할</span>
+                            <input id="aep-role" class="ep-input" placeholder="예: 부대훈련총괄담당">
+                            <span class="ep-label">기간</span>
+                            <input id="aep-period" class="ep-input" placeholder="예: 2023.12 ~ 2025.02">
+                            <span class="ep-label">직급 / 성과</span>
+                            <input id="aep-rank" class="ep-input" placeholder="예: 대위(진) ~ 대위">
+                            <div class="ep-section">
+                                <div class="ep-section-head">📋 상세 내용 (HTML 허용)</div>
+                                <textarea id="aep-content" class="ep-textarea" rows="6" placeholder="상세 내용 입력..."></textarea>
+                            </div>
+                        </div>
+                        <div class="ep-foot">
+                            <button class="ep-cancel" onclick="ActivityEditPanel.close()">취소</button>
+                            <button class="ep-save" onclick="ActivityEditPanel.save()">저장</button>
+                        </div>
+                    </div>`;
+                document.body.appendChild(this.el);
+            },
+            open(item) {
+                if (!item) return;
+                this.idx = PORTFOLIO_DATA.activitiesList.findIndex(a => a.id === item.id);
+                document.getElementById('aep-icon').value = item.icon || '';
+                document.getElementById('aep-title').value = item.title || '';
+                document.getElementById('aep-role').value = item.role || '';
+                document.getElementById('aep-period').value = item.period || '';
+                document.getElementById('aep-rank').value = item.rank || '';
+                document.getElementById('aep-content').value = item.content || '';
+                this.el.style.display = 'flex';
+            },
+            close() { this.el.style.display = 'none'; },
+            save() {
+                const item = PORTFOLIO_DATA.activitiesList[this.idx];
+                if (!item) return;
+                item.icon = document.getElementById('aep-icon').value;
+                item.title = document.getElementById('aep-title').value;
+                item.role = document.getElementById('aep-role').value;
+                item.period = document.getElementById('aep-period').value;
+                item.rank = document.getElementById('aep-rank').value;
+                item.content = document.getElementById('aep-content').value;
+                App.renderActivitiesList();
+                this.close();
+                InlineEditor._toast('활동 저장됨. 전체 저장 ✓ 버튼을 잊지 마세요!');
+            }
+        };
+
+        // ── MAIN INLINE EDITOR ──
+        const InlineEditor = {
+            active: false, snapshot: null,
+
+            enable() {
+                if (this.active) return;
+                // 세션 인증 확인 → 없으면 비밀번호 요청
+                const token = sessionStorage.getItem('editor_auth');
+                if (!token) {
+                    AuthModal.show(t => {
+                        fetch('/api/content', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + t },
+                            body: JSON.stringify(PORTFOLIO_DATA)
+                        }).then(r => {
+                            if (r.ok) {
+                                sessionStorage.setItem('editor_auth', t);
+                                AuthModal.close();
+                                this._activateEdit();
+                            } else {
+                                AuthModal.showError('비밀번호가 올바르지 않습니다. 다시 입력하세요.');
+                            }
+                        }).catch(() => {
+                            // /api/content 없음 (개발 환경) → 인증 없이 허용
+                            sessionStorage.setItem('editor_auth', '__dev__');
+                            AuthModal.close();
+                            this._activateEdit();
+                        });
+                    });
+                    return;
+                }
+                this._activateEdit();
+            },
+
+            _activateEdit() {
+                this.active = true;
+                this.snapshot = JSON.parse(JSON.stringify(PORTFOLIO_DATA));
+                document.body.classList.add('edit-mode');
+                document.getElementById('inline-edit-bar').classList.add('open');
+                document.getElementById('inline-edit-fab').classList.add('hidden-fab');
+                // Simple text/HTML fields
+                document.querySelectorAll('[data-inline-editable]').forEach(el => {
+                    el.setAttribute('contenteditable', 'true');
+                    el.setAttribute('spellcheck', 'false');
+                });
+                // DX content & Education content
+                ['dx-content','education-content'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) { el.setAttribute('contenteditable','true'); el.setAttribute('spellcheck','false'); }
+                });
+                // DX nav: make title/badge spans editable
+                document.querySelectorAll('#dx-nav button span').forEach(s => s.setAttribute('contenteditable','true'));
+                // Image overlays
+                document.querySelectorAll('main img, section img').forEach(img => {
+                    if (img.closest('.img-edit-wrap')) return;
+                    const wrap = document.createElement('span');
+                    wrap.className = 'img-edit-wrap';
+                    img.parentNode.insertBefore(wrap, img);
+                    wrap.appendChild(img);
+                    const btn = document.createElement('button');
+                    btn.className = 'img-edit-btn';
+                    btn.innerHTML = '🖼️<br>변경';
+                    btn.onclick = e => { e.stopPropagation(); ImageEditor.open(img); };
+                    wrap.appendChild(btn);
+                });
+            },
+
+            disable() {
+                this.active = false;
+                document.body.classList.remove('edit-mode');
+                document.getElementById('inline-edit-bar').classList.remove('open');
+                document.getElementById('inline-edit-fab').classList.remove('hidden-fab');
+                FloatBar.hide();
+                document.querySelectorAll('[data-inline-editable]').forEach(el => {
+                    el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck');
+                });
+                ['dx-content','education-content'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+                });
+                document.querySelectorAll('#dx-nav button span[contenteditable]').forEach(s => s.removeAttribute('contenteditable'));
+                document.querySelectorAll('.img-edit-btn').forEach(b => b.remove());
+                document.querySelectorAll('.img-edit-wrap').forEach(w => {
+                    const img = w.querySelector('img');
+                    if (img) w.parentNode.insertBefore(img, w);
+                    w.remove();
+                });
+            },
+
+            _collectDxNavEdits() {
+                document.querySelectorAll('#dx-nav button').forEach(btn => {
+                    const key = btn.id.replace('btn-','');
+                    if (!PORTFOLIO_DATA.dxCases[key]) return;
+                    const spans = btn.querySelectorAll('span');
+                    if (spans[0]) PORTFOLIO_DATA.dxCases[key].title = spans[0].textContent.replace(/^\d+\.\s*/,'').trim();
+                    if (spans[1]) PORTFOLIO_DATA.dxCases[key].badge = spans[1].textContent.trim();
+                });
+            },
+
+            _collectSectionEdits() {
+                const dxEl = document.getElementById('dx-content');
+                if (dxEl && dxEl.getAttribute('contenteditable')) {
+                    const activeKey = Object.keys(PORTFOLIO_DATA.dxCases).find(k =>
+                        document.getElementById('btn-'+k)?.classList.contains('active-dx')) || 'dx1';
+                    PORTFOLIO_DATA.dxCases[activeKey].content = dxEl.innerHTML;
+                }
+                const eduEl = document.getElementById('education-content');
+                if (eduEl && eduEl.getAttribute('contenteditable')) {
+                    const activeKey = ['academic','training','activities','skills'].find(k =>
+                        document.getElementById('edu-tab-'+k)?.className.includes('text-brand-600')) || 'academic';
+                    PORTFOLIO_DATA.education[activeKey] = eduEl.innerHTML;
+                }
+            },
+
+            cancel() {
+                document.querySelectorAll('[data-inline-editable]').forEach(el => {
+                    const key = el.dataset.inlineKey; const type = el.dataset.inlineType;
+                    const val = this.snapshot[key];
+                    if (val) { type === 'text' ? (el.textContent = val) : (el.innerHTML = val); }
+                });
+                Object.assign(PORTFOLIO_DATA, this.snapshot);
+                this.disable();
+                App.renderCareerGrid(); App.renderDxNav(); App.ui.showDx('dx1'); App.ui.showEdu('academic');
+                if (!PORTFOLIO_DATA.trainingList) PORTFOLIO_DATA.trainingList = [];
+                this._toast('취소되었습니다.');
+            },
+
+            save() {
+                document.querySelectorAll('[data-inline-editable]').forEach(el => {
+                    const key = el.dataset.inlineKey; const type = el.dataset.inlineType;
+                    PORTFOLIO_DATA[key] = type === 'text' ? el.textContent.trim() : el.innerHTML.trim();
+                });
+                this._collectDxNavEdits();
+                this._collectSectionEdits();
+                const navEl = document.getElementById('nav-profile-name');
+                if (navEl) navEl.textContent = PORTFOLIO_DATA.profileName;
+                const compEl = document.getElementById('dashboard-company');
+                if (compEl && PORTFOLIO_DATA.companyName) compEl.textContent = PORTFOLIO_DATA.companyName + ' 실무 성과';
+                localStorage.setItem('portfolio_content', JSON.stringify(PORTFOLIO_DATA));
+                this.disable();
+                // KV에도 저장 (Cloudflare Pages Function)
+                const token = sessionStorage.getItem('editor_auth');
+                if (token && token !== '__dev__') {
+                    fetch('/api/content', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                        body: JSON.stringify(PORTFOLIO_DATA)
+                    }).then(r => {
+                        if (r.ok) this._toast('✓ 전체 저장 완료! 모든 기기에 반영됩니다.');
+                        else this._toast('⚠️ 서버 저장 실패. 로컬에만 저장됨.');
+                    }).catch(() => this._toast('✓ 로컬 저장 완료 (서버 미연결)'));
+                } else {
+                    this._toast('✓ 저장 완료');
+                }
+            },
+
+            _toast(msg) {
+                const t = document.createElement('div');
+                t.className = 'fixed bottom-24 left-1/2 z-[800] bg-slate-900 text-white px-6 py-3 rounded-full text-sm font-bold shadow-xl';
+                t.style.cssText = 'transform:translateX(-50%);transition:opacity 0.4s;white-space:nowrap;';
+                t.textContent = msg; document.body.appendChild(t);
+                setTimeout(() => { t.style.opacity='0'; }, 2200);
+                setTimeout(() => t.remove(), 2700);
+            }
+        };
+
+        // ── MONKEY-PATCH showDx: auto-save before switching ──
+        const _origShowDx = App.ui.showDx.bind(App.ui);
+        App.ui.showDx = function(id) {
+            if (InlineEditor.active) {
+                const cur = Object.keys(PORTFOLIO_DATA.dxCases).find(k =>
+                    document.getElementById('btn-'+k)?.classList.contains('active-dx'));
+                if (cur) { const el = document.getElementById('dx-content'); if (el) PORTFOLIO_DATA.dxCases[cur].content = el.innerHTML; }
+            }
+            _origShowDx(id);
+            if (InlineEditor.active) {
+                const el = document.getElementById('dx-content');
+                if (el) el.setAttribute('contenteditable','true');
+            }
+        };
+
+        // ── MONKEY-PATCH showEdu: auto-save before switching ──
+        const _origShowEdu = App.ui.showEdu.bind(App.ui);
+        App.ui.showEdu = function(key) {
+            if (InlineEditor.active) {
+                const cur = ['academic','training','activities','skills'].find(k =>
+                    document.getElementById('edu-tab-'+k)?.className.includes('text-brand-600'));
+                if (cur) { const el = document.getElementById('education-content'); if (el) PORTFOLIO_DATA.education[cur] = el.innerHTML; }
+            }
+            _origShowEdu(key);
+            if (InlineEditor.active) {
+                const el = document.getElementById('education-content');
+                if (el) el.setAttribute('contenteditable','true');
+            }
+        };
+
+        // ── EVENT LISTENERS ──
+        document.getElementById('inline-edit-toggle').addEventListener('click', () => InlineEditor.enable());
+        const _fab = document.getElementById('inline-edit-toggle');
+        const _tip = document.getElementById('inline-edit-tooltip');
+        _fab.addEventListener('mouseenter', () => { _tip.style.opacity = '1'; });
+        _fab.addEventListener('mouseleave', () => { _tip.style.opacity = '0'; });
+        document.getElementById('inline-save-btn').addEventListener('click', () => InlineEditor.save());
+        document.getElementById('inline-cancel-btn').addEventListener('click', () => InlineEditor.cancel());
+        document.getElementById('inline-admin-btn').addEventListener('click', () => window.open('admin.html','_blank'));
+
+        // FloatBar: show on text selection
+        document.addEventListener('mouseup', () => { if (InlineEditor.active) setTimeout(() => FloatBar.show(), 20); });
+        document.addEventListener('keyup', e => {
+            if (InlineEditor.active && e.shiftKey) setTimeout(() => FloatBar.show(), 20);
+        });
+
+        // Career card intercept (capture phase — fires before App handler)
+        document.addEventListener('click', e => {
+            if (!InlineEditor.active) return;
+            const card = e.target.closest('[data-action="open-modal"]');
+            if (card && card.dataset.id && card.dataset.id.startsWith('career_')) {
+                e.stopImmediatePropagation(); e.preventDefault();
+                CareerEditPanel.open(PORTFOLIO_DATA.careerProjects.find(p => p.id === card.dataset.id));
+            }
+        }, true);
+
+        // Initialize all panels
+        FloatBar.init();
+        CareerEditPanel.init();
+        ImageEditor.init();
+        TrainingEditPanel.init();
+        ActivityEditPanel.init();
+
+        // 전역 노출 (HTML inline onclick에서 접근 가능하도록)
+        window.AuthModal = AuthModal;
+        window.CareerEditPanel = CareerEditPanel;
+        window.ImageEditor = ImageEditor;
+        window.FloatBar = FloatBar;
+        window.InlineEditor = InlineEditor;
+        window.TrainingEditPanel = TrainingEditPanel;
+        window.ActivityEditPanel = ActivityEditPanel;
+        window.App = App;
+    });
+    </script>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
