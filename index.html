@@ -317,10 +317,12 @@
 <div class="p-6 lg:p-12">
 
 <!-- ── HERO ── -->
-<section id="hero" class="mb-20 scroll-mt-6">
+<section id="hero" class="mb-20 scroll-mt-6 lg:min-h-[calc(100vh-96px)]">
 
   <!-- Hero content card — enhanced -->
-  <div class="rounded-4xl border p-8 md:p-12 reveal" style="border-color: var(--border); background: linear-gradient(160deg, #f0f8ff 0%, #ffffff 45%);">
+  <div class="rounded-4xl border p-8 md:p-12 reveal lg:min-h-full lg:flex lg:flex-col" style="border-color: var(--border); background: linear-gradient(160deg, #f0f8ff 0%, #ffffff 45%);">
+    <!-- 상단 그룹: 배지 + 헤드라인 + 설명 -->
+    <div>
     <!-- Top row: badges + open-to-work indicator -->
     <div class="flex flex-wrap items-center justify-between gap-3 mb-8">
       <div class="flex flex-wrap gap-2">
@@ -346,6 +348,10 @@
       ATS 도입 · 근태 시스템 재편 · 52시간 관리 · 업무 자동화<br>
       1년 안에 4개 영역을 직접 설계하고 작동시켰습니다.
     </p>
+    </div>
+
+    <!-- flex-grow 스페이서: 상단 콘텐츠와 하단 사이 여백 자동 분배 -->
+    <div class="lg:flex-1"></div>
 
     <!-- Impact mini-cards -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
