@@ -1,7 +1,7 @@
 // content.js - 포트폴리오 기본 콘텐츠 데이터
 // !! 이 파일은 GitHub Actions (sync-notion.yml) 이 자동 생성합니다 !!
 // 직접 편집하지 마세요 — Notion DB 에서 수정하세요.
-// 마지막 생성: 2026-03-08T06:24:10.702Z
+// 마지막 생성: 2026-03-09T01:08:00.489Z
 
 const SITE_CONTENT = {
 
@@ -21,10 +21,10 @@ const SITE_CONTENT = {
 
   // ===== 다운로드 링크 (Notion: 사이트 설정) =====
   downloads: {
-    "resume_kr": "",
-    "resume_en": "",
-    "portfolio_kr": "",
-    "portfolio_en": ""
+    "resume_kr": "https://drive.google.com/uc?export=download&id=1sTqdcd8MPOAjTG9nQo7m2SNFGWzE7Llx",
+    "resume_en": "https://drive.google.com/uc?export=download&id=1UhAHgmxX9bQ51uPwV2wTwif1-QNBn5Rh",
+    "portfolio_kr": "https://drive.google.com/uc?export=download&id=1FEuhZWT7z_EjbulkEPNe9VksuVzZw4vV",
+    "portfolio_en": "https://drive.google.com/uc?export=download&id=1YtTpVhKyjNThPHPFAt0_LMbHNd5MIAHm"
 },
 
   // ===== 교육 모달 상세 (Notion: 성장 기록 페이지 본문) =====
@@ -130,18 +130,10 @@ const SITE_CONTENT = {
     }
 ],
 
-  // ===== 교육 정보 =====
-  education: {
-    'academic': `<div class="flex flex-col md:flex-row gap-6 p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:border-primary-100 transition duration-300 animate-[slideIn_0.4s_ease-out]"><div class="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center text-3xl border border-slate-100">🎓</div><div class="flex-1"><div class="flex flex-col md:flex-row md:items-center justify-between mb-2"><h4 class="text-xl font-bold text-slate-900 break-keep">한국항공대학교(Korea Aerospace University)</h4><span class="text-xs font-bold text-primary-600 bg-primary-50 px-3 py-1 rounded-full w-fit mt-2 md:mt-0">2017.03 ~ 2021.02</span></div><p class="text-slate-700 font-bold mb-4 break-keep">경영학부 경영학 전공(B.B.A)</p><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="bg-white p-4 rounded-xl border border-slate-100"><span class="text-xs text-slate-400 block mb-1">전체 평점</span><span class="text-lg font-bold text-slate-800">3.67 / 4.5</span><span class="text-xs text-slate-400 ml-1">(133학점 이수)</span></div><div class="bg-white p-4 rounded-xl border border-slate-100"><span class="text-xs text-slate-400 block mb-1">전공 평점</span><span class="text-lg font-bold text-primary-600">3.78 / 4.5</span><span class="text-xs text-slate-400 ml-1">(67학점 이수)</span></div></div></div></div>`,
-    'training': '',
-    'activities': '',
-    'skills': `<div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-[slideIn_0.4s_ease-out]"><div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-md transition"><div class="flex items-center gap-3 mb-4"><span class="text-2xl bg-white p-2 rounded-lg shadow-sm">📊</span><h4 class="text-lg font-bold text-slate-900">Data & Analytics</h4></div><ul class="space-y-3 text-sm text-slate-600"><li class="flex justify-between items-center"><span>Tableau</span><span class="text-xs font-bold bg-blue-100 text-blue-600 px-2 py-0.5 rounded">Intermediate</span></li><li class="flex justify-between items-center"><span>Google Analytics 4</span><span class="text-xs font-bold bg-blue-100 text-blue-600 px-2 py-0.5 rounded">Certified</span></li><li class="flex justify-between items-center"><span>Python (Text Mining)</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Basic</span></li></ul></div><div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-md transition"><div class="flex items-center gap-3 mb-4"><span class="text-2xl bg-white p-2 rounded-lg shadow-sm">⚙️</span><h4 class="text-lg font-bold text-slate-900">Automation & Dev</h4></div><ul class="space-y-3 text-sm text-slate-600"><li class="flex justify-between items-center"><span>Google Apps Script</span><span class="text-xs font-bold bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded">Intermediate</span></li><li class="flex justify-between items-center"><span>MAKE (Integromat)</span><span class="text-xs font-bold bg-purple-100 text-purple-600 px-2 py-0.5 rounded">Workflow</span></li><li class="flex justify-between items-center"><span>HTML / CSS</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Basic</span></li></ul></div><div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-md transition"><div class="flex items-center gap-3 mb-4"><span class="text-2xl bg-white p-2 rounded-lg shadow-sm">🤖</span><h4 class="text-lg font-bold text-slate-900">HR Tech & AI</h4></div><ul class="space-y-3 text-sm text-slate-600"><li class="flex justify-between items-center"><span>Ninehire (ATS)</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Admin</span></li><li class="flex justify-between items-center"><span>GPT Agent Design</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Prompt Eng.</span></li><li class="flex justify-between items-center"><span>Slack / Notion / Teams</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Collaboration</span></li></ul></div><div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-md transition"><div class="flex items-center gap-3 mb-4"><span class="text-2xl bg-white p-2 rounded-lg shadow-sm">📝</span><h4 class="text-lg font-bold text-slate-900">Office & Documentation</h4></div><ul class="space-y-3 text-sm text-slate-600"><li class="flex justify-between items-center"><span>Excel / Google Sheets</span><span class="text-xs font-bold bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded">Advanced</span></li><li class="flex justify-between items-center"><span>PowerPoint</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Proficient</span></li><li class="flex justify-between items-center"><span>Word / HWP</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Proficient</span></li></ul></div></div>`
-  },
-
   // ===== 자격 & 어학 (Notion: 성장 기록 DB, 유형=certification) =====
   certificationList: [
     {
-        "id": "cert_ga4",
+        "id": "cert_1",
         "title": "Google Analytics Certification",
         "org": "Google",
         "date": "2026.01.11",
@@ -150,7 +142,7 @@ const SITE_CONTENT = {
         "credentialUrl": "https://www.credential.net/e50ea40f-aae0-41d7-b242-d6551212a14f"
     },
     {
-        "id": "cert_toeic",
+        "id": "cert_2",
         "title": "TOEIC Speaking IM2",
         "org": "ETS",
         "date": "2024.09.21",
@@ -159,6 +151,14 @@ const SITE_CONTENT = {
         "credentialUrl": null
     }
 ],
+
+  // ===== 교육 정보 =====
+  education: {
+    'academic': `<div class="flex flex-col md:flex-row gap-6 p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:border-brand-100 transition duration-300 animate-[slideIn_0.4s_ease-out]"><div class="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center text-3xl border border-slate-100">🎓</div><div class="flex-1"><div class="flex flex-col md:flex-row md:items-center justify-between mb-2"><h4 class="text-xl font-bold text-slate-900 break-keep">한국항공대학교(Korea Aerospace University)</h4><span class="text-xs font-bold text-primary-600 bg-primary-50 px-3 py-1 rounded-full w-fit mt-2 md:mt-0">2017.03 ~ 2021.02</span></div><p class="text-slate-700 font-bold mb-4 break-keep">경영학부 경영학 전공(B.B.A)</p><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="bg-white p-4 rounded-xl border border-slate-100"><span class="text-xs text-slate-400 block mb-1">전체 평점</span><span class="text-lg font-bold text-slate-800">3.67 / 4.5</span><span class="text-xs text-slate-400 ml-1">(133학점 이수)</span></div><div class="bg-white p-4 rounded-xl border border-slate-100"><span class="text-xs text-slate-400 block mb-1">전공 평점</span><span class="text-lg font-bold text-primary-600">3.78 / 4.5</span><span class="text-xs text-slate-400 ml-1">(67학점 이수)</span></div></div></div></div>`,
+    'training': '',
+    'activities': '',
+    'skills': `<div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-[slideIn_0.4s_ease-out]"><div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-md transition"><div class="flex items-center gap-3 mb-4"><span class="text-2xl bg-white p-2 rounded-lg shadow-sm">📊</span><h4 class="text-lg font-bold text-slate-900">Data & Analytics</h4></div><ul class="space-y-3 text-sm text-slate-600"><li class="flex justify-between items-center"><span>Tableau</span><span class="text-xs font-bold bg-blue-100 text-blue-600 px-2 py-0.5 rounded">Intermediate</span></li><li class="flex justify-between items-center"><span>Google Analytics 4</span><span class="text-xs font-bold bg-blue-100 text-blue-600 px-2 py-0.5 rounded">Certified</span></li><li class="flex justify-between items-center"><span>Python (Text Mining)</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Basic</span></li></ul></div><div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-md transition"><div class="flex items-center gap-3 mb-4"><span class="text-2xl bg-white p-2 rounded-lg shadow-sm">⚙️</span><h4 class="text-lg font-bold text-slate-900">Automation & Dev</h4></div><ul class="space-y-3 text-sm text-slate-600"><li class="flex justify-between items-center"><span>Google Apps Script</span><span class="text-xs font-bold bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded">Intermediate</span></li><li class="flex justify-between items-center"><span>MAKE (Integromat)</span><span class="text-xs font-bold bg-purple-100 text-purple-600 px-2 py-0.5 rounded">Workflow</span></li><li class="flex justify-between items-center"><span>HTML / CSS</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Basic</span></li></ul></div><div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-md transition"><div class="flex items-center gap-3 mb-4"><span class="text-2xl bg-white p-2 rounded-lg shadow-sm">🤖</span><h4 class="text-lg font-bold text-slate-900">HR Tech & AI</h4></div><ul class="space-y-3 text-sm text-slate-600"><li class="flex justify-between items-center"><span>Ninehire (ATS)</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Admin</span></li><li class="flex justify-between items-center"><span>GPT Agent Design</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Prompt Eng.</span></li><li class="flex justify-between items-center"><span>Slack / Notion / Teams</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Collaboration</span></li></ul></div><div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-md transition"><div class="flex items-center gap-3 mb-4"><span class="text-2xl bg-white p-2 rounded-lg shadow-sm">📝</span><h4 class="text-lg font-bold text-slate-900">Office & Documentation</h4></div><ul class="space-y-3 text-sm text-slate-600"><li class="flex justify-between items-center"><span>Excel / Google Sheets</span><span class="text-xs font-bold bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded">Advanced</span></li><li class="flex justify-between items-center"><span>PowerPoint</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Proficient</span></li><li class="flex justify-between items-center"><span>Word / HWP</span><span class="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">Proficient</span></li></ul></div></div>`
+  },
 
   // ===== 주요 활동 (Notion: 성장 기록 DB, 유형=activity) =====
   activitiesList: [
@@ -169,7 +169,7 @@ const SITE_CONTENT = {
         "period": "2023.12 ~ 2025.02",
         "rank": "대위(진) ~ 대위",
         "icon": "🪖",
-        "content": "<div class=\"space-y-4\"><div class=\"bg-blue-50/50 p-4 rounded-xl border border-blue-100\"><strong class=\"text-primary-600 block mb-1\">💡 성과 요약</strong><ul class=\"list-disc pl-4 text-sm text-slate-700 space-y-1\"><li>사격훈련 진행률 45% → 75% 대폭 개선</li><li>공군 사격대회 순위 16위 → 8위로 상승</li><li>시설 수리 및 훈련 병행 기간 안전사고 0건 유지</li></ul></div><div><strong class=\"text-slate-800 block mb-2\">🚀 주요 프로젝트 1: 사격훈련 운영 체계 개편</strong><p class=\"text-sm text-slate-600 mb-2\"><strong>문제:</strong> 무기고 봉인 등 예측 불가능한 일정으로 훈련 중단 반복</p><p class=\"text-sm text-slate-600\"><strong>해결:</strong> 방첩/보안 부서와 봉인 일정 사전 통보 체계 확립 및 인트라넷 예약 시스템 구축으로 '예측 가능한 훈련 리듬' 설계</p></div><div><strong class=\"text-slate-800 block mb-2\">🔧 주요 프로젝트 2: 노후 사격장 부분 수리 전략</strong><p class=\"text-sm text-slate-600 mb-2\"><strong>문제:</strong> 사로 60% 파손으로 전면 수리 시 훈련 중단 위기</p><p class=\"text-sm text-slate-600\"><strong>해결:</strong> 긴급 구역 우선 수리 및 안전 가드 확보를 통한 '부분 수리 + 훈련 병행' 프로세스 설계로 운영 연속성 확보</p></div><div class=\"border-t border-slate-100 pt-3\"><span class=\"text-xs font-bold text-slate-400 uppercase tracking-widest\">핵심 역량</span><p class=\"text-sm text-slate-700 mt-1\">계획-현장-안전 연동 운영 설계, 다부서 이해관계 조율(Facility/Security)</p></div></div>"
+        "content": "<div class=\"space-y-4\"></div>"
     },
     {
         "id": "act2",
@@ -178,7 +178,7 @@ const SITE_CONTENT = {
         "period": "2022.09 ~ 2023.12",
         "rank": "중위 ~ 대위(진)",
         "icon": "🏛️",
-        "content": "<div class=\"space-y-4\"><div class=\"bg-blue-50/50 p-4 rounded-xl border border-blue-100\"><strong class=\"text-primary-600 block mb-1\">💡 성과 요약</strong><ul class=\"list-disc pl-4 text-sm text-slate-700 space-y-1\"><li>창설 검열 시 '주요 미흡사항 없음' 인정</li><li>후보생 지원자 전년 대비 100% 증가</li></ul></div><div><strong class=\"text-slate-800 block mb-2\">📢 주요 프로젝트 1: 후보생 모집 브랜딩 리뉴얼</strong><p class=\"text-sm text-slate-600\"><strong>해결:</strong> '병역'이 아닌 '전문 커리어'로 소구점 전환</p></div><div class=\"border-t border-slate-100 pt-3\"><span class=\"text-xs font-bold text-slate-400 uppercase tracking-widest\">핵심 역량</span><p class=\"text-sm text-slate-700 mt-1\">0 to 1 조직 구축, 이해관계자 관리</p></div></div>"
+        "content": "<div class=\"space-y-4\"></div>"
     },
     {
         "id": "act3",
@@ -187,7 +187,7 @@ const SITE_CONTENT = {
         "period": "2021.03 ~ 2022.09",
         "rank": "소위 ~ 중위",
         "icon": "✈️",
-        "content": "<div class=\"space-y-4\"><div class=\"bg-blue-50/50 p-4 rounded-xl border border-blue-100\"><strong class=\"text-primary-600 block mb-1\">💡 성과 요약</strong><ul class=\"list-disc pl-4 text-sm text-slate-700 space-y-1\"><li>교육 만족도 64점 → 88점 향상</li><li>코로나 시기 연가 사용률 6%p 상승</li></ul></div><div><strong class=\"text-slate-800 block mb-2\">🎓 주요 프로젝트 1: 내부 강사 양성</strong><p class=\"text-sm text-slate-600\"><strong>해결:</strong> 외부 전문가 초빙 강사 코칭 프로그램 도입</p></div><div class=\"border-t border-slate-100 pt-3\"><span class=\"text-xs font-bold text-slate-400 uppercase tracking-widest\">핵심 역량</span><p class=\"text-sm text-slate-700 mt-1\">HRD 시스템 내재화, 규정 준수</p></div></div>"
+        "content": "<div class=\"space-y-4\"></div>"
     },
     {
         "id": "act4",
@@ -196,7 +196,7 @@ const SITE_CONTENT = {
         "period": "2018.10 ~ 2018.11",
         "rank": "베스트프레젠터상 수상",
         "icon": "💎",
-        "content": "<div class=\"space-y-4\"><div class=\"bg-blue-50/50 p-4 rounded-xl border border-blue-100\"><strong class=\"text-primary-600 block mb-1\">💡 성과 요약</strong><ul class=\"list-disc pl-4 text-sm text-slate-700 space-y-1\"><li>베스트프레젠터상 수상</li><li>데이터 기반 2030 타겟 니즈 도출</li></ul></div><div><strong class=\"text-slate-800 block mb-2\">🔍 문제 정의: 경험 부재의 상권</strong><p class=\"text-sm text-slate-600\">핵심은 제품이 아닌 <strong>'방문하고 인증할 만한 경험'의 부재</strong></p></div><div class=\"border-t border-slate-100 pt-3\"><span class=\"text-xs font-bold text-slate-400 uppercase tracking-widest\">핵심 역량</span><p class=\"text-sm text-slate-700 mt-1\">문제 구조화, 공간 브랜딩 기획</p></div></div>"
+        "content": "<div class=\"space-y-4\"></div>"
     },
     {
         "id": "act5",
@@ -205,7 +205,7 @@ const SITE_CONTENT = {
         "period": "2018.10.05",
         "rank": "최우수상 수상",
         "icon": "🏆",
-        "content": "<div class=\"space-y-4\"><div class=\"bg-blue-50/50 p-4 rounded-xl border border-blue-100\"><strong class=\"text-primary-600 block mb-1\">💡 성과 요약</strong><ul class=\"list-disc pl-4 text-sm text-slate-700 space-y-1\"><li>최우수상 수상</li><li>사용자 경험(UX) 개선 모델 제시</li></ul></div><div><strong class=\"text-slate-800 block mb-2\">💡 솔루션: 여행 경험의 단순화</strong><p class=\"text-sm text-slate-600\">수하물/좌석/기내식을 묶은 <strong>'월정액 구독 모델'</strong> 제안</p></div><div class=\"border-t border-slate-100 pt-3\"><span class=\"text-xs font-bold text-slate-400 uppercase tracking-widest\">핵심 역량</span><p class=\"text-sm text-slate-700 mt-1\">비즈니스 모델 설계, UX 중심 사고</p></div></div>"
+        "content": "<div class=\"space-y-4\"></div>"
     }
 ]
 
