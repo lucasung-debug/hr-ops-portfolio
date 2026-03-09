@@ -128,7 +128,7 @@
     <div class="print-toolbar-btns">
         <input id="company-input" type="text" placeholder="채용 회사명 입력 (선택)" oninput="applyCompany(this.value)"
             style="padding:7px 12px;border-radius:7px;border:none;font-size:13px;width:200px;outline:none;color:#1e293b;">
-        <button class="btn-back" onclick="history.back()">← 돌아가기</button>
+        <button class="btn-back" onclick="window.close(); location.href='index.html';">← 돌아가기</button>
         <button class="btn-print" onclick="window.print()">PDF 저장 / 인쇄</button>
     </div>
 </div>
@@ -247,12 +247,15 @@
         if (!m) return '';
         return m[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
     }
-    function renderDx(compact = false) {
+    function renderDx(compact = false, start = 0, end = undefined) {
         if (!D.dxCases) return '';
-        const cases = Object.values(D.dxCases);
+        const allCases = Object.values(D.dxCases);
+        if (!allCases.length) return '';
+        const cases = allCases.slice(start, end);
         if (!cases.length) return '';
         const itemMargin = compact ? '14px' : '18px';
-        const items = cases.map((c, i) => {
+        const items = cases.map((c, idx) => {
+            const i = start + idx;
             const bg = extractDxSection(c.content, 'Background');
             const result = extractDxSection(c.content, 'Result') || extractDxSection(c.content, 'Future Plan');
             return `<div class="dx-item" style="margin-bottom:${itemMargin}">
@@ -291,25 +294,19 @@
                     <span style="font-size:8pt;font-weight:700;color:var(--brand);white-space:nowrap;">${t.status || ''}</span>
                 </div>
             </div>`).join('');
-        const certsHtml = `
-            <div style="margin-bottom:8px;padding:8px 10px;background:var(--gray-100);border-radius:6px;break-inside:avoid;">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
-                    <div>
-                        <strong style="font-size:9.5pt;">Google Analytics Certification</strong>
-                        <div style="font-size:8.5pt;color:var(--gray-500);margin-top:1px;">Google · 2026.01.11</div>
-                    </div>
-                    <span style="font-size:8pt;font-weight:700;color:var(--brand);white-space:nowrap;">취득</span>
-                </div>
-            </div>
-            <div style="margin-bottom:8px;padding:8px 10px;background:var(--gray-100);border-radius:6px;break-inside:avoid;">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
-                    <div>
-                        <strong style="font-size:9.5pt;">TOEIC Speaking IM2</strong>
-                        <div style="font-size:8.5pt;color:var(--gray-500);margin-top:1px;">ETS · 2024.09.21</div>
-                    </div>
-                    <span style="font-size:8pt;font-weight:700;color:var(--brand);white-space:nowrap;">취득</span>
-                </div>
-            </div>`;
+        const certsHtml = (D.certificationList || []).map(function(cert) {
+            return '<div style="margin-bottom:8px;padding:8px 10px;background:var(--gray-100);border-radius:6px;break-inside:avoid;">'
+                + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">'
+                + '<div>'
+                + '<strong style="font-size:9.5pt;">' + (cert.title || '') + '</strong>'
+                + '<div style="font-size:8.5pt;color:var(--gray-500);margin-top:1px;">'
+                + (cert.org || '') + ' · ' + (cert.date || '')
+                + '</div>'
+                + '</div>'
+                + '<span style="font-size:8pt;font-weight:700;color:var(--brand);white-space:nowrap;">취득</span>'
+                + '</div>'
+                + '</div>';
+        }).join('');
         // 학력 텍스트 간략 파싱 (인라인 HTML → 플레인 텍스트 카드)
         const academicText = (academic || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
         const academicHtml = `
@@ -363,7 +360,7 @@
     function renderActivities() {
         if (!D.activitiesList?.length) return '';
         const items = D.activitiesList.map(a => `
-            <div class="act-item" style="margin-bottom:10px;padding:10px 12px;background:#f8fafc;border-radius:8px;break-inside:avoid;page-break-inside:avoid;">
+            <div class="act-item" style="margin-bottom:6px;padding:7px 10px;background:#f8fafc;border-radius:8px;break-inside:avoid;page-break-inside:avoid;">
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;">
                     <div>
                         <strong>${a.icon || ''} ${a.title || ''}</strong>
@@ -389,12 +386,13 @@
         </div>
         <div class="a4-page">
             ${renderCareers(3, 6, true)}
-            ${renderDx(true)}
+            ${renderDx(true, 0, 2)}
         </div>
         <div class="a4-page">
+            ${renderDx(true, 2)}
             ${renderEducation()}
             ${renderActivities()}
-            <div style="text-align:center;font-size:8.5pt;color:#94a3b8;margin-top:24px;padding-top:12px;border-top:1px solid #e2e8f0;">
+            <div style="text-align:center;font-size:8.5pt;color:#94a3b8;margin-top:12px;padding-top:8px;border-top:1px solid #e2e8f0;">
                 ${D.profileName || ''} · ${D.email || ''} · smjportfolio.com · ${D.lastUpdated || ''}
             </div>
         </div>
