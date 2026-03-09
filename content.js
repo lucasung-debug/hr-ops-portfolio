@@ -1,7 +1,7 @@
 // content.js - 포트폴리오 기본 콘텐츠 데이터
 // !! 이 파일은 GitHub Actions (sync-notion.yml) 이 자동 생성합니다 !!
 // 직접 편집하지 마세요 — Notion DB 에서 수정하세요.
-// 마지막 생성: 2026-03-09T14:22:42.729Z
+// 마지막 생성: 2026-03-09T14:46:37.248Z
 
 const SITE_CONTENT = {
 
@@ -134,12 +134,12 @@ const SITE_CONTENT = {
   certificationList: [
     {
         "id": "cert_1",
-        "title": "Claude Code in Action",
+        "title": "Google Analytics Certification",
         "org": "Google",
-        "date": "2026.03.08",
+        "date": "2026.01.11",
         "icon": "📜",
-        "desc": "클로드 코드 교육 수료",
-        "credentialUrl": null
+        "desc": "GA4 인증",
+        "credentialUrl": "https://www.credential.net/e50ea40f-aae0-41d7-b242-d6551212a14f"
     },
     {
         "id": "cert_2",
@@ -152,12 +152,12 @@ const SITE_CONTENT = {
     },
     {
         "id": "cert_3",
-        "title": "Google Analytics Certification",
-        "org": "Google",
-        "date": "2026.01.11",
+        "title": "Claude Code in Action",
+        "org": "Anthropic",
+        "date": "2026.03.08",
         "icon": "📜",
-        "desc": "GA4 인증",
-        "credentialUrl": "https://www.credential.net/e50ea40f-aae0-41d7-b242-d6551212a14f"
+        "desc": "클로드 코드 교육 수료",
+        "credentialUrl": "https://verify.skilljar.com/c/855s5776siee"
     }
 ],
 
