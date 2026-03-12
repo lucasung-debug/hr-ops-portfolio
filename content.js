@@ -15,7 +15,7 @@ const SITE_CONTENT = {
 
   // ===== 히어로 섹션 (하드코딩) =====
   heroSubtitle: "HR Operations",
-  heroDescription: `ATS 도입 · 근태 시스템 재편 · 52시간 관리 · 업무 자동화<br>1년 안에 4개 영역을 직접 설계하고 작동시켰습니다.`,
+  heroDescription: `ATS 도입, 근태 운영 재편, 52시간 관리, 채용 프로세스 개선까지<br>문제를 발견하고 기준을 설계해 실제 운영 변화로 연결해왔습니다.<br><br>1년 안에 채용, 근태, 제도 운영, 자동화 영역에서<br>반복 업무는 줄이고 운영 정확도는 높이는 구조를 직접 만들었습니다.`,
   heroHeadlineHTML: `'원래 이랬어'를 <span style="color: var(--primary)">바꾸는</span> HR입니다.`,
   heroImpactHTML: `700명 규모 사업장 근태 시스템 재설계 →<br>인식률 <span style="color: var(--primary)">+12%p</span>, 수기 정정 <span style="color: var(--primary)">–8%p</span>, 클레임 <span style="color: var(--primary)">0건</span>`,
 
