@@ -1,7 +1,7 @@
 // content.js - 포트폴리오 기본 콘텐츠 데이터
 // !! 이 파일은 GitHub Actions (sync-notion.yml) 이 자동 생성합니다 !!
 // 직접 편집하지 마세요 — Notion DB 에서 수정하세요.
-// 마지막 생성: 2026-03-11T01:03:27.295Z
+// 마지막 생성: 2026-03-12T01:00:41.083Z
 
 const SITE_CONTENT = {
 
@@ -178,7 +178,7 @@ const SITE_CONTENT = {
         "period": "2023.12 ~ 2025.02",
         "rank": "대위(진) ~ 대위",
         "icon": "🪖",
-        "content": "<div class=\"space-y-4\"><div class=\"bg-blue-50/50 p-4 rounded-xl border border-blue-100\"><strong class=\"text-brand-600 block mb-1\">💡 성과 요약</strong><ul class=\"list-disc pl-4 text-sm text-slate-700 space-y-1\"><li>사격훈련 진행률 45% → 75% 대폭 개선</li><li>공군 사격대회 순위 16위 → 8위로 상승</li><li>시설 수리 및 훈련 병행 기간 안전사고 0건 유지</li></ul></div><div><strong class=\"text-slate-800 block mb-2\">🚀 주요 프로젝트 1: 사격훈련 운영 체계 개편</strong><p class=\"text-sm text-slate-600 mb-2\"><strong>문제:</strong> 무기고 봉인 등 예측 불가능한 일정으로 훈련 중단 반복</p><p class=\"text-sm text-slate-600\"><strong>해결:</strong> 방첩/보안 부서와 봉인 일정 사전 통보 체계 확립 및 인트라넷 예약 시스템 구축으로 '예측 가능한 훈련 리듬' 설계</p></div><div><strong class=\"text-slate-800 block mb-2\">🔧 주요 프로젝트 2: 노후 사격장 부분 수리 전략</strong><p class=\"text-sm text-slate-600 mb-2\"><strong>문제:</strong> 사로 60% 파손으로 전면 수리 시 훈련 중단 위기</p><p class=\"text-sm text-slate-600\"><strong>해결:</strong> 긴급 구역 우선 수리 및 안전 가드 확보를 통한 '부분 수리 + 훈련 병행' 프로세스 설계로 운영 연속성 확보</p></div><div class=\"border-t border-slate-100 pt-3\"><span class=\"text-xs font-bold text-slate-400 uppercase tracking-widest\">핵심 역량</span><p class=\"text-sm text-slate-700 mt-1\">계획-현장-안전 연동 운영 설계, 다부서 이해관계 조율(Facility/Security)</p></div></div>"
+        "content": "<div class=\"space-y-4\"><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>부대훈련총괄담당</strong></p><p class=\"text-slate-600 text-sm leading-relaxed\">2023.12 ~ 2025.02 · 대위(진) ~ 대위</p><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>💡 성과 요약</strong></p><ul class=\"list-disc pl-4 text-sm text-slate-600 space-y-2\"><li>사격훈련 진행률 45% → 75% 대폭 개선</li><li>공군 사격대회 순위 16위 → 8위로 상승</li><li>시설 수리 및 훈련 병행 기간 안전사고 0건 유지</li></ul><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>🚀 주요 프로젝트 1: 사격훈련 운영 체계 개편</strong></p><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>문제:</strong> 무기고 봉인 등 예측 불가능한 일정으로 훈련 중단 반복</p><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>해결:</strong> 방첩/보안 부서와 봉인 일정 사전 통보 체계 확립 및 인트라넷 예약 시스템 구축으로 '예측 가능한 훈련 리듬' 설계</p><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>🔧 주요 프로젝트 2: 노후 사격장 부분 수리 전략</strong></p><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>문제:</strong> 사로 60% 파손으로 전면 수리 시 훈련 중단 위기</p><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>해결:</strong> 긴급 구역 우선 수리 및 안전 가드 확보를 통한 '부분 수리 + 훈련 병행' 프로세스 설계로 운영 연속성 확보</p><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>핵심 역량</strong></p><p class=\"text-slate-600 text-sm leading-relaxed\">계획-현장-안전 연동 운영 설계, 다부서 이해관계 조율(Facility/Security)</p></div>"
     },
     {
         "id": "act2",
@@ -187,7 +187,7 @@ const SITE_CONTENT = {
         "period": "2022.09 ~ 2023.12",
         "rank": "중위 ~ 대위(진)",
         "icon": "🏛️",
-        "content": "<div class=\"space-y-4\"><div class=\"bg-blue-50/50 p-4 rounded-xl border border-blue-100\"><strong class=\"text-brand-600 block mb-1\">💡 성과 요약</strong><ul class=\"list-disc pl-4 text-sm text-slate-700 space-y-1\"><li>창설 검열 시 '주요 미흡사항 없음' 인정</li><li>후보생 지원자 전년 대비 100% 증가</li></ul></div><div><strong class=\"text-slate-800 block mb-2\">📢 주요 프로젝트 1: 후보생 모집 브랜딩 리뉴얼</strong><p class=\"text-sm text-slate-600\"><strong>해결:</strong> '병역'이 아닌 '전문 커리어'로 소구점 전환</p></div><div class=\"border-t border-slate-100 pt-3\"><span class=\"text-xs font-bold text-slate-400 uppercase tracking-widest\">핵심 역량</span><p class=\"text-sm text-slate-700 mt-1\">0 to 1 조직 구축, 이해관계자 관리</p></div></div>"
+        "content": "<div class=\"space-y-4\"><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>창설 TF 팀장 / 교육행정담당</strong></p><p class=\"text-slate-600 text-sm leading-relaxed\">2022.09 ~ 2023.12 · 중위 ~ 대위(진)</p><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>💡 성과 요약</strong></p><ul class=\"list-disc pl-4 text-sm text-slate-600 space-y-2\"><li>창설 검열 시 '주요 미흡사항 없음' 인정</li><li>후보생 지원자 전년 대비 100% 증가</li></ul><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>📢 주요 프로젝트 1: 후보생 모집 브랜딩 리뉴얼</strong></p><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>해결:</strong> '병역'이 아닌 '전문 커리어'로 소구점 전환</p><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>핵심 역량</strong></p><p class=\"text-slate-600 text-sm leading-relaxed\">0 to 1 조직 구축, 이해관계자 관리</p></div>"
     },
     {
         "id": "act3",
@@ -196,7 +196,7 @@ const SITE_CONTENT = {
         "period": "2021.03 ~ 2022.09",
         "rank": "소위 ~ 중위",
         "icon": "✈️",
-        "content": "<div class=\"space-y-4\"><div class=\"bg-blue-50/50 p-4 rounded-xl border border-blue-100\"><strong class=\"text-brand-600 block mb-1\">💡 성과 요약</strong><ul class=\"list-disc pl-4 text-sm text-slate-700 space-y-1\"><li>교육 만족도 64점 → 88점 향상</li><li>코로나 시기 연가 사용률 6%p 상승</li></ul></div><div><strong class=\"text-slate-800 block mb-2\">🎓 주요 프로젝트 1: 내부 강사 양성</strong><p class=\"text-sm text-slate-600\"><strong>해결:</strong> 외부 전문가 초빙 강사 코칭 프로그램 도입</p></div><div class=\"border-t border-slate-100 pt-3\"><span class=\"text-xs font-bold text-slate-400 uppercase tracking-widest\">핵심 역량</span><p class=\"text-sm text-slate-700 mt-1\">HRD 시스템 내재화, 규정 준수</p></div></div>"
+        "content": "<div class=\"space-y-4\"><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>인사정훈담당</strong></p><p class=\"text-slate-600 text-sm leading-relaxed\">2021.03 ~ 2022.09 · 소위 ~ 중위</p><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>💡 성과 요약</strong></p><ul class=\"list-disc pl-4 text-sm text-slate-600 space-y-2\"><li>교육 만족도 64점 → 88점 향상</li><li>코로나 시기 연가 사용률 6%p 상승</li></ul><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>🎓 주요 프로젝트 1: 내부 강사 양성</strong></p><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>해결:</strong> 외부 전문가 초빙 강사 코칭 프로그램 도입</p><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>핵심 역량</strong></p><p class=\"text-slate-600 text-sm leading-relaxed\">HRD 시스템 내재화, 규정 준수</p></div>"
     },
     {
         "id": "act4",
@@ -205,7 +205,7 @@ const SITE_CONTENT = {
         "period": "2018.10 ~ 2018.11",
         "rank": "베스트프레젠터상 수상",
         "icon": "💎",
-        "content": "<div class=\"space-y-4\"><div class=\"bg-blue-50/50 p-4 rounded-xl border border-blue-100\"><strong class=\"text-brand-600 block mb-1\">💡 성과 요약</strong><ul class=\"list-disc pl-4 text-sm text-slate-700 space-y-1\"><li>베스트프레젠터상 수상</li><li>데이터 기반 2030 타겟 니즈 도출</li></ul></div><div><strong class=\"text-slate-800 block mb-2\">🔍 문제 정의: 경험 부재의 상권</strong><p class=\"text-sm text-slate-600\">핵심은 제품이 아닌 <strong>'방문하고 인증할 만한 경험'의 부재</strong></p></div><div class=\"border-t border-slate-100 pt-3\"><span class=\"text-xs font-bold text-slate-400 uppercase tracking-widest\">핵심 역량</span><p class=\"text-sm text-slate-700 mt-1\">문제 구조화, 공간 브랜딩 기획</p></div></div>"
+        "content": "<div class=\"space-y-4\"><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>상상마케팅스쿨 북서울 12기 (팀장)</strong></p><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>2018.10 ~ 2018.11 · 베스트프레젠터상 수상</strong></p><h4 class=\"text-primary-600\">💡 성과 요약</h4><ul class=\"list-disc pl-4 text-sm text-slate-600 space-y-2\"><li>베스트프레젠터상 수상</li><li>GIS 데이터 기반 소비자 밀집 시간 분석 수행</li><li>2030 타깃 유입 접점 도출</li><li>서순라길 중심 공간 브랜딩 전략 기획</li></ul><h4 class=\"text-primary-600\">🔎 문제 정의: 제품이 아닌 경험의 문제</h4><p class=\"text-slate-600 text-sm leading-relaxed\">핵심은 상품 자체보다도, 2030세대가 방문하고 체험하며 공유할 만한 경험 요소가 부족했다는 점</p><h4 class=\"text-primary-600\">🧭 주요 역할</h4><p class=\"text-slate-600 text-sm leading-relaxed\">팀장으로서 전체 발표 방향과 액션 플랜을 총괄하고, PPT 스토리라인 설계 및 GIS 데이터 기반 소비자 밀집 시간 분석을 담당</p><h4 class=\"text-primary-600\">핵심 역량</h4><p class=\"text-slate-600 text-sm leading-relaxed\">문제 구조화, 데이터 기반 분석, 공간 브랜딩 기획, 팀 리딩 및 발표 총괄</p></div>"
     },
     {
         "id": "act5",
@@ -214,7 +214,7 @@ const SITE_CONTENT = {
         "period": "2018.10.05",
         "rank": "최우수상 수상",
         "icon": "🏆",
-        "content": "<div class=\"space-y-4\"><div class=\"bg-blue-50/50 p-4 rounded-xl border border-blue-100\"><strong class=\"text-brand-600 block mb-1\">💡 성과 요약</strong><ul class=\"list-disc pl-4 text-sm text-slate-700 space-y-1\"><li>최우수상 수상</li><li>사용자 경험(UX) 개선 모델 제시</li></ul></div><div><strong class=\"text-slate-800 block mb-2\">💡 솔루션: 여행 경험의 단순화</strong><p class=\"text-sm text-slate-600\">수하물/좌석/기내식을 묶은 <strong>'월정액 구독 모델'</strong> 제안</p></div><div class=\"border-t border-slate-100 pt-3\"><span class=\"text-xs font-bold text-slate-400 uppercase tracking-widest\">핵심 역량</span><p class=\"text-sm text-slate-700 mt-1\">비즈니스 모델 설계, UX 중심 사고</p></div></div>"
+        "content": "<div class=\"space-y-4\"><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>교내 비즈니스 경진대회</strong></p><p class=\"text-slate-600 text-sm leading-relaxed\">2018.10.05 · 최우수상 수상</p><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>💡 성과 요약</strong></p><ul class=\"list-disc pl-4 text-sm text-slate-600 space-y-2\"><li>최우수상 수상</li><li>사용자 경험(UX) 개선 모델 제시</li></ul><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>💡 솔루션: 여행 경험의 단순화</strong></p><p class=\"text-slate-600 text-sm leading-relaxed\">수하물/좌석/기내식을 묶은 <strong>'월정액 구독 모델'</strong> 제안</p><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>핵심 역량</strong></p><p class=\"text-slate-600 text-sm leading-relaxed\">비즈니스 모델 설계, UX 중심 사고</p></div>"
     }
 ]
 
