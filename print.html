@@ -145,10 +145,10 @@
         const defaults = typeof SITE_CONTENT !== 'undefined' ? JSON.parse(JSON.stringify(SITE_CONTENT)) : {};
         try {
             const r = await fetch('/api/content', { cache: 'no-store' });
-            if (r.ok) { const d = await r.json(); if (d && typeof d === 'object') return Object.assign(defaults, d); }
+            if (r.ok) { const d = await r.json(); if (d && typeof d === 'object') return Object.assign({}, d, defaults); }
         } catch(e) {}
         const saved = localStorage.getItem('portfolio_content');
-        if (saved) { try { return Object.assign(defaults, JSON.parse(saved)); } catch(e) {} }
+        if (saved) { try { return Object.assign({}, JSON.parse(saved), defaults); } catch(e) {} }
         return defaults;
     }
 
@@ -209,8 +209,18 @@
     // ── 결과 불릿 추출
     function extractResults(html) {
         if (!html) return '';
-        const m = html.match(/결과[^<]*<\/h4>([\s\S]*?)<\/div>/);
-        if (!m) return '';
+        // 여러 패턴 시도: "결과 (Result)", "결과", "Result" 순서로 매칭
+        const patterns = [
+            /결과\s*\(Result\)[^<]*<\/h4>([\s\S]*?)<\/div>/,
+            /결과[^<]*<\/h4>([\s\S]*?)<\/div>/,
+            /Result[^<]*<\/h4>([\s\S]*?)<\/div>/
+        ];
+        let m = null;
+        for (const pat of patterns) {
+            m = html.match(pat);
+            if (m) break;
+        }
+        if (!m) { console.warn('[print] extractResults: 결과 섹션을 찾지 못했습니다.'); return ''; }
         const ul = m[1].match(/<ul[\s\S]*?<\/ul>/);
         return ul ? ul[0] : '';
     }
@@ -307,23 +317,65 @@
                 + '</div>'
                 + '</div>';
         }).join('');
-        // 학력 텍스트 간략 파싱 (인라인 HTML → 플레인 텍스트 카드)
-        const academicText = (academic || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-        const academicHtml = `
-            <div style="padding:10px 12px;background:var(--gray-100);border-radius:8px;">
-                <div style="font-weight:800;font-size:10pt;color:var(--gray-900);">한국항공대학교</div>
-                <div style="font-size:8.5pt;color:var(--brand);font-weight:700;margin:2px 0;">경영학부 경영학 전공 · 2017.03 ~ 2021.02</div>
-                <div style="font-size:8.5pt;color:var(--gray-700);margin-top:4px;">
-                    전체 평점 3.67 / 4.5 (133학점) &nbsp;|&nbsp; 전공 평점 3.78 / 4.5 (67학점)
-                </div>
-            </div>`;
-        // 보유기술 텍스트 파싱 → 깔끔한 테이블 형태
-        const skillGroups = [
-            { icon: '📊', name: 'Data & Analytics', items: [['Tableau','Intermediate'],['Google Analytics 4','Certified'],['Python (Text Mining)','Basic']] },
-            { icon: '⚙️', name: 'Automation & Dev',  items: [['Google Apps Script','Intermediate'],['MAKE (Integromat)','Workflow'],['HTML / CSS','Basic']] },
-            { icon: '🤖', name: 'HR Tech & AI',       items: [['Ninehire (ATS)','Admin'],['GPT Agent Design','Prompt Eng.'],['Slack / Notion / Teams','Collaboration']] },
-            { icon: '📝', name: 'Office & Docs',      items: [['Excel / Google Sheets','Advanced'],['PowerPoint','Proficient'],['Word / HWP','Proficient']] }
-        ];
+        // 학력 정보: content.js의 education.academic HTML에서 동적 파싱
+        let academicHtml;
+        try {
+            const acSrc = academic || '';
+            const schoolMatch = acSrc.match(/<h4[^>]*>([^<]+)</);
+            const majorMatch = acSrc.match(/font-bold[^>]*>([^<]+<\/p>|[^<]+)/);
+            const periodMatch = acSrc.match(/(\d{4}\.\d{2}\s*~\s*\d{4}\.\d{2})/);
+            const gpaMatches = [...acSrc.matchAll(/([\d.]+)\s*\/\s*([\d.]+)<\/span>\s*<span[^>]*>\((\d+)학점/g)];
+            const school = schoolMatch ? schoolMatch[1].replace(/\(.*\)/, '').trim() : null;
+            const schoolEn = schoolMatch ? (schoolMatch[1].match(/\(([^)]+)\)/) || [])[1] : '';
+            const majorRaw = majorMatch ? majorMatch[1].replace(/<\/p>/, '').trim() : null;
+            const period = periodMatch ? periodMatch[1] : null;
+            if (school && majorRaw && period && gpaMatches.length >= 2) {
+                academicHtml = `
+                    <div style="padding:10px 12px;background:var(--gray-100);border-radius:8px;">
+                        <div style="font-weight:800;font-size:10pt;color:var(--gray-900);">${school}${schoolEn ? '(' + schoolEn + ')' : ''}</div>
+                        <div style="font-size:8.5pt;color:var(--brand);font-weight:700;margin:2px 0;">${majorRaw} · ${period}</div>
+                        <div style="font-size:8.5pt;color:var(--gray-700);margin-top:4px;">
+                            전체 평점 ${gpaMatches[0][1]} / ${gpaMatches[0][2]} (${gpaMatches[0][3]}학점) &nbsp;|&nbsp; 전공 평점 ${gpaMatches[1][1]} / ${gpaMatches[1][2]} (${gpaMatches[1][3]}학점)
+                        </div>
+                    </div>`;
+            } else { throw new Error('파싱 불완전'); }
+        } catch(e) {
+            console.warn('[print] academic 파싱 실패, 하드코딩 폴백 사용:', e.message);
+            academicHtml = `
+                <div style="padding:10px 12px;background:var(--gray-100);border-radius:8px;">
+                    <div style="font-weight:800;font-size:10pt;color:var(--gray-900);">한국항공대학교</div>
+                    <div style="font-size:8.5pt;color:var(--brand);font-weight:700;margin:2px 0;">경영학부 경영학 전공 · 2017.03 ~ 2021.02</div>
+                    <div style="font-size:8.5pt;color:var(--gray-700);margin-top:4px;">
+                        전체 평점 3.67 / 4.5 (133학점) &nbsp;|&nbsp; 전공 평점 3.78 / 4.5 (67학점)
+                    </div>
+                </div>`;
+        }
+        // 보유기술: content.js의 education.skills HTML에서 동적 파싱
+        let skillGroups;
+        try {
+            const skillsSrc = skills || '';
+            const groupBlocks = skillsSrc.split(/<div class="p-6 rounded-2xl/).slice(1);
+            if (!groupBlocks.length) throw new Error('스킬 그룹 블록 없음');
+            skillGroups = groupBlocks.map(block => {
+                const iconMatch = block.match(/<span class="text-2xl[^"]*">([^<]+)<\/span>/);
+                const nameMatch = block.match(/<h4[^>]*>([^<]+)<\/h4>/);
+                const itemMatches = [...block.matchAll(/<li[^>]*>\s*<span>([^<]+)<\/span>\s*<span[^>]*>([^<]+)<\/span>/g)];
+                return {
+                    icon: iconMatch ? iconMatch[1].trim() : '',
+                    name: nameMatch ? nameMatch[1].trim() : '',
+                    items: itemMatches.map(m => [m[1].trim(), m[2].trim()])
+                };
+            }).filter(g => g.name && g.items.length);
+            if (!skillGroups.length) throw new Error('파싱된 스킬 그룹 없음');
+        } catch(e) {
+            console.warn('[print] skills 파싱 실패, 하드코딩 폴백 사용:', e.message);
+            skillGroups = [
+                { icon: '📊', name: 'Data & Analytics', items: [['Tableau','Intermediate'],['Google Analytics 4','Certified'],['Python (Text Mining)','Basic']] },
+                { icon: '⚙️', name: 'Automation & Dev',  items: [['Google Apps Script','Intermediate'],['MAKE (Integromat)','Workflow'],['HTML / CSS','Basic']] },
+                { icon: '🤖', name: 'HR Tech & AI',       items: [['Ninehire (ATS)','Admin'],['GPT Agent Design','Prompt Eng.'],['Slack / Notion / Teams','Collaboration']] },
+                { icon: '📝', name: 'Office & Docs',      items: [['Excel / Google Sheets','Advanced'],['PowerPoint','Proficient'],['Word / HWP','Proficient']] }
+            ];
+        }
         const skillsHtml = skillGroups.map(g => `
             <div style="margin-bottom:5px;">
                 <div style="font-size:8.5pt;font-weight:800;color:var(--brand);margin-bottom:2px;">${g.icon} ${g.name}</div>
