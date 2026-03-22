@@ -147,9 +147,26 @@
     .reveal-delay-2 { transition-delay: 0.2s; }
     .reveal-delay-3 { transition-delay: 0.3s; }
 
-    /* ── Card hover ── */
+    /* ── Card hover — 4 variations ── */
+    .card-hover-lift { transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease; }
+    .card-hover-lift:hover { transform: translateY(-4px); box-shadow: 0 12px 32px -4px rgba(13,154,191,0.15); border-color: #99d3eb !important; }
+
+    .card-hover-border { transition: border-left 0.25s ease, box-shadow 0.25s ease; border-left: 3px solid transparent; }
+    .card-hover-border:hover { border-left: 3px solid var(--primary); box-shadow: 0 4px 16px -2px rgba(13,154,191,0.08); }
+
+    .card-hover-scale { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+    .card-hover-scale:hover { transform: scale(1.02); box-shadow: 0 8px 24px -4px rgba(13,154,191,0.12); }
+
+    .card-hover-glow { transition: box-shadow 0.3s ease, border-color 0.3s ease; }
+    .card-hover-glow:hover { box-shadow: 0 0 20px rgba(13,154,191,0.12); border-color: #cce9f5 !important; }
+
+    /* Legacy fallback */
     .card-hover { transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease; }
     .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 32px -4px rgba(13,154,191,0.15); border-color: #99d3eb !important; }
+
+    /* ── Focus visible for keyboard navigation ── */
+    :focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 4px; }
+    [data-action]:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
     /* ── Section label ── */
     .section-label { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: var(--primary); }
@@ -159,9 +176,12 @@
     #mobile-menu.open { max-height: 400px; opacity: 1; }
 
     /* ── Modal ── */
-    #detail-modal { transition: opacity 0.25s ease; }
+    #detail-modal { transition: opacity 0.3s ease; }
     #detail-modal.hidden { opacity: 0; pointer-events: none; }
     #detail-modal:not(.hidden) { opacity: 1; pointer-events: auto; }
+    #detail-modal .modal-panel { transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease; }
+    #detail-modal.hidden .modal-panel { transform: translateY(16px) scale(0.97); opacity: 0; }
+    #detail-modal:not(.hidden) .modal-panel { transform: translateY(0) scale(1); opacity: 1; }
 
     /* ── Prose (modal content) ── */
     .prose h4 { color: var(--primary); font-weight: 700; margin-top: 1.4em; margin-bottom: 0.4em; font-size: 1em; }
@@ -184,6 +204,7 @@
   </style>
 </head>
 <body class="text-slate-900 antialiased">
+<a href="#hero" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[999] focus:bg-white focus:text-slate-900 focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:font-bold focus:text-sm">본문으로 건너뛰기</a>
 
 <!-- ════════════════════════════════════════════
      SIDEBAR (desktop)
@@ -295,9 +316,9 @@
 <!-- ════════════════════════════════════════════
      DETAIL MODAL
 ═════════════════════════════════════════════ -->
-<div id="detail-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8">
+<div id="detail-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8" role="dialog" aria-modal="true">
   <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal()"></div>
-  <div class="relative bg-white rounded-4xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
+  <div class="modal-panel relative bg-white rounded-4xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
     <div class="flex items-start justify-between p-6 md:p-8 border-b border-gray-100">
       <div>
         <div id="modal-tag" class="section-label mb-2"></div>
@@ -317,10 +338,10 @@
 <div class="p-6 lg:p-12">
 
 <!-- ── HERO ── -->
-<section id="hero" class="mb-20 scroll-mt-6">
+<section id="hero" class="mb-24 scroll-mt-6">
 
   <!-- Hero content card — enhanced -->
-  <div class="rounded-4xl border p-8 md:p-12 reveal" style="border-color: var(--border); background: linear-gradient(160deg, #f0f8ff 0%, #ffffff 45%);">
+  <div class="rounded-4xl border p-8 md:p-12 reveal" style="border-color: var(--border); background: linear-gradient(145deg, #f5f9ff 0%, #fff 40%, #fefcf9 100%);">
     <!-- 상단 그룹: 배지 + 헤드라인 + 설명 -->
     <div>
     <!-- Top row: badges + open-to-work indicator -->
@@ -340,7 +361,7 @@
       </span>
     </div>
 
-    <h1 id="hero-headline" class="text-5xl md:text-6xl font-black text-slate-900 leading-tight break-keep mb-5">
+    <h1 id="hero-headline" class="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 leading-tight break-keep mb-5">
       '원래 이랬어'를<br><span style="color: var(--primary)">바꾸는</span> HR입니다.
     </h1>
 
@@ -356,7 +377,7 @@
     <div class="h-6 lg:h-8"></div>
 
     <!-- Impact mini-cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+    <div class="grid grid-cols-1 sm:grid-cols-[1.1fr_1fr_0.9fr] gap-4 mb-10">
       <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
         <p class="text-4xl font-black mb-1.5" style="color: var(--primary)">–85%</p>
         <p class="text-xs text-slate-500 font-semibold">근태 수기 정정 오류 감소</p>
@@ -395,7 +416,7 @@
 </section>
 
 <!-- ── PERFORMANCE ── -->
-<section id="performance" class="mb-20 scroll-mt-6">
+<section id="performance" class="mb-16 scroll-mt-6">
   <div class="mb-10 reveal">
     <p class="section-label mb-2">Performance</p>
     <h2 class="text-2xl md:text-3xl font-black text-slate-900 break-keep">측정 가능한 성과</h2>
@@ -403,7 +424,7 @@
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-    <div class="bg-white rounded-3xl border p-7 card-hover reveal reveal-delay-1" style="border-color: var(--border)">
+    <div class="bg-white rounded-3xl border p-7 card-hover-lift reveal reveal-delay-1" style="border-color: var(--border)">
       <div class="w-11 h-11 rounded-xl bg-rose-50 flex items-center justify-center text-xl mb-5">⚠️</div>
       <p class="section-label text-rose-500 mb-2">Risk Reduction</p>
       <p class="text-4xl font-black text-slate-900 mb-1">0<span class="text-xl">건</span></p>
@@ -415,7 +436,7 @@
       <div class="relative h-24"><canvas id="riskChart"></canvas></div>
     </div>
 
-    <div class="bg-white rounded-3xl border p-7 card-hover reveal reveal-delay-2" style="border-color: var(--border)">
+    <div class="bg-white rounded-3xl border p-7 card-hover-lift reveal reveal-delay-2" style="border-color: var(--border)">
       <div class="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center text-xl mb-5">📈</div>
       <p class="section-label text-emerald-600 mb-2">Recruiting</p>
       <p class="text-4xl font-black text-slate-900 mb-1">+217<span class="text-xl">%</span></p>
@@ -427,7 +448,7 @@
       <div class="relative h-24"><canvas id="recruitChart"></canvas></div>
     </div>
 
-    <div class="bg-white rounded-3xl border p-7 card-hover reveal reveal-delay-3" style="border-color: var(--border)">
+    <div class="bg-white rounded-3xl border p-7 card-hover-lift reveal reveal-delay-3" style="border-color: var(--border)">
       <div class="w-11 h-11 rounded-xl flex items-center justify-center text-xl mb-5" style="background: #e6f4fa">🏷️</div>
       <p class="section-label mb-2" style="color: var(--primary)">System Efficiency</p>
       <p class="text-4xl font-black text-slate-900 mb-1">+12<span class="text-xl">%p</span></p>
@@ -491,7 +512,7 @@
 </section>
 
 <!-- ── DX CASE ── -->
-<section id="dxcase" class="mb-20 scroll-mt-6">
+<section id="dxcase" class="mb-28 scroll-mt-6">
   <div class="mb-10 reveal">
     <p class="section-label mb-2">DX Case</p>
     <h2 class="text-2xl md:text-3xl font-black text-slate-900 break-keep">자동화 &amp; 디지털 전환</h2>
@@ -502,7 +523,7 @@
 </section>
 
 <!-- ── GROWTH ── -->
-<section id="growth" class="mb-20 scroll-mt-6">
+<section id="growth" class="mb-16 scroll-mt-6">
   <div class="mb-10 reveal">
     <p class="section-label mb-2">Growth</p>
     <h2 class="text-2xl md:text-3xl font-black text-slate-900 break-keep">학력 &amp; 교육</h2>
@@ -801,7 +822,7 @@ function renderCareerGrid() {
     var highlight = p.highlight
       ? '<div class="mt-4 bg-white rounded-xl border border-gray-200 px-4 py-2 text-xs font-bold" style="color: var(--primary)">' + p.highlight + '</div>'
       : '';
-    return '<div class="bg-gray-50 rounded-2xl border border-gray-200 p-5 card-hover cursor-pointer group" data-action="open-modal" data-id="' + (p.id || '') + '">'
+    return '<div class="bg-gray-50 rounded-2xl border border-gray-200 p-5 card-hover-border cursor-pointer group" tabindex="0" role="button" data-action="open-modal" data-id="' + (p.id || '') + '">'
       + '<div class="flex flex-wrap gap-2 mb-3">' + tags + '</div>'
       + '<h5 class="font-black text-slate-900 mb-2 break-keep group-hover:text-primary-600 transition text-sm">' + (p.title || '') + '</h5>'
       + '<p class="text-sm text-slate-500 break-keep line-clamp-2">' + (p.desc || '') + '</p>'
@@ -829,7 +850,7 @@ function renderDxGrid() {
     var badgeHtml = c.badge
       ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wide" style="color: var(--primary); background: #e6f4fa; border-color: #99d3eb">' + c.badge + '</span>'
       : '';
-    return '<div class="bg-white rounded-3xl border p-6 card-hover cursor-pointer group" data-action="open-dx-modal" data-id="' + k + '" style="border-color: var(--border)">'
+    return '<div class="bg-white rounded-3xl border p-6 card-hover-scale cursor-pointer group" tabindex="0" role="button" data-action="open-dx-modal" data-id="' + k + '" style="border-color: var(--border)">'
       + '<div class="flex flex-wrap gap-2 mb-4">' + badgeHtml + '</div>'
       + '<h4 class="font-black text-lg text-slate-900 mb-2 break-keep group-hover:text-primary-600 transition">' + (c.title || k) + '</h4>'
       + '<span class="text-xs font-bold flex items-center gap-1" style="color: var(--primary)">자세히 보기 →</span>'
@@ -848,9 +869,9 @@ function renderTraining() {
   if (empty) empty.classList.add('hidden');
   var html = list.map(function(t) {
     var hasModal = t.modalId && (D.modalDetails || {})[t.modalId];
-    return '<div class="bg-white rounded-2xl border p-5 card-hover' + (hasModal ? ' cursor-pointer' : '') + '"'
+    return '<div class="bg-white rounded-2xl border p-5 card-hover-glow' + (hasModal ? ' cursor-pointer' : '') + '"'
       + ' style="border-color: var(--border)"'
-      + (hasModal ? ' data-action="open-training-modal" data-id="' + t.modalId + '"' : '')
+      + (hasModal ? ' tabindex="0" role="button" data-action="open-training-modal" data-id="' + t.modalId + '"' : '')
       + '>'
       + '<div class="flex items-start justify-between gap-3">'
       + '<div class="min-w-0 flex-1">'
@@ -1041,7 +1062,18 @@ function initCharts() {
   var base = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        enabled: true,
+        backgroundColor: '#1e293b',
+        titleFont: { family: 'Pretendard', size: 12, weight: 700 },
+        bodyFont: { family: 'Pretendard', size: 11 },
+        cornerRadius: 8,
+        padding: 10,
+        displayColors: false
+      }
+    },
     scales:  { x: { display: false }, y: { display: false, beginAtZero: true } },
     animation: { duration: 900, easing: 'easeOutQuart' }
   };
@@ -1087,21 +1119,39 @@ function waitForChart(cb, tries) {
 function setupReveal() {
   var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(e) {
-      if (e.isIntersecting) { e.target.classList.add('active'); obs.unobserve(e.target); }
+      if (e.isIntersecting) {
+        // Find sibling index for stagger effect
+        var parent = e.target.parentElement;
+        if (parent) {
+          var siblings = Array.from(parent.querySelectorAll(':scope > .reveal'));
+          var idx = siblings.indexOf(e.target);
+          if (idx > 0) e.target.style.transitionDelay = Math.min(idx * 80, 600) + 'ms';
+        }
+        e.target.classList.add('active');
+        obs.unobserve(e.target);
+      }
     });
   }, { threshold: 0.08 });
   document.querySelectorAll('.reveal').forEach(function(el) { obs.observe(el); });
 }
 
 // ── Event delegation (modal triggers)
-document.addEventListener('click', function(e) {
-  var el = e.target.closest('[data-action]');
+function handleAction(el) {
   if (!el) return;
   var action = el.dataset.action;
   var id     = el.dataset.id;
   if (action === 'open-modal')          openModal(id);
   if (action === 'open-dx-modal')       openDxModal(id);
   if (action === 'open-training-modal') openTrainingModal(id);
+}
+document.addEventListener('click', function(e) {
+  handleAction(e.target.closest('[data-action]'));
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    var el = e.target.closest('[data-action]');
+    if (el) { e.preventDefault(); handleAction(el); }
+  }
 });
 
 // ── Esc closes modal
