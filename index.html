@@ -853,11 +853,12 @@ function renderTraining() {
       + (hasModal ? ' data-action="open-training-modal" data-id="' + t.modalId + '"' : '')
       + '>'
       + '<div class="flex items-start justify-between gap-3">'
-      + '<div>'
+      + '<div class="min-w-0 flex-1">'
       + '<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">' + (t.category || 'Training') + '</span>'
       + '<h5 class="font-black text-slate-900 break-keep text-sm">' + (t.title || '') + '</h5>'
       + '<p class="text-xs text-slate-500 mt-1">' + (t.org || '') + '</p>'
       + '</div>'
+      + (t.certImage ? '<img src="' + t.certImage + '" alt="수료증" class="w-10 h-10 rounded object-cover border border-slate-200 flex-shrink-0">' : '')
       + '</div></div>';
   }).join('');
   setNodeContent(grid, html);
@@ -997,7 +998,10 @@ function openTrainingModal(id) {
   if (!details) return;
   document.getElementById('modal-tag').textContent   = details.subtitle || '';
   document.getElementById('modal-title').textContent = details.title || '';
-  setNodeContent(document.getElementById('modal-body'), details.content || '상세 내용이 없습니다.');
+  var imgHtml = details.certImage
+    ? '<img src="' + details.certImage + '" alt="수료증" class="w-full rounded-lg mb-4 border">'
+    : '';
+  setNodeContent(document.getElementById('modal-body'), imgHtml + (details.content || '상세 내용이 없습니다.'));
   document.getElementById('detail-modal').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
 }

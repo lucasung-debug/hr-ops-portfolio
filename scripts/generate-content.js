@@ -317,6 +317,22 @@ async function fetchGrowth() {
     const modalId = prop(row, '모달ID');
 
     if (type === 'training') {
+      const blocks = await fetchBlocks(row.id);
+      let certImage = null;
+
+      for (const b of blocks) {
+        if (b.type === 'image') {
+          const img = b.image;
+          certImage = img.type === 'file' ? img.file.url : img.external.url;
+          break;
+        }
+        if (b.type === 'file' || b.type === 'pdf') {
+          const f = b[b.type];
+          certImage = (f && (f.file ? f.file.url : f.external?.url)) || null;
+          if (certImage) break;
+        }
+      }
+
       trainingList.push({
         id:       `tr${trainingList.length + 1}`,
         category: prop(row, '카테고리'),
@@ -325,18 +341,17 @@ async function fetchGrowth() {
         org:      prop(row, '기관'),
         desc:     prop(row, '설명'),
         status:   prop(row, '상태텍스트'),
+        certImage: certImage,
         modalId:  modalId || undefined,
       });
 
-      if (modalId) {
-        const blocks = await fetchBlocks(row.id);
-        if (blocks.length > 0) {
-          modalDetails[modalId] = {
-            title:    prop(row, '제목'),
-            subtitle: prop(row, '설명'),
-            content:  notionBlocksToHtml(blocks),
-          };
-        }
+      if (modalId && blocks.length > 0) {
+        modalDetails[modalId] = {
+          title:    prop(row, '제목'),
+          subtitle: prop(row, '설명'),
+          content:  notionBlocksToHtml(blocks),
+          certImage: certImage,
+        };
       }
     } else if (type === 'activity') {
       const blocks = await fetchBlocks(row.id);
