@@ -822,11 +822,15 @@ function renderCareerGrid() {
     var highlight = p.highlight
       ? '<div class="mt-4 bg-white rounded-xl border border-gray-200 px-4 py-2 text-xs font-bold" style="color: var(--primary)">' + p.highlight + '</div>'
       : '';
+    var evidenceCta = p.evidenceUrl
+      ? '<a class="inline-flex items-center mt-4 text-xs font-black text-primary-600 hover:text-primary-700 transition" href="' + p.evidenceUrl + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">실제 작동 증거 보기 →</a>'
+      : '';
     return '<div class="bg-gray-50 rounded-2xl border border-gray-200 p-5 card-hover-border cursor-pointer group" tabindex="0" role="button" data-action="open-modal" data-id="' + (p.id || '') + '">'
       + '<div class="flex flex-wrap gap-2 mb-3">' + tags + '</div>'
       + '<h5 class="font-black text-slate-900 mb-2 break-keep group-hover:text-primary-600 transition text-sm">' + (p.title || '') + '</h5>'
       + '<p class="text-sm text-slate-500 break-keep line-clamp-2">' + (p.desc || '') + '</p>'
       + highlight
+      + evidenceCta
       + '</div>';
   }).join('');
   setNodeContent(grid, html);
@@ -850,10 +854,14 @@ function renderDxGrid() {
     var badgeHtml = c.badge
       ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wide" style="color: var(--primary); background: #e6f4fa; border-color: #99d3eb">' + c.badge + '</span>'
       : '';
+    var evidenceCta = c.evidenceUrl
+      ? '<a class="inline-flex items-center mt-4 text-xs font-black text-primary-600 hover:text-primary-700 transition" href="' + c.evidenceUrl + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">실제 작동 증거 보기 →</a>'
+      : '';
     return '<div class="bg-white rounded-3xl border p-6 card-hover-scale cursor-pointer group" tabindex="0" role="button" data-action="open-dx-modal" data-id="' + k + '" style="border-color: var(--border)">'
       + '<div class="flex flex-wrap gap-2 mb-4">' + badgeHtml + '</div>'
       + '<h4 class="font-black text-lg text-slate-900 mb-2 break-keep group-hover:text-primary-600 transition">' + (c.title || k) + '</h4>'
       + '<span class="text-xs font-bold flex items-center gap-1" style="color: var(--primary)">자세히 보기 →</span>'
+      + evidenceCta
       + '</div>';
   }).join('');
   setNodeContent(grid, html);

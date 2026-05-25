@@ -44,6 +44,28 @@ function prop(page, name, fallback = '') {
   return fallback;
 }
 
+const EVIDENCE_PAGE_URL = 'https://lucasung-debug.github.io/hermes-ops-dashboard-page/';
+
+function normalizeTitle(title) {
+  return String(title || '').replace(/\s+/g, '');
+}
+
+function evidenceUrlForCase(row, type, title) {
+  const explicit = prop(row, 'evidenceUrl') || prop(row, '증거URL') || prop(row, '증거 URL') || prop(row, 'Evidence URL');
+  if (explicit) return explicit;
+
+  const normalized = normalizeTitle(title);
+  if (type === 'dx') {
+    if (normalized.includes('경조화환')) return `${EVIDENCE_PAGE_URL}#case-gift`;
+    if (normalized.includes('전자서명')) return `${EVIDENCE_PAGE_URL}#case-sign`;
+    if (normalized.includes('직무키워드')) return `${EVIDENCE_PAGE_URL}#case-keyword`;
+  }
+  if (type === 'career' && normalized.includes('직무분석기반채용홍보')) {
+    return `${EVIDENCE_PAGE_URL}#case-recruit`;
+  }
+  return '';
+}
+
 // ──────────────────────────────────────────────
 // 유틸: Notion 페이지 블록 → HTML
 // ──────────────────────────────────────────────
@@ -271,9 +293,11 @@ async function fetchCases() {
   for (const row of rows) {
     const type = prop(row, '유형');
     if (type === 'career') {
-      careerProjects.push({
+      const title = prop(row, '제목');
+      const evidenceUrl = evidenceUrlForCase(row, type, title);
+      const project = {
         id:           `career_${prop(row, '순서') || careerProjects.length + 1}`,
-        title:        prop(row, '제목'),
+        title,
         sub:          prop(row, 'sub'),
         desc:         prop(row, 'desc'),
         modalContent: buildCareerModalHtml(
@@ -281,20 +305,26 @@ async function fetchCases() {
           prop(row, '액션'),
           prop(row, '결과')
         ),
-      });
+      };
+      if (evidenceUrl) project.evidenceUrl = evidenceUrl;
+      careerProjects.push(project);
     } else if (type === 'dx') {
       const key = `dx${Object.keys(dxCases).length + 1}`;
+      const title = prop(row, '제목');
+      const badge = prop(row, '뱃지');
+      const evidenceUrl = evidenceUrlForCase(row, type, title);
       dxCases[key] = {
-        title:   prop(row, '제목'),
-        badge:   prop(row, '뱃지'),
+        title,
+        badge,
         content: buildDxContentHtml(
-          prop(row, '제목'),
-          prop(row, '뱃지'),
+          title,
+          badge,
           prop(row, '문제'),
           prop(row, '액션'),
           prop(row, '결과')
         ),
       };
+      if (evidenceUrl) dxCases[key].evidenceUrl = evidenceUrl;
     }
   }
   return { careerProjects, dxCases };
