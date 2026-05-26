@@ -17,7 +17,7 @@ const SITE_CONTENT = {
   heroSubtitle: "HR Operations",
   heroDescription: `ATS 도입 · 근태 시스템 재편 · 52시간 관리 · 업무 자동화<br>1년 안에 4개 영역을 직접 설계하고 작동시켰습니다.`,
   heroHeadlineHTML: `'원래 이랬어'를 <span style="color: var(--primary)">바꾸는</span> HR입니다.`,
-  heroImpactHTML: `700명 규모 사업장 근태 시스템 재설계 →<br>인식률 <span style="color: var(--primary)">+12%p</span>, 수기 정정 <span style="color: var(--primary)">–8%p</span>, 클레임 <span style="color: var(--primary)">0건</span>`,
+  heroImpactHTML: `700명 규모 사업장 근태 시스템 재설계 →<br>인식률 <span style="color: var(--primary)">+12%p</span>, 수기 정정 <span style="color: var(--primary)">–85%</span>, 클레임 <span style="color: var(--primary)">0건</span>`,
 
   // ===== 다운로드 링크 (Notion: 사이트 설정) =====
   downloads: {
@@ -84,7 +84,7 @@ const SITE_CONTENT = {
         "title": "근태기 루트 효율화",
         "sub": "동선 분석 기반 기기 재배치 프로젝트",
         "desc": "동선 데이터 분석을 통한 기기 재배치 및 인식률 개선",
-        "modalContent": "<div class=\"space-y-6\"><div><h4 class=\"text-primary-600\">🔍 문제 상황</h4><p class=\"text-slate-600 text-sm leading-relaxed\">기존 근태기가 직원들의 주 이동 동선과 동떨어진 곳에 위치하여, 출퇴근 시 태깅 누락이 빈번하게 발생했습니다. 이로 인해 월말 수기 수정 요청 건수가 급증하여 행정 업무 효율 감소 및 급여 신뢰도 하락 리스크 지속.</p></div><div><h4 class=\"text-primary-600\">🛠️ 실행 (Action)</h4><ul class=\"list-disc pl-4 text-sm text-slate-600 space-y-2\"><li>동선 히트맵 분석: 노조와 협의하여 CCTV, 근태로그 기반 식당, 주차장, 탈의실 등 주요 거점과 작업장 간의 이동 경로를 2주간 추적 분석.</li><li>병목 구간 식별: 출퇴근 피크 타임에 대기 줄이 길어지는 구역과 아예 사용되지 않는 기기 식별.</li><li>기기 재배치: 유휴 기기 3대를 주 동선 교차점으로 이동 설치하고, 인식 속도가 느린 구형 기기 교체.</li></ul></div><div><h4 class=\"text-primary-600\">📈 결과 (Result)</h4><ul class=\"list-disc pl-4 text-sm text-slate-600 space-y-2\"><li>인식률 개선: 전체 근태 태깅률 73% → 85% (12%p 개선)</li><li>오류 감소: 월 평균 수기 수정 요청 건수 8%p 감소</li><li>현장 만족도: 출퇴근 대기 시간 단축으로 현장 직원 불만 해소</li></ul></div></div>"
+        "modalContent": "<div class=\"space-y-6\"><div><h4 class=\"text-primary-600\">🔍 문제 상황</h4><p class=\"text-slate-600 text-sm leading-relaxed\">기존 근태기가 직원들의 주 이동 동선과 동떨어진 곳에 위치하여, 출퇴근 시 태깅 누락이 빈번하게 발생했습니다. 이로 인해 월말 수기 수정 요청 건수가 급증하여 행정 업무 효율 감소 및 급여 신뢰도 하락 리스크 지속.</p></div><div><h4 class=\"text-primary-600\">🛠️ 실행 (Action)</h4><ul class=\"list-disc pl-4 text-sm text-slate-600 space-y-2\"><li>동선 히트맵 분석: 노조와 협의하여 CCTV, 근태로그 기반 식당, 주차장, 탈의실 등 주요 거점과 작업장 간의 이동 경로를 2주간 추적 분석.</li><li>병목 구간 식별: 출퇴근 피크 타임에 대기 줄이 길어지는 구역과 아예 사용되지 않는 기기 식별.</li><li>기기 재배치: 유휴 기기 3대를 주 동선 교차점으로 이동 설치하고, 인식 속도가 느린 구형 기기 교체.</li></ul></div><div><h4 class=\"text-primary-600\">📈 결과 (Result)</h4><ul class=\"list-disc pl-4 text-sm text-slate-600 space-y-2\"><li>인식률 개선: 전체 근태 태깅률 73% → 85% (12%p 개선)</li><li>오류 감소: 월 평균 수기 수정 요청 건수 약 100건 → 15건 (–85%)</li><li>현장 만족도: 출퇴근 대기 시간 단축으로 현장 직원 불만 해소</li></ul></div></div>"
     },
     {
         "id": "career_5",

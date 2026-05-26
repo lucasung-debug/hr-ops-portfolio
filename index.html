@@ -1096,12 +1096,11 @@ function initCharts() {
   });
   var recCtx = document.getElementById('recruitChart');
   if (recCtx) new Chart(recCtx, {
-    type: 'line',
-    data: { labels: ['Q2 24','Q3 24','Q4 24','Q1 25'],
-      datasets: [{ data: [12,24,32,38],
-        borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)',
-        borderWidth: 2.5, tension: 0.4, fill: true,
-        pointRadius: 3, pointBackgroundColor: '#10b981' }] },
+    type: 'bar',
+    data: { labels: ['평소 공고','개선 공고'],
+      datasets: [{ data: [35,111],
+        backgroundColor: ['#a7f3d0','#10b981'],
+        borderRadius: 6, borderSkipped: false }] },
     options: base
   });
   var effCtx = document.getElementById('efficiencyChart');
