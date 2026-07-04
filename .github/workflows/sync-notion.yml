@@ -19,7 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '24'
 
       - name: Install dependencies
         run: npm install --prefix scripts
@@ -38,4 +38,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add content.js
+          if [ -d assets/notion ]; then git add assets/notion; fi
           git diff --staged --quiet || (git commit -m "chore: auto-sync content from Notion" && git pull --rebase && git push)
