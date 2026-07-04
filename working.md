@@ -296,3 +296,30 @@ Post-merge checks to perform:
 - Confirm `origin/main` contains the PR branch changes.
 - Confirm production Cloudflare Pages deploy status for the merge commit.
 - Confirm generated `content.js` on `main` still uses `assets/notion/...` instead of Notion signed URLs.
+
+## 2026-07-05 - Post-merge verification
+
+Context:
+- PR `#10` was merged into `main`.
+
+Evidence:
+- Merge commit: `99637bb160b0c250566682bbae1e4a464e39f22c`
+- PR state after merge: merged
+- Merge timestamp: `2026-07-04T16:17:12Z`
+- Local `main` was fast-forwarded to `origin/main`.
+- Cloudflare Pages production check for merge commit: success
+- Cloudflare details URL: `https://dash.cloudflare.com/?to=/01275b0606082ec1359b29d2f59f47d7/pages/view/hr-ops-portfolio/a5d683da-fa99-4290-9cb5-b393d4040ff4`
+- Production default URL check:
+  - `https://hr-ops-portfolio.pages.dev/content.js` returned HTTP 200.
+  - `https://hr-ops-portfolio.pages.dev/assets/notion/training-32ac27c2-afbf-80a5-89f0-f6f737dc9aa8-e6758d401bc0.jpg` returned HTTP 200 with `image/jpeg`.
+- Production `content.js` contains the stable asset path.
+- Production `content.js` does not contain `X-Amz-*`, `prod-files-secure`, or the generated timestamp marker.
+
+Interpretation:
+- The Notion sync safety and generated-asset stabilization changes are now on `main`.
+- Cloudflare Pages production deployment for the merge commit succeeded.
+- The signed URL churn fix is present in production static output.
+
+Remaining follow-up:
+- On the next scheduled Notion sync, verify that no new auto-sync commit appears if Notion content is unchanged.
+- Manually check the live site certificate image if the UI appears to load content from Cloudflare KV instead of `content.js`.
