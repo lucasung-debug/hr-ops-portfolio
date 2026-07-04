@@ -361,8 +361,14 @@ async function queryAll(dbId, filter, sorts, label = 'database') {
   return rows;
 }
 
-function publishValueFilter(propertyName, propertyType) {
-  const conditions = PUBLISH_STATUS_VALUE_ALIASES.map(value => ({
+function publishOptionNames(property) {
+  if (property.type === 'select') return (property.select?.options || []).map(option => option.name);
+  if (property.type === 'status') return (property.status?.options || []).map(option => option.name);
+  return [];
+}
+
+function publishValueFilter(propertyName, propertyType, values) {
+  const conditions = values.map(value => ({
     property: propertyName,
     [propertyType]: { equals: value },
   }));
@@ -386,10 +392,21 @@ async function publishFilterForDatabase(dbId, label) {
     );
   }
 
+  const availableValues = publishOptionNames(supported.property);
+  const publishValues = PUBLISH_STATUS_VALUE_ALIASES
+    .filter(value => availableValues.includes(value));
+
+  if (!publishValues.length) {
+    throw new Error(
+      `[schema] ${label}: publish status property "${supported.name}" has no publish-ready option. Expected one of: ${PUBLISH_STATUS_VALUE_ALIASES.join(', ')}. Available options: ${availableValues.join(', ') || 'none'}.`
+    );
+  }
+
   return {
-    filter: publishValueFilter(supported.name, supported.property.type),
+    filter: publishValueFilter(supported.name, supported.property.type, publishValues),
     propertyName: supported.name,
     propertyType: supported.property.type,
+    publishValues,
   };
 }
 
@@ -490,6 +507,7 @@ async function fetchCases() {
       publishedRows: rows.length,
       publishProperty: publishFilter.propertyName,
       publishPropertyType: publishFilter.propertyType,
+      publishValues: publishFilter.publishValues,
     },
   };
 }
@@ -601,6 +619,7 @@ async function fetchGrowth() {
       publishedRows: rows.length,
       publishProperty: publishFilter.propertyName,
       publishPropertyType: publishFilter.propertyType,
+      publishValues: publishFilter.publishValues,
     },
   };
 }
@@ -631,6 +650,7 @@ async function fetchSkills() {
       categories: Object.keys(byCategory).length,
       publishProperty: publishFilter.propertyName,
       publishPropertyType: publishFilter.propertyType,
+      publishValues: publishFilter.publishValues,
     },
   };
 }
@@ -703,14 +723,14 @@ function printSyncSummary(settings, caseData, growthData, skillData, contentLeng
     .reduce((sum, items) => sum + items.length, 0);
 
   console.log('Sync summary:');
-  console.log(`- Case studies: ${caseData.sync.publishedRows} published rows using "${caseData.sync.publishProperty}" (${caseData.sync.publishPropertyType})`);
+  console.log(`- Case studies: ${caseData.sync.publishedRows} published rows using "${caseData.sync.publishProperty}" (${caseData.sync.publishPropertyType}: ${caseData.sync.publishValues.join(', ')})`);
   console.log(`  - Career projects: ${caseData.careerProjects.length}`);
   console.log(`  - DX cases: ${Object.keys(caseData.dxCases).length}`);
-  console.log(`- Growth records: ${growthData.sync.publishedRows} published rows using "${growthData.sync.publishProperty}" (${growthData.sync.publishPropertyType})`);
+  console.log(`- Growth records: ${growthData.sync.publishedRows} published rows using "${growthData.sync.publishProperty}" (${growthData.sync.publishPropertyType}: ${growthData.sync.publishValues.join(', ')})`);
   console.log(`  - Training: ${growthData.trainingList.length}`);
   console.log(`  - Activities: ${growthData.activitiesList.length}`);
   console.log(`  - Certifications: ${growthData.certificationList.length}`);
-  console.log(`- Skills: ${skillData.sync.publishedRows} published rows across ${skillData.sync.categories} categories using "${skillData.sync.publishProperty}" (${skillData.sync.publishPropertyType})`);
+  console.log(`- Skills: ${skillData.sync.publishedRows} published rows across ${skillData.sync.categories} categories using "${skillData.sync.publishProperty}" (${skillData.sync.publishPropertyType}: ${skillData.sync.publishValues.join(', ')})`);
   console.log(`  - Skill items rendered: ${totalSkills}`);
   console.log(`- Stable Notion assets: ${generatedAssetFiles.size} files in ${GENERATED_ASSET_PUBLIC_DIR}`);
 

@@ -22,7 +22,7 @@ Update after initial review:
 - After diff review, the branch also stabilizes Notion temporary file URLs by downloading them into `assets/notion/` and referencing stable local paths from generated `content.js`.
 - The earlier assumption that signed URL work could wait was incorrect: the latest daily commit changed one timestamp line and two signed certificate image URL lines.
 - `.github/workflows/sync-notion.yml` was updated so generated assets are staged with `content.js`.
-- The workflow Node.js runtime was raised from 18 to 20 because the generator now uses global `fetch()` for Notion asset downloads.
+- The workflow Node.js runtime was first raised from 18 to 20 for global `fetch()`, then to 24 after GitHub Actions emitted a Node 20 deprecation warning.
 - The draft has not been pushed to GitHub and has not changed Cloudflare Pages or Notion.
 
 ## Sources Reviewed

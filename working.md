@@ -167,6 +167,35 @@ Open items:
   1. First run should create or update `assets/notion/...` and generated `content.js`.
   2. Second run should produce no diff if Notion content and files are unchanged.
 
+## 2026-07-05 - GitHub Actions run 1 failure and fix
+
+Context:
+- The branch was pushed to GitHub.
+- First manual `Sync Notion -> content.js` workflow run was started on branch `codex/notion-sync-ux-safety`.
+
+Evidence:
+- Run ID: `28711791326`
+- Run URL: `https://github.com/lucasung-debug/hr-ops-portfolio/actions/runs/28711791326`
+- Conclusion: failure
+- Failed step: `Generate content.js`
+- Failure message: Notion rejected `Published` for property `상태`; available options were `초안`, `발행`.
+
+Diagnosis:
+- The fail-closed behavior worked correctly: the sync stopped instead of querying without a publish filter.
+- The new alias logic was too broad for Notion select filters. Notion validates every filter value, so asking for `Published` fails when the database only defines `발행`.
+
+Fix:
+- `publishFilterForDatabase()` now reads the actual select/status option names from the Notion database schema.
+- The generated filter only includes publish aliases that actually exist in that database.
+- If no publish-ready option exists, the workflow fails with an explicit schema error.
+- The sync summary now prints the actual publish values used.
+- The workflow runtime was moved from Node 20 to Node 24 because the first run emitted a Node 20 deprecation warning in GitHub Actions.
+
+Next verification:
+- Re-run local syntax and diff checks.
+- Commit and push the fix.
+- Trigger GitHub Actions run 1 again.
+
 ## 2026-07-05 - Pre-push verification plan
 
 Context:
