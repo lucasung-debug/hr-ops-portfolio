@@ -8,6 +8,7 @@
 const { Client } = require('@notionhq/client');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
@@ -39,15 +40,139 @@ function prop(page, name, fallback = '') {
   if (p.type === 'title')     return plainText(p.title);
   if (p.type === 'rich_text') return plainText(p.rich_text);
   if (p.type === 'select')    return p.select ? p.select.name : fallback;
+  if (p.type === 'status')    return p.status ? p.status.name : fallback;
   if (p.type === 'number')    return p.number ?? fallback;
   if (p.type === 'url')       return p.url ?? fallback;
   return fallback;
 }
 
+function propAny(page, names, fallback = '') {
+  for (const name of names) {
+    const value = prop(page, name, undefined);
+    if (value !== undefined && value !== null && value !== '') return value;
+  }
+  return fallback;
+}
+
+const PUBLISH_STATUS_PROPERTY_ALIASES = [
+  '상태',
+  '선택',
+  'publishStatus',
+  'publish_status',
+  'Publish Status',
+  'Publication Status',
+];
+
+const PUBLISH_STATUS_VALUE_ALIASES = ['발행', 'Published', 'Publish', 'Live'];
+
+const SKILL_CATEGORY_PROPERTY_ALIASES = [
+  '카테고리',
+  '카테코리',
+  'category',
+  'Category',
+];
+
+const GENERATED_ASSET_DIR = path.join(__dirname, '..', 'assets', 'notion');
+const GENERATED_ASSET_PUBLIC_DIR = 'assets/notion';
+const generatedAssetFiles = new Set();
+
 const EVIDENCE_PAGE_URL = 'https://lucasung-debug.github.io/hermes-ops-dashboard-page/';
 
 function normalizeTitle(title) {
   return String(title || '').replace(/\s+/g, '');
+}
+
+function stableHash(value, length = 12) {
+  return crypto.createHash('sha256').update(String(value)).digest('hex').slice(0, length);
+}
+
+function safeFilePart(value, fallback = 'asset') {
+  const safe = String(value || '')
+    .normalize('NFKD')
+    .replace(/[^\w.-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .toLowerCase();
+  return safe || fallback;
+}
+
+function extensionFromUrl(url) {
+  try {
+    const ext = path.extname(decodeURIComponent(new URL(url).pathname)).toLowerCase();
+    if (/^\.(jpg|jpeg|png|webp|gif|pdf)$/.test(ext)) return ext;
+  } catch {
+    return '';
+  }
+  return '';
+}
+
+function extensionFromContentType(contentType) {
+  const normalized = String(contentType || '').split(';')[0].trim().toLowerCase();
+  const map = {
+    'image/jpeg': '.jpg',
+    'image/png': '.png',
+    'image/webp': '.webp',
+    'image/gif': '.gif',
+    'application/pdf': '.pdf',
+  };
+  return map[normalized] || '';
+}
+
+function isNotionTemporaryUrl(url) {
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname === 'prod-files-secure.s3.us-west-2.amazonaws.com'
+      || parsed.searchParams.has('X-Amz-Signature')
+      || parsed.searchParams.has('X-Amz-Credential')
+      || parsed.searchParams.has('X-Amz-Date');
+  } catch {
+    return false;
+  }
+}
+
+function extractFileUrl(fileLike) {
+  if (!fileLike) return null;
+  if (fileLike.type === 'file') return fileLike.file?.url || null;
+  if (fileLike.type === 'external') return fileLike.external?.url || null;
+  return fileLike.file?.url || fileLike.external?.url || fileLike.url || null;
+}
+
+async function stableAssetUrl(sourceUrl, assetKey, label) {
+  if (!sourceUrl || !isNotionTemporaryUrl(sourceUrl)) return sourceUrl || null;
+
+  const parsed = new URL(sourceUrl);
+  const extFromUrl = extensionFromUrl(sourceUrl);
+  const urlFingerprint = stableHash(`${parsed.origin}${parsed.pathname}`);
+  const safeKey = safeFilePart(assetKey, 'notion-asset');
+  const baseName = `${safeKey}-${urlFingerprint}`;
+
+  fs.mkdirSync(GENERATED_ASSET_DIR, { recursive: true });
+
+  const response = await fetch(sourceUrl);
+  if (!response.ok) {
+    throw new Error(`[asset] Failed to download ${label}: HTTP ${response.status} ${response.statusText}`);
+  }
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+  const ext = extFromUrl || extensionFromContentType(response.headers.get('content-type')) || '.bin';
+  const fileName = `${baseName}${ext}`;
+  const filePath = path.join(GENERATED_ASSET_DIR, fileName);
+
+  if (!fs.existsSync(filePath) || !fs.readFileSync(filePath).equals(buffer)) {
+    fs.writeFileSync(filePath, buffer);
+  }
+
+  generatedAssetFiles.add(fileName);
+  return `${GENERATED_ASSET_PUBLIC_DIR}/${fileName}`;
+}
+
+function pruneUnusedGeneratedAssets() {
+  if (!fs.existsSync(GENERATED_ASSET_DIR)) return;
+  for (const entry of fs.readdirSync(GENERATED_ASSET_DIR)) {
+    const filePath = path.join(GENERATED_ASSET_DIR, entry);
+    if (fs.statSync(filePath).isFile() && !generatedAssetFiles.has(entry)) {
+      fs.unlinkSync(filePath);
+    }
+  }
 }
 
 function evidenceUrlForCase(row, type, title) {
@@ -213,10 +338,9 @@ function buildAcademicHtml(s) {
 // ──────────────────────────────────────────────
 // Notion 데이터 페칭
 // ──────────────────────────────────────────────
-async function queryAll(dbId, filter, sorts) {
+async function queryAll(dbId, filter, sorts, label = 'database') {
   const rows = [];
   let cursor;
-  // 필터 없이 먼저 시도, 실패 시 필터 제거하고 재시도
   const params = { database_id: dbId, sorts, page_size: 100 };
   if (filter) params.filter = filter;
   do {
@@ -225,18 +349,48 @@ async function queryAll(dbId, filter, sorts) {
       resp = await notion.databases.query({ ...params, start_cursor: cursor });
     } catch (e) {
       if (e.code === 'validation_error' && filter) {
-        // 프로퍼티명 불일치 → 필터 없이 전체 조회
-        console.warn(`  [warn] filter 오류, 전체 조회로 전환: ${e.message}`);
-        delete params.filter;
-        resp = await notion.databases.query({ ...params, start_cursor: cursor });
-      } else {
-        throw e;
+        throw new Error(
+          `[schema] ${label}: Notion rejected a publish filter. Refusing to query without the filter because that could publish drafts. ${e.message}`
+        );
       }
+      throw e;
     }
     rows.push(...resp.results);
     cursor = resp.next_cursor;
   } while (cursor);
   return rows;
+}
+
+function publishValueFilter(propertyName, propertyType) {
+  const conditions = PUBLISH_STATUS_VALUE_ALIASES.map(value => ({
+    property: propertyName,
+    [propertyType]: { equals: value },
+  }));
+  return conditions.length === 1 ? conditions[0] : { or: conditions };
+}
+
+async function publishFilterForDatabase(dbId, label) {
+  const db = await notion.databases.retrieve({ database_id: dbId });
+  const properties = db.properties || {};
+  const candidates = PUBLISH_STATUS_PROPERTY_ALIASES
+    .map(name => ({ name, property: properties[name] }))
+    .filter(item => item.property);
+
+  const supported = candidates.find(item => ['select', 'status'].includes(item.property.type));
+  if (!supported) {
+    const found = candidates.length
+      ? candidates.map(item => `${item.name} (${item.property.type})`).join(', ')
+      : 'none';
+    throw new Error(
+      `[schema] ${label}: missing publish status property. Expected one of: ${PUBLISH_STATUS_PROPERTY_ALIASES.join(', ')}. Found: ${found}.`
+    );
+  }
+
+  return {
+    filter: publishValueFilter(supported.name, supported.property.type),
+    propertyName: supported.name,
+    propertyType: supported.property.type,
+  };
 }
 
 async function fetchSettings() {
@@ -281,10 +435,12 @@ async function fetchSettings() {
 }
 
 async function fetchCases() {
+  const publishFilter = await publishFilterForDatabase(DB_CASES, 'Case studies');
   const rows = await queryAll(
     DB_CASES,
-    { property: '상태', select: { equals: '발행' } },
-    [{ property: '순서', direction: 'ascending' }]
+    publishFilter.filter,
+    [{ property: '순서', direction: 'ascending' }],
+    'Case studies'
   );
 
   const careerProjects = [];
@@ -327,14 +483,24 @@ async function fetchCases() {
       if (evidenceUrl) dxCases[key].evidenceUrl = evidenceUrl;
     }
   }
-  return { careerProjects, dxCases };
+  return {
+    careerProjects,
+    dxCases,
+    sync: {
+      publishedRows: rows.length,
+      publishProperty: publishFilter.propertyName,
+      publishPropertyType: publishFilter.propertyType,
+    },
+  };
 }
 
 async function fetchGrowth() {
+  const publishFilter = await publishFilterForDatabase(DB_GROWTH, 'Growth records');
   const rows = await queryAll(
     DB_GROWTH,
-    { property: '상태', select: { equals: '발행' } },
-    [{ property: '순서', direction: 'ascending' }]
+    publishFilter.filter,
+    [{ property: '순서', direction: 'ascending' }],
+    'Growth records'
   );
 
   const trainingList = [];
@@ -353,12 +519,13 @@ async function fetchGrowth() {
       for (const b of blocks) {
         if (b.type === 'image') {
           const img = b.image;
-          certImage = img.type === 'file' ? img.file.url : img.external.url;
+          const rawUrl = extractFileUrl(img);
+          certImage = await stableAssetUrl(rawUrl, `training-${row.id}`, prop(row, '제목') || 'training image');
           break;
         }
         if (b.type === 'file' || b.type === 'pdf') {
-          const f = b[b.type];
-          certImage = (f && (f.file ? f.file.url : f.external?.url)) || null;
+          const rawUrl = extractFileUrl(b[b.type]);
+          certImage = await stableAssetUrl(rawUrl, `training-${row.id}`, prop(row, '제목') || 'training file');
           if (certImage) break;
         }
       }
@@ -403,8 +570,8 @@ async function fetchGrowth() {
           break;
         }
         if (b.type === 'file' || b.type === 'pdf') {
-          const f = b[b.type];
-          credentialUrl = (f && f.url) || null;
+          const rawUrl = extractFileUrl(b[b.type]);
+          credentialUrl = await stableAssetUrl(rawUrl, `credential-${row.id}`, prop(row, '제목') || 'credential file');
           if (credentialUrl) break;
         }
         if (b.type === 'paragraph' && b.paragraph && b.paragraph.rich_text) {
@@ -425,19 +592,31 @@ async function fetchGrowth() {
       });
     }
   }
-  return { trainingList, activitiesList, certificationList, modalDetails };
+  return {
+    trainingList,
+    activitiesList,
+    certificationList,
+    modalDetails,
+    sync: {
+      publishedRows: rows.length,
+      publishProperty: publishFilter.propertyName,
+      publishPropertyType: publishFilter.propertyType,
+    },
+  };
 }
 
 async function fetchSkills() {
+  const publishFilter = await publishFilterForDatabase(DB_SKILLS, 'Skills');
   const rows = await queryAll(
     DB_SKILLS,
-    { property: '선택', select: { equals: '발행' } },
-    [{ property: '순서', direction: 'ascending' }]
+    publishFilter.filter,
+    [{ property: '순서', direction: 'ascending' }],
+    'Skills'
   );
 
   const byCategory = {};
   for (const row of rows) {
-    const cat = prop(row, '카테코리');
+    const cat = propAny(row, SKILL_CATEGORY_PROPERTY_ALIASES, 'Uncategorized');
     if (!byCategory[cat]) byCategory[cat] = [];
     byCategory[cat].push({
       name:  prop(row, '스킬명'),
@@ -445,7 +624,15 @@ async function fetchSkills() {
       color: prop(row, '레벨색상'),
     });
   }
-  return byCategory;
+  return {
+    byCategory,
+    sync: {
+      publishedRows: rows.length,
+      categories: Object.keys(byCategory).length,
+      publishProperty: publishFilter.propertyName,
+      publishPropertyType: publishFilter.propertyType,
+    },
+  };
 }
 
 // ──────────────────────────────────────────────
@@ -461,7 +648,6 @@ function buildContentJs(data) {
   return `// content.js - 포트폴리오 기본 콘텐츠 데이터
 // !! 이 파일은 GitHub Actions (sync-notion.yml) 이 자동 생성합니다 !!
 // 직접 편집하지 마세요 — Notion DB 에서 수정하세요.
-// 마지막 생성: ${new Date().toISOString()}
 
 const SITE_CONTENT = {
 
@@ -512,6 +698,39 @@ const SITE_CONTENT = {
 `;
 }
 
+function printSyncSummary(settings, caseData, growthData, skillData, contentLength) {
+  const totalSkills = Object.values(skillData.byCategory)
+    .reduce((sum, items) => sum + items.length, 0);
+
+  console.log('Sync summary:');
+  console.log(`- Case studies: ${caseData.sync.publishedRows} published rows using "${caseData.sync.publishProperty}" (${caseData.sync.publishPropertyType})`);
+  console.log(`  - Career projects: ${caseData.careerProjects.length}`);
+  console.log(`  - DX cases: ${Object.keys(caseData.dxCases).length}`);
+  console.log(`- Growth records: ${growthData.sync.publishedRows} published rows using "${growthData.sync.publishProperty}" (${growthData.sync.publishPropertyType})`);
+  console.log(`  - Training: ${growthData.trainingList.length}`);
+  console.log(`  - Activities: ${growthData.activitiesList.length}`);
+  console.log(`  - Certifications: ${growthData.certificationList.length}`);
+  console.log(`- Skills: ${skillData.sync.publishedRows} published rows across ${skillData.sync.categories} categories using "${skillData.sync.publishProperty}" (${skillData.sync.publishPropertyType})`);
+  console.log(`  - Skill items rendered: ${totalSkills}`);
+  console.log(`- Stable Notion assets: ${generatedAssetFiles.size} files in ${GENERATED_ASSET_PUBLIC_DIR}`);
+
+  const missingSettings = [
+    ['resume_kr', settings.resume_kr],
+    ['resume_en', settings.resume_en],
+    ['portfolio_kr', settings.portfolio_kr],
+    ['portfolio_en', settings.portfolio_en],
+    ['academic_school', settings.school],
+    ['academic_major', settings.major],
+    ['academic_period', settings.period],
+  ].filter(([, value]) => !value).map(([key]) => key);
+
+  if (missingSettings.length) {
+    console.warn(`[warn] Settings page is missing recommended values: ${missingSettings.join(', ')}`);
+  }
+
+  console.log(`- content.js size: ${contentLength} bytes`);
+}
+
 // ──────────────────────────────────────────────
 // 메인
 // ──────────────────────────────────────────────
@@ -524,13 +743,15 @@ async function main() {
   }
 
   console.log('Fetching Notion data...');
-  const [settings, caseData, growthData, skillsByCategory] = await Promise.all([
+  const [settings, caseData, growthData, skillData] = await Promise.all([
     fetchSettings(),
     fetchCases(),
     fetchGrowth(),
     fetchSkills(),
   ]);
+  pruneUnusedGeneratedAssets();
 
+  const skillsByCategory = skillData.byCategory;
   const academicHtml  = buildAcademicHtml(settings);
   const skillsHtml    = buildSkillsHtml(skillsByCategory);
 
@@ -555,6 +776,7 @@ async function main() {
 
   const outPath = path.join(__dirname, '..', 'content.js');
   fs.writeFileSync(outPath, content, 'utf8');
+  printSyncSummary(settings, caseData, growthData, skillData, content.length);
   console.log(`content.js written (${content.length} bytes)`);
 }
 
