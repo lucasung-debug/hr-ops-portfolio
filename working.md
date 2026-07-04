@@ -273,3 +273,26 @@ Notes:
 - The PR body includes the local checks, GitHub Actions run IDs, and the successful no-diff second sync run.
 - Opening the PR should trigger the repository's `Claude Code Review` workflow because `.github/workflows/claude-code-review.yml` listens to pull request events.
 - This record commit is documentation-only and does not change sync behavior.
+
+## 2026-07-05 - Pre-merge approval checkpoint
+
+Context:
+- Claude performed a final pre-merge review of PR `#10` and approved merge.
+- The operator instructed to proceed.
+
+Evidence:
+- Pull request: `https://github.com/lucasung-debug/hr-ops-portfolio/pull/10`
+- PR state before merge: open
+- Merge state before merge: clean
+- Head commit before merge: `f43f4df6100dee6723315f3f7686cf1109934af2`
+- Claude Code Review check: success
+- Cloudflare Pages branch preview check: success
+
+Decision:
+- Proceed with merging PR `#10` into `main`.
+
+Post-merge checks to perform:
+- Confirm PR is merged.
+- Confirm `origin/main` contains the PR branch changes.
+- Confirm production Cloudflare Pages deploy status for the merge commit.
+- Confirm generated `content.js` on `main` still uses `assets/notion/...` instead of Notion signed URLs.
