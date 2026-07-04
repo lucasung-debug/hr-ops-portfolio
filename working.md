@@ -167,6 +167,32 @@ Open items:
   1. First run should create or update `assets/notion/...` and generated `content.js`.
   2. Second run should produce no diff if Notion content and files are unchanged.
 
+## 2026-07-05 - Pre-push verification plan
+
+Context:
+- The operator approved proceeding with the branch, with clear records for Claude review at every step.
+- Up to this point, all changes were local only.
+
+Goal:
+- Commit and push `codex/notion-sync-ux-safety`, then use GitHub Actions to turn the asset-stabilization design into verified evidence.
+
+Planned gates:
+- Local gate: syntax check and whitespace/EOL check pass before commit.
+- GitHub gate 1: first `sync-notion` workflow run on the branch succeeds and, if Notion temporary assets exist, commits stable `assets/notion/...` paths.
+- GitHub gate 2: second `sync-notion` workflow run on the branch succeeds without creating another commit when Notion content is unchanged.
+
+Evidence to collect:
+- Local commit hash.
+- Branch push result.
+- GitHub Actions run IDs and conclusions.
+- Whether generated `content.js` still contains `X-Amz-*` certificate URLs after the first run.
+- Whether the second run creates no additional commit.
+
+Non-goals:
+- Do not merge to `main` in this step.
+- Do not change Notion schema or content.
+- Do not manually trigger Cloudflare Pages outside the normal GitHub branch behavior.
+
 ## 2026-07-05 - GitHub Actions run 1 failure and fix
 
 Context:
@@ -196,28 +222,37 @@ Next verification:
 - Commit and push the fix.
 - Trigger GitHub Actions run 1 again.
 
-## 2026-07-05 - Pre-push verification plan
+## 2026-07-05 - GitHub Actions verification passed
 
 Context:
-- The operator approved proceeding with the branch, with clear records for Claude review at every step.
-- Up to this point, all changes were local only.
+- After fixing the publish-option filter issue, the branch was pushed again and the GitHub Actions verification was rerun.
 
-Goal:
-- Commit and push `codex/notion-sync-ux-safety`, then use GitHub Actions to turn the asset-stabilization design into verified evidence.
+Evidence:
+- Fix commit: `3e87b3052cab7aceca84d8f0cf94abb151e80a08`
+- First successful workflow run ID: `28711844232`
+- First successful workflow run URL: `https://github.com/lucasung-debug/hr-ops-portfolio/actions/runs/28711844232`
+- First successful run conclusion: success
+- First successful run generated commit: `644ba2c8d9bbd7c80d21067e87aa7791ef36b28c`
+- Generated commit summary: 2 files changed, 2 insertions, 3 deletions, and `assets/notion/training-32ac27c2-afbf-80a5-89f0-f6f737dc9aa8-e6758d401bc0.jpg` was created.
+- First run sync summary:
+  - Case studies: 9 published rows using `상태` with value `발행`.
+  - Growth records: 12 published rows using `상태` with value `발행`.
+  - Skills: 13 published rows across 4 categories using `선택` with value `발행`.
+  - Stable Notion assets: 1 file in `assets/notion`.
+- Local inspection after pulling `644ba2c8d9bbd7c80d21067e87aa7791ef36b28c` confirmed `content.js` now references `assets/notion/training-32ac27c2-afbf-80a5-89f0-f6f737dc9aa8-e6758d401bc0.jpg` for both certificate image usages.
+- Local inspection found no `X-Amz-*` or `prod-files-secure` URL in generated `content.js`.
+- Second workflow run ID: `28711873867`
+- Second workflow run URL: `https://github.com/lucasung-debug/hr-ops-portfolio/actions/runs/28711873867`
+- Second workflow run conclusion: success
+- Second run head SHA: `644ba2c8d9bbd7c80d21067e87aa7791ef36b28c`
+- Branch head after the second run remained `644ba2c8d9bbd7c80d21067e87aa7791ef36b28c`, so the second run did not create another sync commit.
 
-Planned gates:
-- Local gate: syntax check and whitespace/EOL check pass before commit.
-- GitHub gate 1: first `sync-notion` workflow run on the branch succeeds and, if Notion temporary assets exist, commits stable `assets/notion/...` paths.
-- GitHub gate 2: second `sync-notion` workflow run on the branch succeeds without creating another commit when Notion content is unchanged.
+Interpretation:
+- The branch has moved from designed to verified for the daily signed-URL churn fix.
+- The first successful run created the stable asset and rewrote `content.js` to use a stable local asset path.
+- The second successful run produced no new commit when Notion content was unchanged, which is the target behavior.
 
-Evidence to collect:
-- Local commit hash.
-- Branch push result.
-- GitHub Actions run IDs and conclusions.
-- Whether generated `content.js` still contains `X-Amz-*` certificate URLs after the first run.
-- Whether the second run creates no additional commit.
-
-Non-goals:
-- Do not merge to `main` in this step.
-- Do not change Notion schema or content.
-- Do not manually trigger Cloudflare Pages outside the normal GitHub branch behavior.
+Remaining note:
+- GitHub Actions still emits a warning that `actions/checkout@v4` and `actions/setup-node@v4` target Node 20 internally and are being forced to Node 24. This warning did not fail the sync job. The workflow's configured script runtime is already Node 24.
+- This branch is still not merged to `main`.
+- Cloudflare Pages production was not intentionally changed by this verification. If Cloudflare is configured to build branch previews, GitHub branch pushes may have created preview builds, but production `main` was not merged here.

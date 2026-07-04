@@ -8,22 +8,29 @@ Deployment model: GitHub Actions generates `content.js`; Cloudflare Pages deploy
 
 ## Current Status
 
+Initial baseline:
+
 - Local `main` is aligned with `origin/main`.
 - Latest verified commit: `1ec34a3e2415a3211d93d800b5184e52b9e33bf6`
 - Working tree was clean before this note was added.
 - Previous local-only `.gitignore` and `AGENTS.md` changes were preserved in Git stash: `stash@{0}: codex-pre-sync-hr-ops-portfolio-20260704T164959`
-- This brief records analysis only. No sync code, Notion content, GitHub workflow, or Cloudflare deployment behavior has been changed.
 
-Update after initial review:
+Current branch state:
 
-- A local implementation branch was created: `codex/notion-sync-ux-safety`.
-- That branch currently contains a draft code change in `scripts/generate-content.js`.
-- The draft removes generated timestamp churn, fails closed on Notion publish-filter validation errors, adds status/category aliases, and prints a sync summary.
+- Implementation branch: `codex/notion-sync-ux-safety`.
+- Branch pushed to GitHub.
+- The branch changes `scripts/generate-content.js`, `.github/workflows/sync-notion.yml`, this brief, and `working.md`.
+- The branch removes generated timestamp churn, fails closed on Notion publish-filter validation errors, adds status/category aliases, and prints a sync summary.
 - After diff review, the branch also stabilizes Notion temporary file URLs by downloading them into `assets/notion/` and referencing stable local paths from generated `content.js`.
 - The earlier assumption that signed URL work could wait was incorrect: the latest daily commit changed one timestamp line and two signed certificate image URL lines.
 - `.github/workflows/sync-notion.yml` was updated so generated assets are staged with `content.js`.
 - The workflow Node.js runtime was first raised from 18 to 20 for global `fetch()`, then to 24 after GitHub Actions emitted a Node 20 deprecation warning.
-- The draft has not been pushed to GitHub and has not changed Cloudflare Pages or Notion.
+- GitHub Actions verification passed on the branch:
+  - First successful run `28711844232` created one stable generated asset and updated `content.js`.
+  - Second successful run `28711873867` created no additional sync commit when Notion content was unchanged.
+- The branch has not been merged to `main`.
+- Notion schema and content were not changed.
+- Cloudflare Pages production was not intentionally changed by this branch verification.
 
 ## Sources Reviewed
 
