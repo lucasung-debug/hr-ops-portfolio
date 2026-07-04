@@ -256,3 +256,20 @@ Remaining note:
 - GitHub Actions still emits a warning that `actions/checkout@v4` and `actions/setup-node@v4` target Node 20 internally and are being forced to Node 24. This warning did not fail the sync job. The workflow's configured script runtime is already Node 24.
 - This branch is still not merged to `main`.
 - Cloudflare Pages production was not intentionally changed by this verification. If Cloudflare is configured to build branch previews, GitHub branch pushes may have created preview builds, but production `main` was not merged here.
+
+## 2026-07-05 - Pull request opened
+
+Context:
+- After the branch passed the two-run sync verification, a pull request was opened for Claude/GitHub review.
+
+Evidence:
+- Pull request: `#10`
+- Pull request URL: `https://github.com/lucasung-debug/hr-ops-portfolio/pull/10`
+- Base branch: `main`
+- Head branch: `codex/notion-sync-ux-safety`
+- PR title: `Harden Notion sync and stabilize generated assets`
+
+Notes:
+- The PR body includes the local checks, GitHub Actions run IDs, and the successful no-diff second sync run.
+- Opening the PR should trigger the repository's `Claude Code Review` workflow because `.github/workflows/claude-code-review.yml` listens to pull request events.
+- This record commit is documentation-only and does not change sync behavior.
