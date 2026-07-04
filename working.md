@@ -323,3 +323,26 @@ Interpretation:
 Remaining follow-up:
 - On the next scheduled Notion sync, verify that no new auto-sync commit appears if Notion content is unchanged.
 - Manually check the live site certificate image if the UI appears to load content from Cloudflare KV instead of `content.js`.
+
+## 2026-07-05 - Live KV fallback observation
+
+Context:
+- After merge, Claude performed a final production check and flagged that Cloudflare KV still contains old content.
+- Codex rechecked the live `/api/content` response directly before recording this.
+
+Evidence:
+- `https://hr-ops-portfolio.pages.dev/api/content` returned HTTP 200 with JSON content.
+- Live KV response length was about 30 KB.
+- Live KV response did not contain `X-Amz-*` or `prod-files-secure`.
+- Live KV response did not contain `certImage`.
+- Live KV response still contained old branding text such as `HR의 문제를` and `HRM Manager`.
+- `index.html` loads `content.js` first and then merges KV as supplemental data with `Object.assign({}, json, base)`, so `content.js` wins when keys overlap.
+- Live `content.js` still contains the stable `assets/notion/...` path and contains no signed URL or generated timestamp marker.
+
+Interpretation:
+- The stale KV data is not currently affecting the live site because `content.js` takes precedence.
+- The stale KV data could become visible only if `content.js` fails to load or a key exists only in KV.
+- This is not a blocker for the merged Notion sync fix.
+
+Follow-up:
+- At a calm point, refresh the admin/KV content or clear the stale KV entry so the fallback layer matches the current site.
