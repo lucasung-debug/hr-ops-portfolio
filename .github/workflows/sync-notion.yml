@@ -34,9 +34,23 @@ jobs:
           NOTION_PAGE_ID_SETTINGS: ${{ secrets.NOTION_PAGE_ID_SETTINGS }}
 
       - name: Commit and push if changed
+        id: commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add content.js
           if [ -d assets/notion ]; then git add assets/notion; fi
-          git diff --staged --quiet || (git commit -m "chore: auto-sync content from Notion" && git pull --rebase && git push)
+          if git diff --staged --quiet; then
+            echo "outcome=unchanged" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "chore: auto-sync content from Notion"
+            git pull --rebase
+            git push
+            echo "outcome=changed" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Notify Notion (status callout)
+        if: always()
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+        run: node scripts/notify-notion.js "${{ steps.commit.outputs.outcome || 'failed' }}"
