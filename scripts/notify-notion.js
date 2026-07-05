@@ -23,7 +23,19 @@ function requireToken() {
 }
 
 function hubPageId() {
-  return process.env.NOTION_SYNC_HUB_PAGE_ID || DEFAULT_HUB_PAGE_ID;
+  return formatNotionId(process.env.NOTION_SYNC_HUB_PAGE_ID || DEFAULT_HUB_PAGE_ID);
+}
+
+function formatNotionId(id) {
+  const compact = String(id || '').replace(/-/g, '');
+  if (!/^[0-9a-f]{32}$/i.test(compact)) return id;
+  return [
+    compact.slice(0, 8),
+    compact.slice(8, 12),
+    compact.slice(12, 16),
+    compact.slice(16, 20),
+    compact.slice(20),
+  ].join('-');
 }
 
 async function notionFetch(method, endpoint, body) {
@@ -188,25 +200,31 @@ async function runCapabilityCheck() {
   });
   console.log(`append status: ${appendResponse.status}`);
 
-  if (!appendResponse.ok) process.exit(1);
+  if (!appendResponse.ok) {
+    process.exitCode = 1;
+    return;
+  }
 
   const data = await appendResponse.json();
   const blockId = data.results && data.results[0] && data.results[0].id;
-  if (!blockId) process.exit(1);
+  if (!blockId) {
+    process.exitCode = 1;
+    return;
+  }
 
   const deleteResponse = await notionFetch('DELETE', `/blocks/${blockId}`);
   console.log(`delete status: ${deleteResponse.status}`);
-  process.exit(deleteResponse.ok ? 0 : 1);
+  process.exitCode = deleteResponse.ok ? 0 : 1;
 }
 
 if (capabilityCheck) {
   runCapabilityCheck().catch(error => {
-    console.error(`capability check failed: ${error.message}`);
-    process.exit(1);
+    console.log('failed status: local_error');
+    process.exitCode = 1;
   });
 } else {
   notify().catch(error => {
     console.warn(`[warn] Notion notification skipped: ${error.message}`);
-    process.exit(0);
+    process.exitCode = 0;
   });
 }
