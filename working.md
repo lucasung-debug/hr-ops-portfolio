@@ -501,3 +501,37 @@ Open items:
 - Run `gh workflow run sync-notion.yml --ref codex/notion-sync-ux-b`.
 - Collect branch workflow run ID/log evidence for Notion notification behavior.
 - G-A1/G-A2 live browser success remains blocked until Cloudflare has `GH_WORKFLOW_TOKEN`.
+
+## 2026-07-05 - Branch workflow verification and Notion access blocker
+
+Context:
+- The branch was pushed so GitHub Actions could run with the repository secrets that are not available locally.
+- Target command: `gh workflow run sync-notion.yml --repo lucasung-debug/hr-ops-portfolio --ref codex/notion-sync-ux-b`.
+
+Goal:
+- Verify Phase B notify behavior with the Actions-owned `NOTION_API_KEY`, and collect evidence for G-B0/G-B1/G-B3 where possible.
+
+Progress:
+- Branch workflow run `28727080750` on commit `bcf32f24aef9e96c3b94aa35ef3276223b1308ba` completed with conclusion `success`.
+- Notify step in run `28727080750` executed `node scripts/notify-notion.js "unchanged"` but printed `[warn] Notion notification skipped: List blocks failed with HTTP 404`.
+- Added Notion page ID normalization to send the default hub page id in dashed UUID form.
+- Branch workflow run `28727106230` on commit `08ef0ff84bd4f56da08ffab2026536fe51cea830` completed with conclusion `success`.
+- Notify step in run `28727106230` again executed `node scripts/notify-notion.js "unchanged"` and again printed `[warn] Notion notification skipped: List blocks failed with HTTP 404`.
+
+Verification:
+- Both branch runs generated the expected content summary:
+  - Case studies: 9 published rows; career 6; DX 3.
+  - Growth records: 12 published rows; training 4; activities 5; certifications 3.
+  - Skills: 13 published rows across 4 categories.
+  - Stable Notion assets: 1.
+  - `content.js` size: 36388 bytes.
+- Both branch runs reached the Notify Notion step and the workflow stayed green despite the notification failure, so G-B3 failure-safety is partially verified for a real Actions-side Notion access failure.
+
+Decisions and failures:
+- G-B0 and G-B1 are BLOCKED, not passed: the GitHub Actions Notion integration cannot read the hub page yet (`HTTP 404` on top-level block listing), so it cannot create or update the status callout.
+- A4 remains MISSING after live branch workflow evidence. This likely needs the manual P0-B2 Notion access/capability step for the `Git-Notion Sync` hub page and integration.
+- G-A1/G-A2 live success paths are still BLOCKED pending P0-B1 (`GH_WORKFLOW_TOKEN` in Cloudflare Pages production env).
+
+Open items:
+- Open the PR with these blocked gates called out explicitly.
+- After master completes P0-B1 and P0-B2, rerun the branch workflow and the live `/api/sync` checks.
