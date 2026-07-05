@@ -718,21 +718,44 @@ const SITE_CONTENT = {
 `;
 }
 
-function printSyncSummary(settings, caseData, growthData, skillData, contentLength) {
+function buildSyncSummary(caseData, growthData, skillData, contentLength) {
   const totalSkills = Object.values(skillData.byCategory)
     .reduce((sum, items) => sum + items.length, 0);
 
+  return {
+    cases: caseData.sync.publishedRows,
+    career: caseData.careerProjects.length,
+    dx: Object.keys(caseData.dxCases).length,
+    growth: growthData.sync.publishedRows,
+    training: growthData.trainingList.length,
+    activities: growthData.activitiesList.length,
+    certifications: growthData.certificationList.length,
+    skills: skillData.sync.publishedRows,
+    skillCategories: skillData.sync.categories,
+    assets: generatedAssetFiles.size,
+    contentBytes: contentLength,
+  };
+}
+
+function writeSyncSummary(summary) {
+  const outPath = path.join(__dirname, '.sync-summary.json');
+  fs.writeFileSync(outPath, `${JSON.stringify(summary, null, 2)}\n`, 'utf8');
+}
+
+function printSyncSummary(settings, caseData, growthData, skillData, contentLength) {
+  const summary = buildSyncSummary(caseData, growthData, skillData, contentLength);
+
   console.log('Sync summary:');
   console.log(`- Case studies: ${caseData.sync.publishedRows} published rows using "${caseData.sync.publishProperty}" (${caseData.sync.publishPropertyType}: ${caseData.sync.publishValues.join(', ')})`);
-  console.log(`  - Career projects: ${caseData.careerProjects.length}`);
-  console.log(`  - DX cases: ${Object.keys(caseData.dxCases).length}`);
+  console.log(`  - Career projects: ${summary.career}`);
+  console.log(`  - DX cases: ${summary.dx}`);
   console.log(`- Growth records: ${growthData.sync.publishedRows} published rows using "${growthData.sync.publishProperty}" (${growthData.sync.publishPropertyType}: ${growthData.sync.publishValues.join(', ')})`);
-  console.log(`  - Training: ${growthData.trainingList.length}`);
-  console.log(`  - Activities: ${growthData.activitiesList.length}`);
-  console.log(`  - Certifications: ${growthData.certificationList.length}`);
+  console.log(`  - Training: ${summary.training}`);
+  console.log(`  - Activities: ${summary.activities}`);
+  console.log(`  - Certifications: ${summary.certifications}`);
   console.log(`- Skills: ${skillData.sync.publishedRows} published rows across ${skillData.sync.categories} categories using "${skillData.sync.publishProperty}" (${skillData.sync.publishPropertyType}: ${skillData.sync.publishValues.join(', ')})`);
-  console.log(`  - Skill items rendered: ${totalSkills}`);
-  console.log(`- Stable Notion assets: ${generatedAssetFiles.size} files in ${GENERATED_ASSET_PUBLIC_DIR}`);
+  console.log(`  - Skill items rendered: ${summary.skills}`);
+  console.log(`- Stable Notion assets: ${summary.assets} files in ${GENERATED_ASSET_PUBLIC_DIR}`);
 
   const missingSettings = [
     ['resume_kr', settings.resume_kr],
@@ -749,6 +772,7 @@ function printSyncSummary(settings, caseData, growthData, skillData, contentLeng
   }
 
   console.log(`- content.js size: ${contentLength} bytes`);
+  return summary;
 }
 
 // ──────────────────────────────────────────────
@@ -796,7 +820,8 @@ async function main() {
 
   const outPath = path.join(__dirname, '..', 'content.js');
   fs.writeFileSync(outPath, content, 'utf8');
-  printSyncSummary(settings, caseData, growthData, skillData, content.length);
+  const summary = printSyncSummary(settings, caseData, growthData, skillData, content.length);
+  writeSyncSummary(summary);
   console.log(`content.js written (${content.length} bytes)`);
 }
 

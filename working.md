@@ -429,3 +429,73 @@ Next:
 - Master approved plan rev 1.1. Plan status updated to GATES FROZEN.
 - Kickoff order for codex: Phase 0-A audit -> report -> implement Phase A+B on branch `codex/notion-sync-ux-b` -> PR (no merge). Gates that need `GH_WORKFLOW_TOKEN` in Cloudflare (G-A1/G-A2 live checks) may be reported as BLOCKED pending P0-B1 until master creates the fine-grained PAT.
 - Claude's next action: adversarial gate review on the PR.
+
+## 2026-07-05 - Phase 0-A credential and capability audit
+
+Context:
+- New mission: implement `docs/plans/2026-07-05-notion-sync-ux-improvement-plan.md` rev 1.1 exactly; gates are frozen.
+- Scope for this entry is Phase 0-A only: audit existing credentials/capabilities before Phase A/B implementation.
+- Local `main` and `origin/main` were both at `153d56249ab4c66d8683b4deac2c9f69221271b4`.
+
+Goal:
+- Produce the six-row audit table required by G-0 with VERIFIED/MISSING status, exact command/API evidence, and no credential values.
+
+Progress:
+
+| # | Capability | Status | Evidence command/API call | Result |
+|---|---|---|---|---|
+| A1 | gh CLI authenticated on this machine, and its scopes | VERIFIED | `gh auth status 2>&1 \| Select-String -Pattern "Logged in\|Active account\|Token scopes\|Git operations"` | Logged in as `lucasung-debug`; active account true; HTTPS git protocol; scopes line includes broad GitHub scopes including `repo` and `workflow`. No token value printed. |
+| A2 | gh can dispatch the sync workflow | VERIFIED | `gh workflow run sync-notion.yml --repo lucasung-debug/hr-ops-portfolio`; then `gh run list --repo lucasung-debug/hr-ops-portfolio --workflow sync-notion.yml --limit 1 --json databaseId,url,status,conclusion,createdAt,headBranch,event,workflowName,displayTitle`; then `gh run view 28726923959 --repo lucasung-debug/hr-ops-portfolio --json databaseId,url,status,conclusion,createdAt,headBranch,event,headSha,workflowName` | Fresh workflow_dispatch run `28726923959` on `main` was created at `2026-07-05T02:26:17Z` and completed with conclusion `success`. |
+| A3 | GitHub repo secrets present | VERIFIED | `gh secret list --repo lucasung-debug/hr-ops-portfolio` | Secret names include `NOTION_API_KEY`, `NOTION_DB_ID_CASES`, `NOTION_DB_ID_GROWTH`, `NOTION_DB_ID_SKILLS`, and `NOTION_PAGE_ID_SETTINGS`. No secret values printed. |
+| A4 | Notion integration WRITE capability | MISSING | `rg -n -- "--capability-check\|notify-notion\|NOTION_SYNC_HUB_PAGE_ID\|blocks\\.children\\.(append\|delete)\|children\\.append\|children\\.delete" .github scripts functions docs/plans/2026-07-05-notion-sync-ux-improvement-plan.md` | Current `main` has no existing workflow/script entry point that can run the required append/delete dry-run with the GitHub Actions `NOTION_API_KEY`. A callable Codex Notion connector was discovered, but it is not the same credential as the repo's Actions secret, so it is not counted for A4. |
+| A5 | Any local Notion/Cloudflare credentials on this PC | VERIFIED | Env names: `Get-ChildItem Env: ...` filtered for `NOTION`, `CLOUDFLARE`, `CF_`, `WRANGLER`, `GH_WORKFLOW`, `EDITOR_TOKEN`, `PORTFOLIO`, `GITHUB_TOKEN`, `GH_TOKEN`; env files: `rg --files --hidden -g '.env*' ...` over this repo, `Desktop\\AI`, and common Cloudflare config roots, then parsed matching key names only | No matching process env vars were present. Matching `.env*` key names were found only in archived HR documents paths: `CLOUDFLARE_TUNNEL_TOKEN` in `C:\Users\propo\Desktop\AI\archive\hr-documents-06legacy-old\hr-documents-main\.env` and `.env.local`. No local Notion key or `GH_WORKFLOW_TOKEN` was found. |
+| A6 | Cloudflare Pages env vars readable/writable from CLI | MISSING | `Get-Command wrangler -ErrorAction SilentlyContinue; if found, wrangler --version` | `wrangler MISSING`; Cloudflare Pages env vars are not readable/writable from this CLI session. |
+
+Decisions and failures:
+- A2 verification does not remove P0-B1. The existing gh CLI token is broad-scope and must not be copied into Cloudflare; the browser button still needs a separate least-privilege `GH_WORKFLOW_TOKEN`.
+- A4 is marked MISSING because the current repo cannot prove write capability for the Actions-owned Notion integration without adding the Phase-B `--capability-check` path or a temporary workflow step. No Notion write was faked through a different credential.
+- Created branch `codex/notion-sync-ux-b` from `153d56249ab4c66d8683b4deac2c9f69221271b4` after completing audit commands and before code edits.
+
+Open items:
+- Implement Phase A+B on `codex/notion-sync-ux-b`.
+- Recheck A4 after `scripts/notify-notion.js --capability-check` exists and can run in the branch workflow with the GitHub Actions `NOTION_API_KEY`.
+- G-A1 and G-A2 live success paths remain blocked until master completes P0-B1 by adding `GH_WORKFLOW_TOKEN` to Cloudflare Pages production env.
+
+## 2026-07-05 - Phase A+B local implementation checkpoint
+
+Context:
+- Work branch: `codex/notion-sync-ux-b`.
+- Scope: Phase A sync button and Phase B Notion status write-back from the frozen plan. Phase C remains out of scope.
+
+Goal:
+- Add the operator sync button, GitHub dispatch API, generated sync summary, Notion notifier, and workflow notify step without adding build tools or new dependencies.
+
+Progress:
+- Added `functions/api/sync.js` as a Cloudflare Pages Function for `POST /api/sync`.
+- Added `sync.html` as the Korean operator-facing sync page, 101 lines.
+- Added `scripts/notify-notion.js` with `changed|unchanged|failed` notify mode and `--capability-check`.
+- Updated `scripts/generate-content.js` to write `scripts/.sync-summary.json` from counts already computed for the sync summary.
+- Added `scripts/.sync-summary.json` to `.gitignore`.
+- Updated `.github/workflows/sync-notion.yml` with `id: commit`, explicit `changed|unchanged` output, and an `always()` Notion notify step.
+
+Verification:
+- `node --check scripts/generate-content.js` passed.
+- `node --check scripts/notify-notion.js` passed.
+- `node --check functions/api/sync.js` passed.
+- Local `/api/sync` missing-token handler check returned `401` with `{"error":"Unauthorized"}`.
+- Local `/api/sync` configured-but-missing-GitHub-token check returned `500` with `{"error":"Server not configured"}`.
+- Local `/api/sync` mocked GitHub `204` dispatch check returned `202` with `{"ok":true}`.
+- `node scripts/notify-notion.js unchanged` without `NOTION_API_KEY` exited `0` and printed a warning, confirming notify mode is failure-safe for missing credentials.
+- Secret scan found no credential values; only existing placeholder examples such as `NOTION_API_KEY=...`.
+- Staged `git diff --cached --stat` equals `git diff --cached --ignore-all-space --stat`: `7 files changed, 488 insertions(+), 10 deletions(-)`.
+- CR-aware whitespace check passed: `git -c core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol diff --cached --check`.
+
+Decisions and failures:
+- The official Notion append-block API cannot prepend a new block before existing top-level blocks; it appends at the bottom or after an existing block. To avoid destructive page rewrites, `notify-notion.js` safely appends the status callout when missing and then updates it on later runs. This still satisfies G-B0's self-created visible callout requirement, but exact first-position placement may require manual/Phase-C page layout work.
+- The callout finder strips a leading `✅` or `❌` before matching `마지막 반영` / `마지막 확인`; otherwise the required callout text format would not be found on the next run.
+
+Open items:
+- Commit and push the branch.
+- Run `gh workflow run sync-notion.yml --ref codex/notion-sync-ux-b`.
+- Collect branch workflow run ID/log evidence for Notion notification behavior.
+- G-A1/G-A2 live browser success remains blocked until Cloudflare has `GH_WORKFLOW_TOKEN`.
