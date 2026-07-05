@@ -605,6 +605,44 @@ Decision:
 - Stop before C-1 Notion changes. No Notion schema, rows, hub blocks, or site output were changed by this run.
 - A plan revision or an approved execution-channel exception is required before Phase C can proceed.
 
+## 2026-07-05 - Phase C dispatch after PR-1 merge
+
+Context:
+- PR #12 was merged into `main` as merge commit `ae68b3d8cf5622ec4cd0c71de55037d7f9f55240`.
+- Per rev 1.1, dispatches were run from `main`.
+
+Goal:
+- Run C-1 rename, verify G-C1, then run C-2 build/verify before PR-2 cleanup.
+
+Progress:
+- C-1 rename run `28735712159` succeeded.
+- Skills DB before schema: `순서 | 레벨 | 카테코리 | 레벨색상 | 선택 | 스킬명`.
+- Rename log: `RENAMED=카테코리 | 선택`.
+- Skills DB after schema: `순서 | 레벨 | 카테고리 | 레벨색상 | 상태 | 스킬명`.
+- G-C1 sync run `28735728678` succeeded.
+- Sync summary after rename:
+  - Case studies: 9 published rows using `상태`.
+  - Growth records: 12 published rows using `상태`.
+  - Skills: 13 published rows across 4 categories using `상태`.
+  - Stable Notion assets: 1.
+  - `content.js` size: 36392 bytes.
+- Commit step emitted `outcome=unchanged`; `origin/main` remained at `ae68b3d8cf5622ec4cd0c71de55037d7f9f55240`, so no auto-sync commit was created.
+
+Decisions and failures:
+- C-2 build-hub run `28735751929` failed after partial insertion.
+- It deleted 4 empty paragraphs, created quick actions, created the cheatsheet, and created publish steps.
+- The runner then failed verification with `PHASE_C_ERROR=G-C2 database section order failed`.
+- Structure evidence from the failed run:
+  - 1 callout at position 1.
+  - Quick actions at positions 2-3.
+  - Child databases at positions 4-6.
+  - Cheatsheet at positions 7-27.
+  - `사이트 설정` at position 28.
+  - `✍️ 콘텐츠 편집` at position 29.
+  - Publish steps at positions 30-33.
+- This does not satisfy the frozen C-2 target layout because `✍️ 콘텐츠 편집` is below the databases instead of above them, and publish steps are after `사이트 설정`.
+- Stop here. Repairing this would require a runner/script revision and likely deletion/recreation of blocks created by the failed run, which is beyond the current frozen dispatch sequence.
+
 ### 2026-07-05 - Phase C: dispatch blocker -> plan rev 1.1 + runner review
 
 - codex correctly STOPPED on a real constraint (frozen-gate discipline worked): GitHub returns 404 dispatching a workflow absent from the default branch. Plan flaw was Claude's (§3 channel design).
