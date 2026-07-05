@@ -604,3 +604,10 @@ Interpretation:
 Decision:
 - Stop before C-1 Notion changes. No Notion schema, rows, hub blocks, or site output were changed by this run.
 - A plan revision or an approved execution-channel exception is required before Phase C can proceed.
+
+### 2026-07-05 - Phase C: dispatch blocker -> plan rev 1.1 + runner review
+
+- codex correctly STOPPED on a real constraint (frozen-gate discipline worked): GitHub returns 404 dispatching a workflow absent from the default branch. Plan flaw was Claude's (§3 channel design).
+- Plan rev 1.1: two-PR flow (PR-1 lands temp runner on main -> dispatch from main -> PR-2 cleanup). Insert-only hub edits acknowledged (Notion API cannot move blocks).
+- Claude reviewed the runner (scripts/notion-phasec.js 408L + phasec-setup.yml): APPROVE with 1 required fix — cheatsheetBlocks() wrongly includes two plan-instruction paragraphs as page content; remove them. Strengths verified: idempotent everywhere, refuses ambiguous renames, enforces single first-position status callout, skills DB resolved by property shape, evidence logs.
+- Next: codex removes the two paragraphs -> opens PR-1 -> Claude delta-checks -> master merges -> dispatch rename-skills/build-hub/verify from main -> PR-2 cleanup.

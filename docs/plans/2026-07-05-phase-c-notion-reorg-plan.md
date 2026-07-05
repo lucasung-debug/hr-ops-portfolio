@@ -26,17 +26,23 @@ in Notion explained which fields count.
 - Do not touch the status callout's marker format (`마지막 반영 / 마지막 확인 /
   동기화 실패`) — `scripts/notify-notion.js` finds its callout by these markers.
 
-## 3. Execution Channel
+## 3. Execution Channel (rev 1.1 — two-PR flow)
 
 Audit A5 found no local Notion credentials, so all API work runs inside
-GitHub Actions where `NOTION_API_KEY` lives:
+GitHub Actions where `NOTION_API_KEY` lives.
 
-- New temporary script `scripts/notion-phasec.js` with subcommands:
-  `rename-skills` | `build-hub` | `verify`.
-- New temporary workflow `.github/workflows/phasec-setup.yml`:
-  `workflow_dispatch` with an `action` input, runs
-  `node scripts/notion-phasec.js "$ACTION"`, env `NOTION_API_KEY` only.
-- Both files are TEMPORARY: after G-C gates pass, a cleanup commit removes them.
+GitHub constraint discovered during Do (2026-07-05, codex stop-and-report):
+a `workflow_dispatch` workflow can only be dispatched if the workflow file
+exists on the DEFAULT branch. A temp workflow living only on a feature branch
+returns HTTP 404. Therefore the channel is a two-PR flow:
+
+- PR-1 (branch `codex/phase-c-notion`): adds the TEMPORARY pair —
+  `scripts/notion-phasec.js` (subcommands `rename-skills` | `build-hub` |
+  `verify`) and `.github/workflows/phasec-setup.yml` (`workflow_dispatch`
+  with an `action` input, env `NOTION_API_KEY` only). Claude reviews, master
+  merges. These files are inert on main until dispatched.
+- Dispatch runs happen FROM MAIN (`--ref main`) after PR-1 merges.
+- PR-2 (cleanup): removes both files after G-C1..C-3 evidence is collected.
 - Every subcommand must be IDEMPOTENT (safe to re-run: check-before-create,
   rename only if the old name exists).
 
@@ -161,3 +167,17 @@ from Notion page history; cleanup commit is a plain revert.
 - TASK_DONE = per-gate evidence: schema before/after property lists, run ids,
   hub page structure fetch, grep for cleanup. Claude re-verifies independently
   (hub page via master-account fetch).
+
+## History
+
+- 1.0 (2026-07-05) Initial Phase C plan.
+- 1.1 (2026-07-05) Act-phase revision after codex stop-and-report: GitHub
+  cannot dispatch a workflow that does not exist on the default branch, so §3
+  becomes a two-PR flow (PR-1 lands the temp runner on main → dispatch from
+  main → PR-2 cleanup). Also acknowledged: Notion API cannot MOVE existing
+  blocks — §5 C-2 is insert-only with `after` anchors (already how the runner
+  is written). Review finding to fix before PR-1: cheatsheetBlocks() must not
+  include the two plan-instruction paragraphs ("아래 내용은 Claude가…" /
+  "codex는 이 내용을 그대로…") — they are directives to codex, not operator
+  content. Accepted cosmetic: the 사이트 설정 page link ends up below the
+  publish-steps section (insert-only consequence).
