@@ -562,3 +562,9 @@ Open items:
 - G-B2 + G-E2E PASS with a guaranteed edit (published growth row): run 28733569211 -> outcome=changed -> callout "✅ 마지막 반영: 2026-07-05 16:37 KST — 변경 반영됨 · 케이스 9 · 성장 12 · 스킬 13 · 이미지 1" -> auto-sync commit 7a58cf6 (1 line, only the master's edit: "UX 중심 사고" -> "사용자 경험 중심 사고") -> production deploy success -> live content.js contains the new text.
 - All frozen gates now PASS except G-C1 (Phase C property renames, next pass).
 - Open items: rotate exposed EDITOR_TOKEN (new value, Secret type) — reminded to master; Phase C (hub dashboard, renames, cheatsheet, DB templates) per plan §9.
+
+### 2026-07-05 - Phase C plan drafted
+
+- New plan: docs/plans/2026-07-05-phase-c-notion-reorg-plan.md (PROVISIONAL until master approves).
+- Scope: skills-DB property renames (카테코리->카테고리, 선택->상태) via temp Actions script; hub page restructure (quick actions / cheatsheet / publish steps); cheatsheet content derived verbatim from generate-content.js by Claude; DB templates = master UI step (API cannot create templates); temp script+workflow removed in cleanup commit.
+- Gates G-C1..G-C5 defined; freeze on approval. Implementer: codex on branch codex/phase-c-notion.
