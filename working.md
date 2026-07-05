@@ -535,3 +535,11 @@ Decisions and failures:
 Open items:
 - Open the PR with these blocked gates called out explicitly.
 - After master completes P0-B1 and P0-B2, rerun the branch workflow and the live `/api/sync` checks.
+
+### 2026-07-05 - PR #11 adversarial gate review (Claude)
+
+- Method: 4-dimension finder fleet + per-finding adversarial verification (10 agents); majors re-verified by live Playwright render of the branch sync.html.
+- Confirmed: [major] tailwind.config set before CDN script -> brand palette never registers, primary button white-on-transparent (fails G-A2; live-verified); [minor] Enter key bypasses disabled guard -> duplicate dispatch risk; [minor] dead totalSkills + unflagged printSyncSummary restructure (accepted retroactively, remove dead var).
+- Rejected after refutation: marker-deviation claim (declared in working.md; plan itself was inconsistent -> plan rev 1.2 note), Pretendard font 400 (pre-existing, matches admin.html).
+- A4 root cause isolated with master-account fetch: hub page id is correct and the page exists -> the Actions 404 is a sharing issue (integration connected per-DB, not to the hub page). Fix = connect integration on the hub page.
+- Full review posted on PR #11. Awaiting: codex 3 fixes; master P0-B1 (GH_WORKFLOW_TOKEN in Cloudflare) + hub-page integration sharing; then live gates.
