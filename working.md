@@ -553,3 +553,12 @@ Open items:
 - G-A2 rendering PASS live (Playwright: brand-600 button visible after fix 04718d5); operator click deferred to production.
 - Security note: EDITOR_TOKEN value was exposed in a dashboard screenshot shared in chat and is stored as plain text -> rotate to a new value with Secret type after E2E completes.
 - Verdict: PR #11 is merge-ready. Remaining gates (G-A1 success half, G-A2 click, G-B2 changed-with-counts, G-E2E) are production-only and non-destructive to verify.
+
+### 2026-07-05 - G-E2E PASS: full pipeline closed (Claude verification)
+
+- PR #11 merged (e0c32f6), production deploy success, /sync.html live, wrong-token 401 verified on production.
+- G-A1 success half + G-A2 PASS: master entered the editor password on production sync.html, clicked, got the success state; two workflow_dispatch runs appeared on main; callout updated.
+- First edit test returned "unchanged" — correct system behavior surfaced that the edited field/row was not part of published site data (exactly the operator-feedback loop working). Root-cause candidates recorded for the Phase C cheatsheet.
+- G-B2 + G-E2E PASS with a guaranteed edit (published growth row): run 28733569211 -> outcome=changed -> callout "✅ 마지막 반영: 2026-07-05 16:37 KST — 변경 반영됨 · 케이스 9 · 성장 12 · 스킬 13 · 이미지 1" -> auto-sync commit 7a58cf6 (1 line, only the master's edit: "UX 중심 사고" -> "사용자 경험 중심 사고") -> production deploy success -> live content.js contains the new text.
+- All frozen gates now PASS except G-C1 (Phase C property renames, next pass).
+- Open items: rotate exposed EDITOR_TOKEN (new value, Secret type) — reminded to master; Phase C (hub dashboard, renames, cheatsheet, DB templates) per plan §9.
