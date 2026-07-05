@@ -667,6 +667,35 @@ Progress:
 - Updated runner code paths so `after` anchors used after block creation are re-read from a fresh block list before reuse.
 - `node --check scripts/notion-phasec.js` passed.
 - EOL/stat check passed: `git diff --stat` matched `git diff --ignore-all-space --stat`.
+- Pushed branch `codex/phase-c-repair` at `56eaeda`.
+- Repair run `28736101809` succeeded:
+  - `REPAIR_HUB_DELETED=content-heading`
+  - `REPAIR_HUB=inserted`
+  - `REPAIR_HUB_EDIT_INDEX=4`
+  - `REPAIR_HUB_FIRST_DATABASE_INDEX=5`
+  - `VERIFY_PASS`
+- Verify run `28736111990` succeeded with this structure:
+  - 1 callout: `✅ 마지막 확인: 2026-07-05 18:07 KST — 변경 없음 (사이트가 이미 최신)`
+  - 2 heading_2: `⚡ 빠른 실행`
+  - 3 paragraph: `사이트에 반영하기 · 라이브 사이트 보기 · GitHub 실행 기록`
+  - 4 heading_2: `✍️ 콘텐츠 편집`
+  - 5-7 child databases: `성장 기록 DB | 케이스 스터디 DB | 스킬 DB`
+  - 8 heading_2: `📋 어떤 칸이 사이트에 나가는가`
+  - 30 heading_2: `🚀 발행 3단계`
+  - `STATUS_CALLOUT_COUNT=1`, `CHILD_DATABASE_COUNT=3`, `VERIFY_PASS`
+- G-C3 sync run `28736123289` on `main` succeeded:
+  - Sync summary remained 9 case studies, 12 growth records, 13 skills, 1 stable asset, `content.js` 36392 bytes.
+  - Commit step outcome was unchanged.
+  - Notify step logged `Status callout updated.`
+  - Callout text: `✅ 마지막 확인: 2026-07-05 18:23 KST — 변경 없음 (사이트가 이미 최신)`.
+- Post-sync verify run `28736136811` succeeded:
+  - Top structure remained callout -> quick actions -> content heading -> three child databases -> cheatsheet -> site settings page -> publish steps.
+  - `STATUS_CALLOUT_COUNT=1`, `CHILD_DATABASE_COUNT=3`, `VERIFY_PASS`.
+- C-4 cleanup prepared:
+  - `.github/workflows/phasec-setup.yml` exists: `False`.
+  - `scripts/notion-phasec.js` exists: `False`.
+  - `rg -n "notion-phasec|phasec-setup|repair-hub|phasec" .github scripts`: `NO_MATCH`.
+  - Final cleanup diff/stat check passed: `git diff HEAD --stat` matched `git diff HEAD --ignore-all-space --stat`.
 
 Decisions and failures:
 - `repair-hub` deletes the misplaced `✍️ 콘텐츠 편집` heading only when it is not already above the first child database.
