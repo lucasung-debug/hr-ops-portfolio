@@ -346,3 +346,39 @@ Interpretation:
 
 Follow-up:
 - At a calm point, refresh the admin/KV content or clear the stale KV entry so the fallback layer matches the current site.
+
+## 2026-07-05 - Scheduled sync verification (production, final)
+
+Context:
+- First scheduled Notion sync on `main` after merging PR `#10`. Notion content was intentionally left unchanged.
+- This was the last open verification gate: an unchanged Notion day must produce no auto-sync commit.
+
+Evidence:
+- Scheduled run `28724258192` on `main` (trigger: `schedule`) completed with success at `2026-07-05T00:22:44Z` (KST 09:22).
+- Run log printed the new sync summary:
+  - Case studies: 9 published rows using "상태" (select: 발행)
+  - Growth records: 12 published rows using "상태" (select: 발행)
+  - Skills: 13 published rows across 4 categories using "선택" (select: 발행)
+  - Stable Notion assets: 1 file in `assets/notion`
+  - `content.js` size: 36388 bytes
+- After the run, `origin/main` tip is still `e4d74b0` (yesterday's docs commit). No new `chore: auto-sync` commit was created.
+
+Interpretation:
+- The daily-noise fix is now verified in production, not just in branch dispatch runs. Unchanged Notion content produces zero commits and zero Cloudflare deploys.
+- The operator-facing sync summary works in the scheduled production run.
+
+## 2026-07-05 - KV refresh handoff (requires editor token)
+
+Context:
+- Remaining cleanup: Cloudflare KV (`portfolio_content` key) still holds December-2025 content (old headline, "HRM Manager"). Harmless today because `content.js` wins the merge, but it is a stale fallback layer.
+
+What was checked:
+- `wrangler` CLI is not installed on this machine, so no local KV key write is possible.
+- The connected Cloudflare MCP only exposes namespace-level KV operations, not key read/write.
+- `functions/api/content.js` PUT requires `Bearer EDITOR_TOKEN`; the token is intentionally not available to agents.
+- `admin.html` save flow confirmed: it PUTs the current content to `/api/content` with the editor password entered in the `kv-token-input` field.
+
+Decision:
+- Hand the KV refresh to the operator (1-minute browser task): open the live `admin.html`, enter the editor password, save once. That overwrites the stale KV value with current content.
+- Alternative: delete the `portfolio_content` key in the Cloudflare dashboard (KV namespace `PORTFOLIO_KV`); `index.html` handles a null KV response safely.
+- Note: verification and this record were done directly by the orchestrator (small verify/record task; no worker routing justified).
