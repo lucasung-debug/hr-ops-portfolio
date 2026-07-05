@@ -255,7 +255,7 @@ const SITE_CONTENT = {
         "period": "2018.10.05",
         "rank": "최우수상 수상",
         "icon": "🏆",
-        "content": "<div class=\"space-y-4\"><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>💡 성과 요약</strong></p><ul class=\"list-disc pl-4 text-sm text-slate-600 space-y-2\"><li>최우수상 수상</li><li>사용자 경험(UX) 개선 모델 제시</li></ul><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>💡 솔루션: 여행 경험의 단순화</strong></p><p class=\"text-slate-600 text-sm leading-relaxed\">수하물/좌석/기내식을 묶은 <strong>'월정액 구독 모델'</strong> 제안</p><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>핵심 역량</strong></p><p class=\"text-slate-600 text-sm leading-relaxed\">비즈니스 모델 설계, UX 중심 사고</p></div>"
+        "content": "<div class=\"space-y-4\"><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>💡 성과 요약</strong></p><ul class=\"list-disc pl-4 text-sm text-slate-600 space-y-2\"><li>최우수상 수상</li><li>사용자 경험(UX) 개선 모델 제시</li></ul><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>💡 솔루션: 여행 경험의 단순화</strong></p><p class=\"text-slate-600 text-sm leading-relaxed\">수하물/좌석/기내식을 묶은 <strong>'월정액 구독 모델'</strong> 제안</p><p class=\"text-slate-600 text-sm leading-relaxed\"><strong>핵심 역량</strong></p><p class=\"text-slate-600 text-sm leading-relaxed\">비즈니스 모델 설계, 사용자 경험 중심 사고</p></div>"
     }
 ]
 
