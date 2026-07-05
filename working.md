@@ -590,3 +590,17 @@ Progress:
 Decisions and failures:
 - Official Notion API documentation says existing blocks cannot be moved through the append-block endpoint. The runner therefore inserts new sections after known anchors and fails if the existing status callout is not already first after empty-paragraph cleanup. It does not silently create a duplicate status callout or rewrite the page.
 - C-3 database templates are intentionally skipped here because the public API cannot create Notion database templates; this remains the master's UI step.
+
+### Blocker: temporary workflow cannot be dispatched from branch
+
+Evidence:
+- Command attempted: `gh workflow run phasec-setup.yml --repo lucasung-debug/hr-ops-portfolio --ref codex/phase-c-notion -f action=rename-skills`.
+- GitHub response: `HTTP 404: workflow phasec-setup.yml not found on the default branch`.
+
+Interpretation:
+- The frozen plan requires a new temporary workflow for Phase C execution, but GitHub will not dispatch a workflow file that exists only on this branch.
+- Running the Notion API work through another path would deviate from the frozen execution channel. Modifying an existing default-branch workflow would also violate the "temporary script + temporary workflow only" constraint.
+
+Decision:
+- Stop before C-1 Notion changes. No Notion schema, rows, hub blocks, or site output were changed by this run.
+- A plan revision or an approved execution-channel exception is required before Phase C can proceed.
