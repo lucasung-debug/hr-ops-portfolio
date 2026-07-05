@@ -383,6 +383,26 @@ Decision:
 - Alternative: delete the `portfolio_content` key in the Cloudflare dashboard (KV namespace `PORTFOLIO_KV`); `index.html` handles a null KV response safely.
 - Note: verification and this record were done directly by the orchestrator (small verify/record task; no worker routing justified).
 
+## 2026-07-05 - KV refresh completed
+
+Context:
+- The operator opened the live admin page and saved once.
+- Codex checked the live `/api/content` response again after that save.
+
+Evidence:
+- `https://hr-ops-portfolio.pages.dev/api/content` returned HTTP 200.
+- Live KV response length: about 34 KB.
+- Live KV response no longer contains old branding text `HR의 문제를`.
+- Live KV response no longer contains old title text `HRM Manager`.
+- Live KV response contains the current headline text `원래 이랬어`.
+- Live KV response contains `certImage` data and the stable `assets/notion/...` asset path.
+- Live KV response does not contain `X-Amz-*` or `prod-files-secure`.
+
+Interpretation:
+- The stale KV fallback cleanup is complete.
+- The fallback layer now matches the current content model closely enough for normal operation.
+- Remaining scheduled-sync validation is already complete: the production cron run created no new auto-sync commit when Notion was unchanged.
+
 ## 2026-07-05 - Notion input UX improvement: plan frozen for codex
 
 Context:
