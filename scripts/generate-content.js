@@ -719,9 +719,6 @@ const SITE_CONTENT = {
 }
 
 function buildSyncSummary(caseData, growthData, skillData, contentLength) {
-  const totalSkills = Object.values(skillData.byCategory)
-    .reduce((sum, items) => sum + items.length, 0);
-
   return {
     cases: caseData.sync.publishedRows,
     career: caseData.careerProjects.length,
