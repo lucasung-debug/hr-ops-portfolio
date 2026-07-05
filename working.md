@@ -543,3 +543,13 @@ Open items:
 - Rejected after refutation: marker-deviation claim (declared in working.md; plan itself was inconsistent -> plan rev 1.2 note), Pretendard font 400 (pre-existing, matches admin.html).
 - A4 root cause isolated with master-account fetch: hub page id is correct and the page exists -> the Actions 404 is a sharing issue (integration connected per-DB, not to the hub page). Fix = connect integration on the hub page.
 - Full review posted on PR #11. Awaiting: codex 3 fixes; master P0-B1 (GH_WORKFLOW_TOKEN in Cloudflare) + hub-page integration sharing; then live gates.
+
+### 2026-07-05 - Live gates on the branch (Claude verification)
+
+- Master completed: GH_WORKFLOW_TOKEN in Cloudflare (Secret) and hub-page integration sharing (Notion Connections).
+- G-B0 PASS: dispatch run 28732798341 -> "Status callout created." -> independently verified on the hub page via master-account fetch (single callout, correct text).
+- G-B1 PASS: unchanged message with fresh KST timestamp; second dispatch 28732824610 -> "Status callout updated." -> single callout, timestamp 16:04 -> 16:05, no duplicate.
+- G-A1 (401 half) PASS live on branch preview after env-var redeploy 86f4791; correct-token half deferred to production (preview env lacks EDITOR_TOKEN and the Cloudflare UI shows no per-env selector -> not worth operator friction).
+- G-A2 rendering PASS live (Playwright: brand-600 button visible after fix 04718d5); operator click deferred to production.
+- Security note: EDITOR_TOKEN value was exposed in a dashboard screenshot shared in chat and is stored as plain text -> rotate to a new value with Secret type after E2E completes.
+- Verdict: PR #11 is merge-ready. Remaining gates (G-A1 success half, G-A2 click, G-B2 changed-with-counts, G-E2E) are production-only and non-destructive to verify.
