@@ -605,9 +605,99 @@ Decision:
 - Stop before C-1 Notion changes. No Notion schema, rows, hub blocks, or site output were changed by this run.
 - A plan revision or an approved execution-channel exception is required before Phase C can proceed.
 
+## 2026-07-05 - Phase C dispatch after PR-1 merge
+
+Context:
+- PR #12 was merged into `main` as merge commit `ae68b3d8cf5622ec4cd0c71de55037d7f9f55240`.
+- Per rev 1.1, dispatches were run from `main`.
+
+Goal:
+- Run C-1 rename, verify G-C1, then run C-2 build/verify before PR-2 cleanup.
+
+Progress:
+- C-1 rename run `28735712159` succeeded.
+- Skills DB before schema: `순서 | 레벨 | 카테코리 | 레벨색상 | 선택 | 스킬명`.
+- Rename log: `RENAMED=카테코리 | 선택`.
+- Skills DB after schema: `순서 | 레벨 | 카테고리 | 레벨색상 | 상태 | 스킬명`.
+- G-C1 sync run `28735728678` succeeded.
+- Sync summary after rename:
+  - Case studies: 9 published rows using `상태`.
+  - Growth records: 12 published rows using `상태`.
+  - Skills: 13 published rows across 4 categories using `상태`.
+  - Stable Notion assets: 1.
+  - `content.js` size: 36392 bytes.
+- Commit step emitted `outcome=unchanged`; `origin/main` remained at `ae68b3d8cf5622ec4cd0c71de55037d7f9f55240`, so no auto-sync commit was created.
+
+Decisions and failures:
+- C-2 build-hub run `28735751929` failed after partial insertion.
+- It deleted 4 empty paragraphs, created quick actions, created the cheatsheet, and created publish steps.
+- The runner then failed verification with `PHASE_C_ERROR=G-C2 database section order failed`.
+- Structure evidence from the failed run:
+  - 1 callout at position 1.
+  - Quick actions at positions 2-3.
+  - Child databases at positions 4-6.
+  - Cheatsheet at positions 7-27.
+  - `사이트 설정` at position 28.
+  - `✍️ 콘텐츠 편집` at position 29.
+  - Publish steps at positions 30-33.
+- This does not satisfy the frozen C-2 target layout because `✍️ 콘텐츠 편집` is below the databases instead of above them, and publish steps are after `사이트 설정`.
+- Stop here. Repairing this would require a runner/script revision and likely deletion/recreation of blocks created by the failed run, which is beyond the current frozen dispatch sequence.
+
 ### 2026-07-05 - Phase C: dispatch blocker -> plan rev 1.1 + runner review
 
 - codex correctly STOPPED on a real constraint (frozen-gate discipline worked): GitHub returns 404 dispatching a workflow absent from the default branch. Plan flaw was Claude's (§3 channel design).
 - Plan rev 1.1: two-PR flow (PR-1 lands temp runner on main -> dispatch from main -> PR-2 cleanup). Insert-only hub edits acknowledged (Notion API cannot move blocks).
 - Claude reviewed the runner (scripts/notion-phasec.js 408L + phasec-setup.yml): APPROVE with 1 required fix — cheatsheetBlocks() wrongly includes two plan-instruction paragraphs as page content; remove them. Strengths verified: idempotent everywhere, refuses ambiguous renames, enforces single first-position status callout, skills DB resolved by property shape, evidence logs.
 - Next: codex removes the two paragraphs -> opens PR-1 -> Claude delta-checks -> master merges -> dispatch rename-skills/build-hub/verify from main -> PR-2 cleanup.
+
+## 2026-07-05 - Phase C repair branch
+
+Context:
+- Plan rev 1.2 is on `main` at `9285f1abe33adc2ccce189bd61e2af939728666b`.
+- Claude identified the root cause of the partial hub failure: Notion `after` anchors taken from creation responses may append at the end; anchors from a fresh children list position correctly.
+- Branch `codex/phase-c-repair` was created from latest `main`.
+
+Goal:
+- Add one idempotent `repair-hub` action, dispatch it from the branch, verify the hub, run one normal sync for G-C3, then open PR-2 that removes the temporary runner files.
+
+Progress:
+- Committed the existing local Phase C evidence first as `577ddc4`.
+- Added `repair-hub` to `scripts/notion-phasec.js`.
+- Added `repair-hub` to the `phasec-setup.yml` workflow input choices.
+- Updated runner code paths so `after` anchors used after block creation are re-read from a fresh block list before reuse.
+- `node --check scripts/notion-phasec.js` passed.
+- EOL/stat check passed: `git diff --stat` matched `git diff --ignore-all-space --stat`.
+- Pushed branch `codex/phase-c-repair` at `56eaeda`.
+- Repair run `28736101809` succeeded:
+  - `REPAIR_HUB_DELETED=content-heading`
+  - `REPAIR_HUB=inserted`
+  - `REPAIR_HUB_EDIT_INDEX=4`
+  - `REPAIR_HUB_FIRST_DATABASE_INDEX=5`
+  - `VERIFY_PASS`
+- Verify run `28736111990` succeeded with this structure:
+  - 1 callout: `✅ 마지막 확인: 2026-07-05 18:07 KST — 변경 없음 (사이트가 이미 최신)`
+  - 2 heading_2: `⚡ 빠른 실행`
+  - 3 paragraph: `사이트에 반영하기 · 라이브 사이트 보기 · GitHub 실행 기록`
+  - 4 heading_2: `✍️ 콘텐츠 편집`
+  - 5-7 child databases: `성장 기록 DB | 케이스 스터디 DB | 스킬 DB`
+  - 8 heading_2: `📋 어떤 칸이 사이트에 나가는가`
+  - 30 heading_2: `🚀 발행 3단계`
+  - `STATUS_CALLOUT_COUNT=1`, `CHILD_DATABASE_COUNT=3`, `VERIFY_PASS`
+- G-C3 sync run `28736123289` on `main` succeeded:
+  - Sync summary remained 9 case studies, 12 growth records, 13 skills, 1 stable asset, `content.js` 36392 bytes.
+  - Commit step outcome was unchanged.
+  - Notify step logged `Status callout updated.`
+  - Callout text: `✅ 마지막 확인: 2026-07-05 18:23 KST — 변경 없음 (사이트가 이미 최신)`.
+- Post-sync verify run `28736136811` succeeded:
+  - Top structure remained callout -> quick actions -> content heading -> three child databases -> cheatsheet -> site settings page -> publish steps.
+  - `STATUS_CALLOUT_COUNT=1`, `CHILD_DATABASE_COUNT=3`, `VERIFY_PASS`.
+- C-4 cleanup prepared:
+  - `.github/workflows/phasec-setup.yml` exists: `False`.
+  - `scripts/notion-phasec.js` exists: `False`.
+  - `rg -n "notion-phasec|phasec-setup|repair-hub|phasec" .github scripts`: `NO_MATCH`.
+  - Final cleanup diff/stat check passed: `git diff HEAD --stat` matched `git diff HEAD --ignore-all-space --stat`.
+
+Decisions and failures:
+- `repair-hub` deletes the misplaced `✍️ 콘텐츠 편집` heading only when it is not already above the first child database.
+- The replacement insert uses the quick-actions paragraph ID from a fresh children list.
+- The repair action re-lists after insertion and throws if the heading is not below quick actions and above the first child database.
