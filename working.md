@@ -486,6 +486,7 @@ Verification:
 - Local `/api/sync` configured-but-missing-GitHub-token check returned `500` with `{"error":"Server not configured"}`.
 - Local `/api/sync` mocked GitHub `204` dispatch check returned `202` with `{"ok":true}`.
 - `node scripts/notify-notion.js unchanged` without `NOTION_API_KEY` exited `0` and printed a warning, confirming notify mode is failure-safe for missing credentials.
+- `node scripts/notify-notion.js changed` with `NOTION_API_KEY=fake-token` and `NOTION_SYNC_HUB_PAGE_ID=bad-page-id` exited `0` and printed a warning, confirming notify HTTP failure is failure-safe.
 - Secret scan found no credential values; only existing placeholder examples such as `NOTION_API_KEY=...`.
 - Staged `git diff --cached --stat` equals `git diff --cached --ignore-all-space --stat`: `7 files changed, 488 insertions(+), 10 deletions(-)`.
 - CR-aware whitespace check passed: `git -c core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol diff --cached --check`.
@@ -493,6 +494,7 @@ Verification:
 Decisions and failures:
 - The official Notion append-block API cannot prepend a new block before existing top-level blocks; it appends at the bottom or after an existing block. To avoid destructive page rewrites, `notify-notion.js` safely appends the status callout when missing and then updates it on later runs. This still satisfies G-B0's self-created visible callout requirement, but exact first-position placement may require manual/Phase-C page layout work.
 - The callout finder strips a leading `✅` or `❌` before matching `마지막 반영` / `마지막 확인`; otherwise the required callout text format would not be found on the next run.
+- A Windows Node assertion appeared when notify failure used `process.exit(0)` immediately after a failed fetch. `notify-notion.js` now sets `process.exitCode` instead, and the fake-token failure test exits cleanly with code `0`.
 
 Open items:
 - Commit and push the branch.
