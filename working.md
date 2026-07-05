@@ -568,3 +568,25 @@ Open items:
 - New plan: docs/plans/2026-07-05-phase-c-notion-reorg-plan.md (PROVISIONAL until master approves).
 - Scope: skills-DB property renames (카테코리->카테고리, 선택->상태) via temp Actions script; hub page restructure (quick actions / cheatsheet / publish steps); cheatsheet content derived verbatim from generate-content.js by Claude; DB templates = master UI step (API cannot create templates); temp script+workflow removed in cleanup commit.
 - Gates G-C1..G-C5 defined; freeze on approval. Implementer: codex on branch codex/phase-c-notion.
+
+## 2026-07-05 - Phase C execution kickoff
+
+Context:
+- New mission: execute `docs/plans/2026-07-05-phase-c-notion-reorg-plan.md` on branch `codex/phase-c-notion`.
+- Base branch: latest `origin/main` at `36177bc`.
+- API work must run in GitHub Actions with `NOTION_API_KEY`; local PC has no Notion credential.
+- Existing untracked local files `AGENTS.md` and `docs/_html/` are out of scope and must not be staged.
+
+Goal:
+- C-1: rename only the Skills DB properties `카테코리` -> `카테고리` and `선택` -> `상태`, then prove the normal Notion sync still has unchanged output.
+- C-2: restructure the `Git-Notion Sync` hub page without breaking the existing status-callout marker.
+- C-4: remove the temporary Actions runner files after evidence is collected.
+
+Progress:
+- Added a temporary Actions runner script with subcommands `rename-skills`, `build-hub`, and `verify`.
+- Added a temporary dispatch workflow that runs the script with only `NOTION_API_KEY`.
+- `node --check` passed for the temporary runner script.
+
+Decisions and failures:
+- Official Notion API documentation says existing blocks cannot be moved through the append-block endpoint. The runner therefore inserts new sections after known anchors and fails if the existing status callout is not already first after empty-paragraph cleanup. It does not silently create a duplicate status callout or rewrite the page.
+- C-3 database templates are intentionally skipped here because the public API cannot create Notion database templates; this remains the master's UI step.
