@@ -181,3 +181,19 @@ from Notion page history; cleanup commit is a plain revert.
   "codex는 이 내용을 그대로…") — they are directives to codex, not operator
   content. Accepted cosmetic: the 사이트 설정 page link ends up below the
   publish-steps section (insert-only consequence).
+- 1.2 (2026-07-05) Act-phase revision after C-2 partial failure (codex
+  stop-and-report; Claude verified the hub state independently). ROOT CAUSE:
+  the Notion `after` anchor silently falls back to append-at-end when given a
+  block id taken from a creation RESPONSE in the same session; anchors taken
+  from a fresh children LIST positioned correctly (quick actions, cheatsheet)
+  while creation-response anchors failed (콘텐츠 편집 heading, 발행 3단계).
+  RULE: anchors must come from a fresh block list, never from creation
+  responses. REPAIR STEP (approved channel): new idempotent subcommand
+  `repair-hub` — delete the stray `✍️ 콘텐츠 편집` heading, re-list, insert it
+  after the quick-actions paragraph (freshly listed id), post-verify its index
+  is below the first database or throw. Publish-steps position stays (verify
+  only requires publish > cheatsheet; settings-between is the accepted
+  cosmetic). CHANNEL NOTE: phasec-setup.yml is now registered on main, so
+  `--ref <branch>` dispatch runs the BRANCH script — no extra merge needed for
+  the repair; add `repair-hub` to the workflow's choice options on the branch.
+  PR-2 (final) = net deletion of both temp files + working.md evidence.
