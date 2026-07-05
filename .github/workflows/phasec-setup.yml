@@ -1,0 +1,32 @@
+name: Phase C Notion setup
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Phase C action to run"
+        required: true
+        type: choice
+        options:
+          - rename-skills
+          - build-hub
+          - verify
+
+jobs:
+  phase-c:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Run Phase C action
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          ACTION: ${{ inputs.action }}
+        run: node scripts/notion-phasec.js "$ACTION"
