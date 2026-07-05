@@ -10,6 +10,7 @@ on:
         options:
           - rename-skills
           - build-hub
+          - repair-hub
           - verify
 
 jobs:

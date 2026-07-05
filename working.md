@@ -649,3 +649,26 @@ Decisions and failures:
 - Plan rev 1.1: two-PR flow (PR-1 lands temp runner on main -> dispatch from main -> PR-2 cleanup). Insert-only hub edits acknowledged (Notion API cannot move blocks).
 - Claude reviewed the runner (scripts/notion-phasec.js 408L + phasec-setup.yml): APPROVE with 1 required fix — cheatsheetBlocks() wrongly includes two plan-instruction paragraphs as page content; remove them. Strengths verified: idempotent everywhere, refuses ambiguous renames, enforces single first-position status callout, skills DB resolved by property shape, evidence logs.
 - Next: codex removes the two paragraphs -> opens PR-1 -> Claude delta-checks -> master merges -> dispatch rename-skills/build-hub/verify from main -> PR-2 cleanup.
+
+## 2026-07-05 - Phase C repair branch
+
+Context:
+- Plan rev 1.2 is on `main` at `9285f1abe33adc2ccce189bd61e2af939728666b`.
+- Claude identified the root cause of the partial hub failure: Notion `after` anchors taken from creation responses may append at the end; anchors from a fresh children list position correctly.
+- Branch `codex/phase-c-repair` was created from latest `main`.
+
+Goal:
+- Add one idempotent `repair-hub` action, dispatch it from the branch, verify the hub, run one normal sync for G-C3, then open PR-2 that removes the temporary runner files.
+
+Progress:
+- Committed the existing local Phase C evidence first as `577ddc4`.
+- Added `repair-hub` to `scripts/notion-phasec.js`.
+- Added `repair-hub` to the `phasec-setup.yml` workflow input choices.
+- Updated runner code paths so `after` anchors used after block creation are re-read from a fresh block list before reuse.
+- `node --check scripts/notion-phasec.js` passed.
+- EOL/stat check passed: `git diff --stat` matched `git diff --ignore-all-space --stat`.
+
+Decisions and failures:
+- `repair-hub` deletes the misplaced `✍️ 콘텐츠 편집` heading only when it is not already above the first child database.
+- The replacement insert uses the quick-actions paragraph ID from a fresh children list.
+- The repair action re-lists after insertion and throws if the heading is not below quick actions and above the first child database.

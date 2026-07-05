@@ -224,6 +224,10 @@ function indexOfBlock(blocks, block) {
   return blocks.findIndex(item => item.id === block?.id);
 }
 
+function firstChildDatabaseIndex(blocks) {
+  return blocks.findIndex(block => block.type === 'child_database');
+}
+
 function sectionEnd(blocks, heading) {
   const start = indexOfBlock(blocks, heading);
   if (start < 0) return heading;
@@ -233,6 +237,41 @@ function sectionEnd(blocks, heading) {
     end = i;
   }
   return blocks[end];
+}
+
+function quickActionsParagraph(blocks) {
+  const quick = findHeading(blocks, QUICK_HEADING);
+  const quickIndex = indexOfBlock(blocks, quick);
+  const paragraphBlock = blocks[quickIndex + 1];
+  if (!quick || !paragraphBlock || paragraphBlock.type !== 'paragraph') {
+    throw new Error('Quick actions paragraph not found in fresh block list');
+  }
+  return { quick, quickIndex, paragraphBlock, paragraphIndex: quickIndex + 1 };
+}
+
+async function freshQuickActionsParagraph() {
+  const blocks = await listBlocks();
+  return quickActionsParagraph(blocks).paragraphBlock;
+}
+
+async function freshSectionEnd(headingText) {
+  const blocks = await listBlocks();
+  const heading = findHeading(blocks, headingText);
+  if (!heading) throw new Error(`Heading not found in fresh block list: ${headingText}`);
+  return sectionEnd(blocks, heading);
+}
+
+function assertContentHeadingPosition(blocks) {
+  const { quickIndex, paragraphIndex } = quickActionsParagraph(blocks);
+  const edit = findHeading(blocks, EDIT_HEADING);
+  const editIndex = indexOfBlock(blocks, edit);
+  const firstDbIndex = firstChildDatabaseIndex(blocks);
+  if (!edit) throw new Error('Content edit heading missing after repair');
+  if (firstDbIndex < 0) throw new Error('No child database found after repair');
+  if (!(editIndex > paragraphIndex && editIndex < firstDbIndex)) {
+    throw new Error(`Content edit heading repair failed; quick=${quickIndex}, edit=${editIndex}, firstDb=${firstDbIndex}`);
+  }
+  return { editIndex, firstDbIndex };
 }
 
 async function removeEmptyParagraphs() {
@@ -259,9 +298,9 @@ async function ensureQuickActions() {
     return sectionEnd(blocks, existing);
   }
   const status = await ensureStatusFirst();
-  const created = await appendAfter(status.id, [heading2(QUICK_HEADING), quickLinksParagraph()]);
+  await appendAfter(status.id, [heading2(QUICK_HEADING), quickLinksParagraph()]);
   console.log('QUICK_ACTIONS=created');
-  return created[created.length - 1];
+  return freshQuickActionsParagraph();
 }
 
 async function ensureContentHeading(afterBlock) {
@@ -271,9 +310,10 @@ async function ensureContentHeading(afterBlock) {
     console.log('CONTENT_HEADING=exists');
     return existing;
   }
-  const created = await appendAfter(afterBlock.id, [heading2(EDIT_HEADING)]);
+  await appendAfter(afterBlock.id, [heading2(EDIT_HEADING)]);
   console.log('CONTENT_HEADING=created');
-  return created[0];
+  blocks = await listBlocks();
+  return findHeading(blocks, EDIT_HEADING);
 }
 
 async function ensureCheatsheet() {
@@ -285,9 +325,9 @@ async function ensureCheatsheet() {
   }
   const childDbs = blocks.filter(block => block.type === 'child_database');
   if (childDbs.length !== 3) throw new Error(`Expected three child databases, found ${childDbs.length}`);
-  const created = await appendAfter(childDbs[childDbs.length - 1].id, [heading2(CHEATSHEET_HEADING), ...cheatsheetBlocks()]);
+  await appendAfter(childDbs[childDbs.length - 1].id, [heading2(CHEATSHEET_HEADING), ...cheatsheetBlocks()]);
   console.log('CHEATSHEET=created');
-  return created[created.length - 1];
+  return freshSectionEnd(CHEATSHEET_HEADING);
 }
 
 async function ensurePublishSteps(afterBlock) {
@@ -334,10 +374,43 @@ function cheatsheetBlocks() {
 async function buildHub() {
   await removeEmptyParagraphs();
   await ensureStatusFirst();
-  const quickEnd = await ensureQuickActions();
-  await ensureContentHeading(quickEnd);
-  const cheatEnd = await ensureCheatsheet();
+  await ensureQuickActions();
+  const quickParagraph = await freshQuickActionsParagraph();
+  await ensureContentHeading(quickParagraph);
+  await ensureCheatsheet();
+  const cheatEnd = await freshSectionEnd(CHEATSHEET_HEADING);
   await ensurePublishSteps(cheatEnd);
+  await verifyHub();
+}
+
+async function repairHub() {
+  let blocks = await listBlocks();
+  const existing = findHeading(blocks, EDIT_HEADING);
+  const existingIndex = indexOfBlock(blocks, existing);
+  const firstDbIndex = firstChildDatabaseIndex(blocks);
+
+  if (existing && firstDbIndex >= 0 && existingIndex < firstDbIndex) {
+    console.log('REPAIR_HUB=NO-OP');
+    await verifyHub();
+    return;
+  }
+
+  if (existing) {
+    await deleteBlock(existing.id);
+    console.log('REPAIR_HUB_DELETED=content-heading');
+  } else {
+    console.log('REPAIR_HUB_EXISTING=missing');
+  }
+
+  blocks = await listBlocks();
+  const { paragraphBlock } = quickActionsParagraph(blocks);
+  await appendAfter(paragraphBlock.id, [heading2(EDIT_HEADING)]);
+
+  blocks = await listBlocks();
+  const { editIndex, firstDbIndex: repairedFirstDbIndex } = assertContentHeadingPosition(blocks);
+  console.log('REPAIR_HUB=inserted');
+  console.log(`REPAIR_HUB_EDIT_INDEX=${editIndex + 1}`);
+  console.log(`REPAIR_HUB_FIRST_DATABASE_INDEX=${repairedFirstDbIndex + 1}`);
   await verifyHub();
 }
 
@@ -396,6 +469,7 @@ async function main() {
   const action = process.argv[2];
   if (action === 'rename-skills') return renameSkills();
   if (action === 'build-hub') return buildHub();
+  if (action === 'repair-hub') return repairHub();
   if (action === 'verify') return verifyHub();
   throw new Error(`Unknown action: ${action || '(missing)'}`);
 }
