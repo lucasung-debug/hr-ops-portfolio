@@ -308,8 +308,6 @@ async function ensurePublishSteps(afterBlock) {
 
 function cheatsheetBlocks() {
   return [
-    paragraph('아래 내용은 Claude가 scripts/generate-content.js 정독으로 도출·검증한 것.'),
-    paragraph('codex는 이 내용을 그대로 Notion 블록으로 옮긴다 (의역 금지).'),
     heading3('공통 규칙'),
     bullet("행이 사이트에 나가는 조건: **'상태' 칸이 '발행'** 일 때만. 초안은 절대 안 나감."),
     bullet("**'순서' 칸의 숫자가 사이트 표시 순서**를 정함 (오름차순)."),
