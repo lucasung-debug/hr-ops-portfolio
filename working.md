@@ -397,3 +397,9 @@ Decision:
 Next:
 - Master reviews/approves the plan, completes Phase 0, then hands Phase A+B to codex on branch `codex/notion-sync-ux-b`.
 - Claude verifies gate-by-gate on the PR (adversarial review), then Phase C Notion edits via MCP after approval.
+
+### 2026-07-05 - Plan rev 1.1 (master feedback)
+
+- Master: "codex may already hold keys/permissions — audit first; and let codex, not Claude, execute the Notion-side work."
+- Applied: Phase 0 split into 0-A codex read-only credential audit / 0-B manual-only-if-missing. Manual callout setup removed entirely — notify script now self-provisions the status callout (find-or-create on the hub page, gate G-B0). Phase C execution reassigned to codex scripts; only Notion UI database templates remain a guided master step (public API cannot create DB templates). Claude = plan/gates/review only, end to end.
+- Gates were not yet frozen, so this is a pre-freeze revision, not an Act-phase gate edit.
