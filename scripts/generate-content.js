@@ -22,10 +22,15 @@ const PAGE_SETTINGS = process.env.NOTION_PAGE_ID_SETTINGS;
 // ──────────────────────────────────────────────
 function richTextToHtml(richText) {
   return richText.map(t => {
+    const annotations = t.annotations || {};
     let text = t.plain_text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    if (t.annotations.bold)   text = `<strong>${text}</strong>`;
-    if (t.annotations.italic) text = `<em>${text}</em>`;
-    if (t.annotations.code)   text = `<code>${text}</code>`;
+    if (annotations.bold)   text = `<strong>${text}</strong>`;
+    if (annotations.italic) text = `<em>${text}</em>`;
+    if (annotations.code)   text = `<code>${text}</code>`;
+    if (t.href) {
+      const href = t.href.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      text = `<a href="${href}" target="_blank" rel="noreferrer" class="underline">${text}</a>`;
+    }
     return text;
   }).join('');
 }
@@ -194,7 +199,7 @@ function evidenceUrlForCase(row, type, title) {
 // ──────────────────────────────────────────────
 // 유틸: Notion 페이지 블록 → HTML
 // ──────────────────────────────────────────────
-async function fetchBlocks(blockId) {
+async function fetchBlocks(blockId, depth = 0) {
   const blocks = [];
   let cursor;
   do {
@@ -206,6 +211,9 @@ async function fetchBlocks(blockId) {
   for (const block of blocks) {
     if (block.type === 'table') {
       block._rows = await fetchBlocks(block.id);
+    }
+    if ((block.type === 'bulleted_list_item' || block.type === 'numbered_list_item') && block.has_children && depth < 1) {
+      block._children = await fetchBlocks(block.id, depth + 1);
     }
   }
   return blocks;
@@ -233,19 +241,55 @@ function buildTableHtml(tableBlock) {
 function notionBlocksToHtml(blocks) {
   const parts = [];
   let listItems = [];
+  let listType = null;
 
   function flushList() {
     if (listItems.length > 0) {
-      parts.push(`<ul class="list-disc pl-4 text-sm text-slate-600 space-y-2">${listItems.join('')}</ul>`);
+      const tag = listType === 'numbered_list_item' ? 'ol' : 'ul';
+      const style = listType === 'numbered_list_item' ? 'list-decimal' : 'list-disc';
+      parts.push(`<${tag} class="${style} pl-4 text-sm text-slate-600 space-y-2">${listItems.join('')}</${tag}>`);
       listItems = [];
+      listType = null;
     }
+  }
+
+  function pushListItem(type, item) {
+    if (listType && listType !== type) flushList();
+    listType = type;
+    listItems.push(item);
+  }
+
+  function nestedListHtml(block) {
+    const children = (block._children || []).filter(child => child.type === 'bulleted_list_item' || child.type === 'numbered_list_item');
+    if (!children.length) return '';
+    const nestedParts = [];
+    let nestedItems = [];
+    let nestedType = null;
+
+    function flushNestedList() {
+      if (!nestedItems.length) return;
+      const tag = nestedType === 'numbered_list_item' ? 'ol' : 'ul';
+      const style = nestedType === 'numbered_list_item' ? 'list-decimal' : 'list-disc';
+      nestedParts.push(`<${tag} class="${style} pl-4 mt-2 space-y-1">${nestedItems.join('')}</${tag}>`);
+      nestedItems = [];
+      nestedType = null;
+    }
+
+    for (const child of children) {
+      // ponytail: render one nested list level; deeper children stay flat by design.
+      if (nestedType && nestedType !== child.type) flushNestedList();
+      nestedType = child.type;
+      nestedItems.push(`<li>${richTextToHtml(child[child.type].rich_text)}</li>`);
+    }
+    flushNestedList();
+    return nestedParts.join('');
   }
 
   for (const block of blocks) {
     const type = block.type;
     const data = block[type];
 
-    if (type !== 'bulleted_list_item') flushList();
+    if (type !== 'bulleted_list_item' && type !== 'numbered_list_item') flushList();
 
     switch (type) {
       case 'heading_1':
@@ -264,7 +308,19 @@ function notionBlocksToHtml(blocks) {
         }
         break;
       case 'bulleted_list_item':
-        listItems.push(`<li>${richTextToHtml(data.rich_text)}</li>`);
+      case 'numbered_list_item':
+        pushListItem(type, `<li>${richTextToHtml(data.rich_text)}${nestedListHtml(block)}</li>`);
+        break;
+      case 'divider':
+        parts.push('<hr class="border-slate-200 my-4">');
+        break;
+      case 'callout': {
+        const icon = data.icon?.type === 'emoji' ? data.icon.emoji : '💡';
+        parts.push(`<div class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 flex gap-3"><span class="mt-0.5">${icon}</span><div>${richTextToHtml(data.rich_text)}</div></div>`);
+        break;
+      }
+      case 'quote':
+        parts.push(`<blockquote class="border-l-4 border-slate-200 pl-4 text-slate-500">${richTextToHtml(data.rich_text)}</blockquote>`);
         break;
       case 'table':
         parts.push(buildTableHtml(block));
@@ -822,4 +878,11 @@ async function main() {
   console.log(`content.js written (${content.length} bytes)`);
 }
 
+if (require.main === module) {
 main().catch(err => { console.error(err); process.exit(1); });
+}
+
+module.exports = {
+  richTextToHtml,
+  notionBlocksToHtml,
+};
