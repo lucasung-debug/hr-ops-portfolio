@@ -382,3 +382,18 @@ Decision:
 - Hand the KV refresh to the operator (1-minute browser task): open the live `admin.html`, enter the editor password, save once. That overwrites the stale KV value with current content.
 - Alternative: delete the `portfolio_content` key in the Cloudflare dashboard (KV namespace `PORTFOLIO_KV`); `index.html` handles a null KV response safely.
 - Note: verification and this record were done directly by the orchestrator (small verify/record task; no worker routing justified).
+
+## 2026-07-05 - Notion input UX improvement: plan frozen for codex
+
+Context:
+- Operator pain (interview): forgets required fields, no visible feedback until next-day cron, cumbersome entry path, narrow body formatting. Usage pattern: batch edits right before job-application events.
+- Approach B chosen: Notion hub cleanup + "sync now" button + sync result written back into a Notion callout. Block-renderer expansion deferred (Phase D backlog).
+
+Decision:
+- Role split per master: codex implements, Claude owns plan/gates/verification and does not modify code.
+- Plan with frozen gates: `docs/plans/2026-07-05-notion-sync-ux-improvement-plan.md`.
+- Blocking prerequisites are master-side (Phase 0): GitHub fine-grained PAT -> Cloudflare env `GH_WORKFLOW_TOKEN`; Notion integration write capability; status callout block id -> GitHub repo variable `NOTION_SYNC_STATUS_BLOCK_ID`.
+
+Next:
+- Master reviews/approves the plan, completes Phase 0, then hands Phase A+B to codex on branch `codex/notion-sync-ux-b`.
+- Claude verifies gate-by-gate on the PR (adversarial review), then Phase C Notion edits via MCP after approval.
