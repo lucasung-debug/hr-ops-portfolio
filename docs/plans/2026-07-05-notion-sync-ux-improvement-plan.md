@@ -4,7 +4,9 @@ Date: 2026-07-05 (rev 1.1 — see History)
 Author: Claude (orchestrator — planning/quality/verification only)
 Implementer: codex (all code phases AND the Phase-0 credential audit AND
 API-scriptable Notion edits). Claude does NOT modify code or Notion content.
-Status: PROVISIONAL until master approves; gates FREEZE on approval.
+Status: APPROVED by master 2026-07-05 — GATES FROZEN (rev 1.1).
+Implementers execute toward §4 gates and MUST NOT edit them. Gate changes
+happen only via a plan revision approved by master (Act phase, outside Do).
 
 ## 1. Problem And Goal
 

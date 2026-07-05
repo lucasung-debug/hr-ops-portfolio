@@ -403,3 +403,9 @@ Next:
 - Master: "codex may already hold keys/permissions — audit first; and let codex, not Claude, execute the Notion-side work."
 - Applied: Phase 0 split into 0-A codex read-only credential audit / 0-B manual-only-if-missing. Manual callout setup removed entirely — notify script now self-provisions the status callout (find-or-create on the hub page, gate G-B0). Phase C execution reassigned to codex scripts; only Notion UI database templates remain a guided master step (public API cannot create DB templates). Claude = plan/gates/review only, end to end.
 - Gates were not yet frozen, so this is a pre-freeze revision, not an Act-phase gate edit.
+
+### 2026-07-05 - Gates frozen; codex kickoff issued
+
+- Master approved plan rev 1.1. Plan status updated to GATES FROZEN.
+- Kickoff order for codex: Phase 0-A audit -> report -> implement Phase A+B on branch `codex/notion-sync-ux-b` -> PR (no merge). Gates that need `GH_WORKFLOW_TOKEN` in Cloudflare (G-A1/G-A2 live checks) may be reported as BLOCKED pending P0-B1 until master creates the fine-grained PAT.
+- Claude's next action: adversarial gate review on the PR.
