@@ -274,3 +274,12 @@ one branch/PR: `codex/notion-sync-ux-b`.
   G-B0), no `NOTION_SYNC_STATUS_BLOCK_ID` variable needed; (c) Phase C execution
   moved from Claude-MCP to codex scripts, except UI-only database templates
   (master, guided) — Claude is spec/review only end to end.
+
+- 1.2 (2026-07-05) Act-phase notes after PR #11 gate review (gates unchanged):
+  (a) §8 B-2 marker list was internally inconsistent with the failed-status
+  format — the implemented third marker `동기화 실패` + leading-emoji strip is
+  ACCEPTED as the only reading under which G-B0/G-B1 hold. (b) Review found the
+  repo-wide latent Tailwind config-before-CDN bug; fixing it inside sync.html is
+  REQUIRED for G-A2, fixing admin.html/index.html is out of scope (separate
+  cleanup). (c) generate-content.js summary extraction accepted retroactively as
+  behavior-identical; dead `totalSkills` must be removed.
