@@ -814,3 +814,10 @@ Decisions and failures:
 - Side observation: skills DB schema now carries `default_page_template` (page 394c27c2...) — evidence master's C-3 "새 스킬" template is set as default (supports G-C5).
 - Track C CLOSED. Program status: Phases 0/A/B/C done; Track A code merged (G-a4 E2E + G-a5 cheatsheet = master Notion actions); Track B-2 review delivered (B-3 = master applies edits); Track C done.
 - Still open (master, non-code): EDITOR_TOKEN rotation (exposed in screenshot); Track A G-a4/G-a5; Track B-3 edits.
+
+### 2026-07-06 - SEO/AEO strategy plan drafted
+
+- Master: "표나지 않는 AEO/SEO, 전략적으로" — keyword-stuffing rejected. Strategy = optimize 3 recruiter discovery moments (name search / AI screening / link share), all head-only + copy de-risking, zero on-screen keyword changes.
+- Plan: docs/plans/2026-07-06-seo-aeo-strategy-plan.md. Track SEO-1 (index.html head: rich meta + canonical smjportfolio.com + Open Graph + JSON-LD Person — the AEO core; additive only, must NOT touch the tailwind-config-before-CDN block owned by a separate task). Track SEO-2 (Notion copy: career_5 제목 misread fix, dx2 550→전원, career_3 desc+MZ, dx3 완결형, career_4 CCTV 순화 [needs fact-check], career_6 자동화 총괄 rewrite [needs master scope]).
+- Gates G-S1..G-S5 (JSON-LD parses in raw HTML, valid Person schema, no on-screen change, content counts intact, share preview resolves). Freeze on approval.
+- Facts: canonical smjportfolio.com (200), assets/profile-illustration.png exists (OG candidate).
