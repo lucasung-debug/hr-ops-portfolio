@@ -708,3 +708,109 @@ Decisions and failures:
 - Session insights promoted to knowledge inbox (3 notes): Notion after-anchor fresh-list rule, workflow_dispatch default-branch registration, worker-session anti-anchoring header.
 - New plan doc: docs/plans/2026-07-05-next-cycle-abc.md — Track C (skills DB stray category option cleanup via codex Notion MCP), Track A (Phase D renderer expansion, code PR), Track B (content quality pass: codex audit -> Claude recruiter-lens review -> master edits). Gates per track; freeze on master approval.
 - Still open: EDITOR_TOKEN rotation (exposed in a screenshot; replace value + Secret type + redeploy).
+
+### 2026-07-05 - Next-cycle A/B/C current state after PR #14 merge
+
+Context:
+- Operator requested a full session restart and asked for the current state to be recorded through the merge point.
+- Local PC has been switched back to `main` and fast-forwarded to GitHub `origin/main`.
+- GitHub `main` is at `86e8b53eda4262e262766ae6644207f84ef4e17d`, the merge commit for PR #14.
+- Local untracked files still present and intentionally untouched: `AGENTS.md`, `docs/_html/`.
+
+Goal:
+- Preserve the exact restart handoff for Tracks C, B-1, and A from `docs/plans/2026-07-05-next-cycle-abc.md`.
+
+Progress:
+- Track B-1 content audit is complete and merged into main.
+  - Code-change receipt: `5325d9af10220cd68491a061b4ebac05d33ef6f9`.
+  - File added: `docs/review/2026-07-content-audit.md`.
+  - Gates: G-b1 PASS, G-b2 PASS, G-b3 PASS.
+  - Evidence summary: inventory coverage is 9 cases, 12 growth records, 13 skills; populated evidence URLs have recorded statuses; branding scan has explicit PASS/FLAG entries.
+- Track A Phase D renderer expansion is complete and merged into main.
+  - PR: #14, `https://github.com/lucasung-debug/hr-ops-portfolio/pull/14`.
+  - PR state verified by `gh pr view 14`: `MERGED`, merged at `2026-07-05T13:11:41Z`.
+  - Merge commit on main: `86e8b53eda4262e262766ae6644207f84ef4e17d`.
+  - Implementation commit: `48ae03483c96aac3df20b78b449aa98b9dfebe81`.
+  - Auto-sync content commit from workflow: `560e3869ebbeeb6d8d3dac17d472ff80ab773107`.
+  - Files now on main: `scripts/generate-content.js`, `scripts/render-check.js`, `content.js`.
+  - Gates: G-a1 PASS, G-a2 PASS. G-a3 completed by PR merge. G-a4 and G-a5 remain master/Notion live-site steps.
+  - Evidence summary: `node --check scripts/generate-content.js`, `node --check scripts/render-check.js`, `node scripts/render-check.js`, and `node --check content.js` passed before PR; final branch stat matched `--ignore-all-space`; baseline sync run `28741182213` succeeded; post-change sync run `28741317543` succeeded and generated commit `560e386`.
+  - `content.js` generated diff was limited to intended renderer output for existing Notion blocks: dividers rendered as `<hr class="border-slate-200 my-4">`; callouts rendered as styled slate callout HTML.
+- Track C skills DB stray category cleanup is still blocked.
+  - Required Notion MCP call `_fetch({"id":"collection://31bc27c2-afbf-80ef-9490-000b01860280"})` still returned HTTP 401 `token_expired` after the operator attempted reconnects.
+  - Alternate Notion MCP fetch attempts with the bare UUID and the hub page URL also returned HTTP 401 `token_expired`.
+  - Playwright browser attempt to open the Notion hub page timed out; no UI-based cleanup was performed.
+
+Decisions and failures:
+- No Track C row or schema changes were made. No Track C sync dispatch was run.
+- Do not fake Track C with GitHub or local scripts; it requires a working Notion connector because the SSOT requires Notion data-source row/schema evidence.
+- Next session should first verify Notion MCP auth with a read-only `_fetch` call against `collection://31bc27c2-afbf-80ef-9490-000b01860280`.
+- If Notion auth works, continue Track C only: count rows using `Office & Document`, reassign any to `Office & Documentation`, remove the stray select option, then dispatch one `sync-notion.yml` run on main and report G-c1..G-c3.
+- Still open from earlier program notes: EDITOR_TOKEN rotation was flagged separately and is not part of Tracks A/B/C.
+
+## 2026-07-05 - Track C Notion stray category cleanup completed
+
+Context:
+- The operator resumed Track C after Notion MCP auth had been blocked by HTTP 401 `token_expired`.
+- Local PC was on `main` at `86e8b53eda4262e262766ae6644207f84ef4e17d`.
+- Existing local untracked files remained out of scope: `AGENTS.md`, `docs/_html/`.
+
+Goal:
+- Remove the stray `Office & Document` select option from the Skills DB `카테고리` schema without losing any skill rows.
+- Run one normal `sync-notion.yml` dispatch on `main` afterward and verify the generated site data remains stable.
+
+Progress:
+- Re-tested Notion MCP auth with `_fetch({"id":"collection://31bc27c2-afbf-80ef-9490-000b01860280"})`; it succeeded.
+- Confirmed the Skills DB schema still had five `카테고리` options before cleanup:
+  - `Data & Analytics`
+  - `Automation & Dev`
+  - `HR Tech & AI`
+  - `Office & Document`
+  - `Office & Documentation`
+- `query_data_sources` remained unavailable because the current Notion plan does not include the Business/Notion AI requirement for SQL data-source queries.
+- Used workspace search plus individual page fetches as the fallback row evidence path.
+- Verified 13 published skill rows:
+  - `Data & Analytics`: 3
+  - `Automation & Dev`: 3
+  - `HR Tech & AI`: 4
+  - `Office & Documentation`: 3
+  - `Office & Document`: 0
+- No row used the stray option, so no row reassignment was performed.
+- Updated the Skills DB `카테고리` schema with `_notion_update_data_source`:
+  - `ALTER COLUMN "카테고리" SET SELECT('Data & Analytics':orange, 'Automation & Dev':default, 'HR Tech & AI':blue, 'Office & Documentation':purple)`
+- Re-fetched the Skills DB schema after cleanup and confirmed `Office & Document` was removed.
+- Dispatched `sync-notion.yml` on `main`.
+
+Evidence:
+- Sync run: `https://github.com/lucasung-debug/hr-ops-portfolio/actions/runs/28742156069`
+- Run conclusion: `success`.
+- Run head SHA: `86e8b53eda4262e262766ae6644207f84ef4e17d`.
+- Sync summary:
+  - Case studies: 9 published rows.
+  - Growth records: 12 published rows.
+  - Skills: 13 published rows across 4 categories using `상태`.
+  - Stable Notion assets: 1.
+  - `content.js` size: 37436 bytes.
+- Notify step: `Status callout updated.`
+- Notify outcome: `unchanged`.
+- Callout text: `✅ 마지막 확인: 2026-07-05 22:20 KST — 변경 없음 (사이트가 이미 최신)`.
+- Remote `origin/main` remained at `86e8b53eda4262e262766ae6644207f84ef4e17d`, so the sync created no new content commit.
+
+Gate status:
+- G-c1 PASS: published skill count remained 13 and every fetched published skill row had a category.
+- G-c2 PASS: the `Office & Document` schema option is no longer present.
+- G-c3 PASS: the main sync run completed with outcome `unchanged` and the Notion status callout updated normally.
+
+Decisions and failures:
+- Do not use `query_data_sources` as the only evidence path on this workspace because it is plan-gated.
+- For small Notion DB checks, workspace search plus individual page fetches can be enough when every expected row can be enumerated and fetched directly.
+- No repository code or Notion row content changed in this Track C pass.
+
+### 2026-07-06 - Track C independently verified (Claude)
+
+- Verified via master-account Notion fetch (not codex self-report): 스킬 DB 카테고리 select now has exactly 4 options — Data & Analytics / Automation & Dev / HR Tech & AI / Office & Documentation. Stray `Office & Document` is GONE (G-c2 PASS).
+- G-c1 PASS: 13 published skills intact, no row edits.
+- G-c3 PASS: sync run 28742156069 (main) success, outcome=unchanged, main still 86e8b53 (no auto-sync commit), callout updated "변경 없음".
+- Side observation: skills DB schema now carries `default_page_template` (page 394c27c2...) — evidence master's C-3 "새 스킬" template is set as default (supports G-C5).
+- Track C CLOSED. Program status: Phases 0/A/B/C done; Track A code merged (G-a4 E2E + G-a5 cheatsheet = master Notion actions); Track B-2 review delivered (B-3 = master applies edits); Track C done.
+- Still open (master, non-code): EDITOR_TOKEN rotation (exposed in screenshot); Track A G-a4/G-a5; Track B-3 edits.
