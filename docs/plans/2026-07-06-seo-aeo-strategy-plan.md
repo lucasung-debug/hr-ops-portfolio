@@ -90,8 +90,8 @@ master-approved wording; the rest apply as written. All are property-field edits
 | dx2 | 문제 | 생산직 **550명**의 '전자 윤리서약서' | 생산직 **전원**의 '전자 윤리서약서' | none (branding rule) |
 | dx2 | 결과 | 3일 만에 **550명 전원** 수합 | 3일 만에 **전원** 수합 (기존 2주 소요) | none |
 | dx3 | 결과 | …EVP 발굴 분석 **확대 중** | 지원자 텍스트 600건+ 분석으로 직무 단위 분류·JD 개선 **완료**, EVP 발굴로 확장 중 | none |
-| career_4 | 액션 | 노조와 협의하여 **CCTV, 근태로그 기반** … 이동 경로를 2주간 **추적 분석** | 노조 사전 협의 하에 **개인 식별 없는** 통행량·근태로그 데이터로 주요 거점 간 이동 패턴을 2주간 분석 | **YES — confirm this matches what was actually done** |
-| career_6 | 전체 | 경조사 자동화 (dx1과 중복) | Rewrite as "자동화 총괄": lead with 증명서 발급 자동화 + 추진 과제; 경조사는 한 줄로 축약 (dx1 = detailed version) | **YES — master supplies the true scope; Claude drafts, master approves** |
+| career_4 | 액션 | 노조와 협의하여 **CCTV, 근태로그 기반** … 이동 경로를 2주간 **추적 분석** | **근태 로그와 현장 확인을 교차 분석해 라인별 실제 이동 경로·태깅 누락 지점을 2주간 파악** | ⚠️ EARLIER "개인 식별 없는" wording was WRONG (fact-distorting) and is RETRACTED. Master confirmed CCTV개인확인은 사실 — so "현장 확인"에 CCTV를 흡수해 민감도만 낮춘 THIS wording. Use exactly this. |
+| career_6 | 전체 | 경조사 자동화 (dx1과 중복) | **SUPERSEDED — see §8a: full rewrite to the newsletter asset** | done 2026-07-06 (master-confirmed) |
 
 Branding guardrails (from CLAUDE.md — do NOT violate):
 - Headline `'원래 이랬어'를 바꾸는 HR입니다.` — never touch.
