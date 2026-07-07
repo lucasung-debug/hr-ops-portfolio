@@ -166,3 +166,52 @@ rely on re-deploying vercel. This is a code PR on the hermes repo, not Notion.
   resolves 200; the 경조사 wording no longer appears in career_6 (only dx1 keeps it).
 - G-S7: on the hermes site, no `*.vercel.app` 404 remains under "라이브 보기";
   each replaced link returns 200.
+
+## 9. SEO-1b — GLM-5.2 cross-critique findings (2026-07-06, master-approved)
+
+Fresh-critic pass by GLM-5.2, re-verified by Claude against the live site.
+SEO-1/2a/2b are merged + production-verified; this is the additive follow-up.
+IMPLEMENTER RULE: use REAL values from content.js / the 사이트 설정 page —
+GLM's guessed specifics (e.g. school name) are NOT authoritative; verify each.
+
+Channel: index.html <head> (additive; NEVER touch the tailwind.config-before-CDN
+block) + 3 new static files + print.html. Branch codex/seo-1b, PR to main, no merge.
+
+Items:
+- 1b-1 [상/하] JSON-LD `sameAs`: add the LinkedIn URL that already exists in
+  index.html body (linkedin.com/in/leo-sung — extract the exact href). AEO's
+  top lever: lets an answer engine cross-verify the person.
+- 1b-2 [상/하] Real `sitemap.xml` + `robots.txt` static files (currently both
+  are SPA-fallback index.html → GSC "could not read"). sitemap lists the
+  canonical https://smjportfolio.com/ ; robots allows all + points to sitemap.
+  Confirm Cloudflare serves the real file (a real file wins over the SPA catch-all).
+- 1b-3 [중/하] print.html: add `<meta name="robots" content="noindex,follow">`
+  (+ optional canonical to /) so /print doesn't compete with / in name search.
+- 1b-4 [중/하] JSON-LD `hasCredential`: from content.js certificationList,
+  add EducationalOccupationalCredential entries for the ones with a real
+  credentialUrl (GA credential.net, Claude Code skilljar). Skip ones without URL.
+- 1b-5 [중/하] Name unification: add `additionalName` for the LinkedIn display
+  name (confirm the actual name on the profile/body; do NOT hardcode "Leo Sung"
+  without checking the real value).
+- 1b-6 [하/하] Wrap Person in `@type: ProfilePage` → `mainEntity: Person`; add
+  `knowsLanguage: ["ko","en"]`, `nationality: "KR"`. Add `alumniOf` ONLY with
+  the REAL school from the 사이트 설정 page (academic_school) — not a guess.
+  Do NOT add HowTo/FAQPage (overkill for a personal portfolio).
+- 1b-7 [확인] heroImpactHTML dead code: content.js heroImpactHTML (line ~19,
+  "+12%p / –8%p / 0건") is NOT rendered by index.html (grep: 0 refs). The SEO-1
+  meta description + JSON-LD description quote these numbers, so they appear in
+  search snippets but nowhere on the visible page. FIX: either surface
+  heroImpactHTML on the hero, OR change the meta/JSON-LD description to numbers
+  that ARE on-screen. Report which and why. (Note: –8%p and –85% are DIFFERENT
+  metrics — do not "reconcile" them; GLM conflated them.)
+- 1b-8 [보너스] Add `llms.txt` at site root (the evidence site already has one;
+  the main portfolio does not) — a short AI-crawler summary of who/what. AEO.
+
+Added gates:
+- G-S8: production raw HTML JSON-LD parses and now contains sameAs + hasCredential
+  (≥1) + ProfilePage/mainEntity; still no email field.
+- G-S9: /sitemap.xml and /robots.txt return REAL content (not <!DOCTYPE html>),
+  sitemap references the canonical host.
+- G-S10: /print raw HTML contains robots noindex.
+- G-S11: /llms.txt returns 200 with real summary text.
+- G-S12: no on-screen change except the intended heroImpact fix (Claude checks).
