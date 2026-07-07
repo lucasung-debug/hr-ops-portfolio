@@ -122,3 +122,47 @@ high AEO payoff). SEO-2 content edits need master fact-confirmation on two rows,
 so they proceed as master approves wording.
 
 Rollback: SEO-1 = revert the head additions. SEO-2 = Notion page history / re-edit.
+
+## 8. SEO-2 finalized (2026-07-06, master-confirmed)
+
+### 8a. career_6 — full rewrite to the newsletter asset (was a dx1 duplicate)
+Audit (subagent, Claude re-verified) found career_6 has ZERO unique assets — it
+duplicates dx1 (경조사, GAS+MAKE). Repoint it to a real, live, unused asset:
+`hr-newsletter-automation` (github repo 200; live https://lucasung-debug.github.io/hr-newsletter-automation/ 200; targets "오뚜기라면 HR 전략팀").
+Master facts: prototype ran DAILY for ~1 month → core curation handed to local
+operation, still publishing; ~2 weeks to build, most of it tuning research scope/relevance.
+
+Final case wording (case-studies DB row currently titled "반복 행정 업무 자동화 (DX)"):
+- 제목: HR 전략 뉴스레터 자동화
+- sub: 뉴스 수집 → AI 분석 → 자동 발송 파이프라인
+- desc: GitHub Actions·Python·Gemini 기반 주간 HR 뉴스레터 자동 생성·발송
+- 문제: HR 전략팀이 매주 산업·정책 동향을 수동 수집·선별하는 데 시간이 들고 담당자별 품질 편차가 컸음.
+- 액션(줄바꿈=항목):
+  GitHub Actions 주간 스케줄로 뉴스 API·RSS에서 HR 관련 기사 자동 수집
+  중복 제거·관련도 스코어링 후 Gemini로 구조화 요약, 품질 게이트로 발송/보류 자동 판정
+  Gmail로 전략팀에 발송하고 GitHub Pages에 아카이브 자동 발행
+- 결과(줄바꿈=항목):
+  프로토타입을 1개월간 매일 발행하며 파이프라인 안정성 검증, 이후 핵심 큐레이션을 로컬 운영으로 이관해 현재까지 정기 발행 지속
+  개발 2주 중 상당 부분을 리서치 범위·관련도 기준 튜닝에 투입해 발송 품질 확보
+  HR 전략팀의 주간 수동 동향 리서치를 자동 파이프라인으로 대체
+- evidenceUrl: https://lucasung-debug.github.io/hr-newsletter-automation/
+- 유형: keep career (do not change 순서/유형; only overwrite the content fields).
+
+### 8b. career_3 — keep evidenceUrl (#case-recruit = 채용 콘텐츠 도구, on-topic);
+the "불일치" resolves once its live link is restored in SEO-2b. Only apply the
+already-confirmed edits: desc → "직무 분석 기반 채용 공고 개편 — 면접 전환율 2.5배";
+본문 "우수 인재(MZ 세대)의" → "우수 인재의".
+
+### 8c. SEO-2b — hermes-ops-dashboard-page repo (SEPARATE repo, local at
+projects/portfolio/hermes-ops-dashboard-page). Two "라이브 보기" buttons 404:
+`hr-documents.vercel.app`, `ottogi-recruit.vercel.app` (source repos hr-documents /
+ottogi-recruit are 200; vercel deploys gone). Fix = repoint each 404 link to a
+LIVE target (the source GitHub repo, or the existing demo video already in the
+site), codex to inspect the repo and pick the cleanest live replacement; do NOT
+rely on re-deploying vercel. This is a code PR on the hermes repo, not Notion.
+
+### 8d. Added gates
+- G-S6: after career_6 rewrite + sync, case count still 9; career_6 evidenceUrl
+  resolves 200; the 경조사 wording no longer appears in career_6 (only dx1 keeps it).
+- G-S7: on the hermes site, no `*.vercel.app` 404 remains under "라이브 보기";
+  each replaced link returns 200.
