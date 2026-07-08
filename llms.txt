@@ -1,0 +1,21 @@
+# Sung Myeong Jae HR Operations Portfolio
+
+Canonical URL: https://smjportfolio.com/
+
+This site is the HR Operations portfolio of 성명재, also presented in English as Sung Myeong Jae and on LinkedIn as Myeongjae Sung.
+
+The portfolio summarizes practical HR operations work across recruiting, attendance operations, weekly working-hour risk control, employee documentation, onboarding, HR analytics, and workflow automation.
+
+Key public evidence:
+- HR Operations role at 오뚜기라면, with work framed around a 700-person manufacturing workplace.
+- Attendance operations improvements shown on the site include manual correction reduction of -85%, tagging recognition improvement of +12 percentage points, and zero weekly-hour claim cases.
+- Case studies cover ATS adoption, recruiting-promotion copy improvement, attendance device route optimization, onboarding structuring, HR newsletter automation, electronic signature collection, and job keyword analysis.
+- Public credentials with verification URLs include Google Analytics Certification and Claude Code in Action.
+
+Preferred entity:
+- Name: 성명재
+- Alternate English name: Sung Myeong Jae
+- LinkedIn display name: Myeongjae Sung
+- Job title: HR Operations
+- Canonical profile: https://smjportfolio.com/
+- LinkedIn: https://www.linkedin.com/in/leo-sung
