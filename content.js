@@ -100,10 +100,33 @@ const SITE_CONTENT = {
         "modalContent": "<div class=\"space-y-6\"><div><h4 class=\"text-primary-600\">🔍 문제 상황</h4><p class=\"text-slate-600 text-sm leading-relaxed\">HR 전략팀이 매주 산업·정책 동향을 수동 수집·선별하는 데 시간이 들고 담당자별 품질 편차가 컸음.</p></div><div><h4 class=\"text-primary-600\">🛠️ 실행 (Action)</h4><ul class=\"list-disc pl-4 text-sm text-slate-600 space-y-2\"><li>GitHub Actions 주간 스케줄로 뉴스 API·RSS에서 HR 관련 기사 자동 수집</li><li>중복 제거·관련도 스코어링 후 Gemini로 구조화 요약, 품질 게이트로 발송/보류 자동 판정</li><li>Gmail로 전략팀에 발송하고 GitHub Pages에 아카이브 자동 발행</li></ul></div><div><h4 class=\"text-primary-600\">📈 결과 (Result)</h4><ul class=\"list-disc pl-4 text-sm text-slate-600 space-y-2\"><li>프로토타입을 1개월간 매일 발행하며 파이프라인 안정성 검증, 이후 핵심 큐레이션을 로컬 운영으로 이관해 현재까지 정기 발행 지속</li><li>개발 2주 중 상당 부분을 리서치 범위·관련도 기준 튜닝에 투입해 발송 품질 확보</li><li>HR 전략팀의 주간 수동 동향 리서치를 자동 파이프라인으로 대체</li></ul></div></div>",
         "evidenceUrl": "https://lucasung-debug.github.io/hr-newsletter-automation/"
     }
-  ],
+],
 
   // ===== Career history (Notion: Career DB) =====
-  careerHistory: [],
+  careerHistory: [
+    {
+        "id": "role_2",
+        "company": "오뚜기라면(주)",
+        "department": "인사팀",
+        "position": "사원",
+        "period": "2025.03 ~ 2026.04",
+        "summary": "채용운영 · 근태관리 · 도급/파견관리 · 급여 운영 지원 · 정부지원사업 관리",
+        "details": [
+            "채용 프로세스 디지털 전환 — ATS(나인하이어) 도입",
+            "주 52시간 근무제 준수 근태 모니터링 시스템 운영",
+            "직무 분석 기반 채용 공고 개편 및 채널 다각화",
+            "동선 데이터 분석 기반 근태기 재배치",
+            "신규 입사자 온보딩 프로그램 구조화·멘토링",
+            "경조화환 주문·전자 서명 수집 등 반복 행정 자동화 (GAS·MAKE)",
+            "직무 키워드 텍스트마이닝 분석",
+            "HR 전략 뉴스레터 자동화 (뉴스 수집→AI 분석→자동 발송)"
+        ],
+        "employmentType": "정규직",
+        "status": "퇴사",
+        "departureReason": "직무 범위 확장",
+        "order": 2
+    }
+],
 
   // ===== DX 사례 (Notion: 케이스 스터디 DB, 유형=dx) =====
   dxCases: {
