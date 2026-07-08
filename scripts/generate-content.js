@@ -17,6 +17,9 @@ const DB_GROWTH   = process.env.NOTION_DB_ID_GROWTH;
 const DB_SKILLS   = process.env.NOTION_DB_ID_SKILLS;
 const PAGE_SETTINGS = process.env.NOTION_PAGE_ID_SETTINGS;
 
+const DEFAULT_HERO_DESCRIPTION = 'ATS 도입 · 근태 시스템 재편 · 52시간 관리 · 업무 자동화<br>1년 안에 4개 영역을 직접 설계하고 작동시켰습니다.';
+const DEFAULT_HERO_HEADLINE_HTML = '\'원래 이랬어\'를 <span style="color: var(--primary)">바꾸는</span> HR입니다.';
+
 // ──────────────────────────────────────────────
 // 유틸: Notion 텍스트 → HTML (인라인 서식)
 // ──────────────────────────────────────────────
@@ -468,7 +471,7 @@ async function publishFilterForDatabase(dbId, label) {
 
 async function fetchSettings() {
   const page = await notion.pages.retrieve({ page_id: PAGE_SETTINGS });
-  // 먼저 페이지 속성에서 읽기
+  // Read page properties first.
   const result = {
     resume_kr:             prop(page, 'resume_kr'),
     resume_en:             prop(page, 'resume_en'),
@@ -481,27 +484,30 @@ async function fetchSettings() {
     gpaCredits:            prop(page, 'academic_gpa_credits'),
     gpaMajor:              prop(page, 'academic_gpa_major'),
     gpaMajorCredits:       prop(page, 'academic_gpa_major_credits'),
+    heroHeadlineHTML:      prop(page, 'hero_headline_html'),
+    heroDescription:       prop(page, 'hero_description'),
   };
-  // 속성에 학력 데이터가 없으면 본문 텍스트에서 "key: value" 형식 파싱
-  if (!result.school) {
-    const blocks = await fetchBlocks(PAGE_SETTINGS);
-    const keyMap = {
-      academic_school: 'school', academic_major: 'major',
-      academic_period: 'period', academic_gpa_total: 'gpaTotal',
-      academic_gpa_credits: 'gpaCredits', academic_gpa_major: 'gpaMajor',
-      academic_gpa_major_credits: 'gpaMajorCredits',
-      resume_kr: 'resume_kr', resume_en: 'resume_en',
-      portfolio_kr: 'portfolio_kr', portfolio_en: 'portfolio_en',
-    };
-    for (const b of blocks) {
-      const texts = b[b.type]?.rich_text;
-      if (!texts) continue;
-      const line = texts.map(t => t.plain_text).join('').trim();
-      const m = line.match(/^(\w+):\s*(.+)$/);
-      if (m && keyMap[m[1]]) {
-        const key = keyMap[m[1]];
-        if (!result[key]) result[key] = m[2].trim();
-      }
+
+  // Always parse body-level "key: value" lines as settings overrides.
+  const blocks = await fetchBlocks(PAGE_SETTINGS);
+  const keyMap = {
+    academic_school: 'school', academic_major: 'major',
+    academic_period: 'period', academic_gpa_total: 'gpaTotal',
+    academic_gpa_credits: 'gpaCredits', academic_gpa_major: 'gpaMajor',
+    academic_gpa_major_credits: 'gpaMajorCredits',
+    resume_kr: 'resume_kr', resume_en: 'resume_en',
+    portfolio_kr: 'portfolio_kr', portfolio_en: 'portfolio_en',
+    hero_headline_html: 'heroHeadlineHTML',
+    hero_description: 'heroDescription',
+  };
+  for (const b of blocks) {
+    const texts = b[b.type]?.rich_text;
+    if (!texts) continue;
+    const line = texts.map(t => t.plain_text).join('').trim();
+    const m = line.match(/^(\w+):\s*(.+)$/);
+    if (m && keyMap[m[1]]) {
+      const key = keyMap[m[1]];
+      if (!result[key]) result[key] = m[2].trim();
     }
   }
   return result;
@@ -737,8 +743,8 @@ const SITE_CONTENT = {
 
   // ===== 히어로 섹션 (하드코딩) =====
   heroSubtitle: "HR Operations",
-  heroDescription: \`ATS 도입 · 근태 시스템 재편 · 52시간 관리 · 업무 자동화<br>1년 안에 4개 영역을 직접 설계하고 작동시켰습니다.\`,
-  heroHeadlineHTML: \`'원래 이랬어'를 <span style="color: var(--primary)">바꾸는</span> HR입니다.\`,
+  heroDescription: \`${settings.heroDescription || DEFAULT_HERO_DESCRIPTION}\`,
+  heroHeadlineHTML: \`${settings.heroHeadlineHTML || DEFAULT_HERO_HEADLINE_HTML}\`,
   heroImpactHTML: \`700명 규모 사업장 근태 시스템 재설계 →<br>인식률 <span style="color: var(--primary)">+12%p</span>, 수기 정정 <span style="color: var(--primary)">–8%p</span>, 클레임 <span style="color: var(--primary)">0건</span>\`,
 
   // ===== 다운로드 링크 (Notion: 사이트 설정) =====
@@ -818,6 +824,8 @@ function printSyncSummary(settings, caseData, growthData, skillData, contentLeng
     ['academic_school', settings.school],
     ['academic_major', settings.major],
     ['academic_period', settings.period],
+    ['hero_headline_html', settings.heroHeadlineHTML],
+    ['hero_description', settings.heroDescription],
   ].filter(([, value]) => !value).map(([key]) => key);
 
   if (missingSettings.length) {
