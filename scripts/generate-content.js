@@ -633,7 +633,6 @@ async function fetchCareerHistory() {
       details,
       employmentType: prop(row, '구분'),
       status,
-      departureReason: prop(row, '퇴사사유'),
       order,
     };
   });

@@ -16,7 +16,7 @@ Required properties:
 - `업무상세`: rich text. One responsibility or achievement per line. `<br>` separators are supported.
 - `구분`: select. Employment type, for example `정규직`, `계약직`, `파견직`, `인턴`, or `기타`.
 - `재직상태`: select. Use `재직 중`, `퇴사`, or `기타(휴직 등)`. This drives the `재직 중` period label.
-- `퇴사사유`: text or rich text. Optional. This is rendered only in `career.html`, never on the public main page.
+- `퇴사사유`: text or rich text. Optional private Notion-only reference. This is not emitted to `content.js` or rendered by public pages.
 - `상태`: status or select. Publish-ready value must be `발행`.
 - `순서`: number. This is the sole sort key; lower numbers render first.
 

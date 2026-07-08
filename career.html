@@ -125,8 +125,6 @@
       white-space: nowrap;
     }
     .summary { color: var(--gray-700); font-size: 9.5pt; margin: 6px 0 9px; }
-    .departure-reason { color: var(--gray-500); font-size: 8.5pt; margin: -3px 0 9px; }
-    .departure-reason strong { color: var(--gray-700); margin-right: 6px; }
     .achievements { list-style: none; padding-left: 0; display: grid; gap: 6px; }
     .achievements li {
       display: grid;
@@ -230,7 +228,6 @@
         + '<div class="role-period">' + escapeHtml(role.period || '') + '</div>'
         + '</div>'
         + (role.summary ? '<p class="summary">' + escapeHtml(role.summary) + '</p>' : '')
-        + (role.departureReason ? '<p class="departure-reason"><strong>퇴사 사유</strong>' + escapeHtml(role.departureReason) + '</p>' : '')
         + (items ? '<ul class="achievements">' + items + '</ul>' : '')
         + '</article>';
     }

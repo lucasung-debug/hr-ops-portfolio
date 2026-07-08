@@ -123,7 +123,6 @@ const SITE_CONTENT = {
         ],
         "employmentType": "정규직",
         "status": "퇴사",
-        "departureReason": "직무 범위 확장",
         "order": 2
     }
 ],
