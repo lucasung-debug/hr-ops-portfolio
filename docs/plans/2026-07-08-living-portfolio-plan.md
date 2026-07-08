@@ -193,3 +193,12 @@ Current DB rows (Claude-entered, master-refined):
 
 Master to confirm/fill: 오뚜기 퇴사월 (재직기간 end) + 퇴사사유(optional); whether to
 flip 드림어스 상태 초안→발행 when ready.
+
+## 11. Schema update (2026-07-08) — 부서명 field added by master
+
+Master added a `부서명` (text) field and split 직책. Current mapping addition for
+codex rework (§10): 부서명 → department; 직책 → position (title within dept).
+Display convention on the site: "{회사} · {부서명} · {직책}" (e.g. 오뚜기라면(주) ·
+인사팀 · 사원). Also: 업무상세 must be REAL job duties entered by master — NOT
+portfolio-case spin (Claude's earlier 오뚜기 각색 was removed; master fills real
+duties like the 드림어스 row). 오뚜기 재직기간 confirmed 2025-03-13 ~ 2026-04-12.

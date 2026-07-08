@@ -1102,3 +1102,8 @@ No files modified. Deliverable complete.
 
 - Claude built 경력 DB via Notion MCP; master enriched schema (구분/재직기간 date/재직상태/퇴사사유) + filled the real contract role (드림어스컴퍼니, 매니저, AX·인사 자동화, 재직 중). Claude filled 오뚜기 new fields + set order (드림어스=1, 오뚜기=2), excluded 군 복무 (already in 활동).
 - BLOCKER on PR #17: codex parsed OLD field names (한줄요약/핵심성과/기간) — the finalized schema uses 업무요약/업무상세/재직기간(date) + 구분/재직상태. Rework needed; prop() also lacks a date case. Privacy rule added: 퇴사사유(이직 희망 사유) must NOT show on public main, only in career.html. Plan §10 documents the correction.
+
+### 2026-07-08 - 경력 각색 제거 + 부서명 필드 + facts-not-spin rule
+
+- Master feedback: 경력 DB 업무상세를 포트폴리오 성과로 각색하지 말고 실제 사실을 정확히 기입. Claude removed the 오뚜기 각색본 (placeholder), saved a feedback memory (career-db-facts-not-portfolio-spin), awaits master's real 오뚜기 duties.
+- Master finalized 오뚜기: 2025-03-13~2026-04-12, 정규직, 부서명=인사팀, 직책=사원, 퇴사사유="직무 범위 확장". New field 부서명 added → codex rework must map it (§11).
