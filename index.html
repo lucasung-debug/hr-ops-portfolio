@@ -491,15 +491,15 @@
           <span class="section-label px-3 py-1.5 rounded-full border" style="color: var(--primary); border-color: #99d3eb; background: #e6f4fa">HR Ops</span>
           <span class="section-label bg-gray-50 text-slate-500 px-3 py-1.5 rounded-full border border-gray-200">Recruiter</span>
         </div>
-        <h3 class="text-xl md:text-2xl font-black text-slate-900">오뚜기라면(주) | 인사팀 | 사원</h3>
-        <p class="text-slate-500 text-sm mt-2 break-keep">채용운영 · 근태관리 · 도급/파견관리 · 급여 운영 지원 · 정부지원사업 관리</p>
+        <h3 id="career-current-title" class="text-xl md:text-2xl font-black text-slate-900">오뚜기라면(주) | 인사팀 | 사원</h3>
+        <p id="career-current-summary" class="text-slate-500 text-sm mt-2 break-keep">채용운영 · 근태관리 · 도급/파견관리 · 급여 운영 지원 · 정부지원사업 관리</p>
       </div>
       <div class="md:text-right shrink-0">
         <p class="text-slate-400 text-sm font-bold flex items-center md:justify-end gap-1 mb-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
           <span id="career-duration">2025.03 ~ 재직 중</span>
         </p>
-        <p class="text-slate-600 text-sm font-medium bg-gray-50 px-4 py-2 rounded-xl border border-gray-100 inline-block break-keep text-left md:text-right max-w-xs">
+        <p id="career-current-highlight" class="text-slate-600 text-sm font-medium bg-gray-50 px-4 py-2 rounded-xl border border-gray-100 inline-block break-keep text-left md:text-right max-w-xs">
           700명 규모 제조 현장의 인사 운영 구조를<br>데이터 기반으로 재설계 · 운영 담당
         </p>
       </div>
@@ -802,6 +802,33 @@ function updateHero() {
 }
 
 // ── Career grid
+function renderCareerHeader() {
+  var history = Array.isArray(D.careerHistory) ? D.careerHistory : [];
+  var current = history[0];
+  if (!current) return;
+
+  var titleEl = document.getElementById('career-current-title');
+  var summaryEl = document.getElementById('career-current-summary');
+  var periodEl = document.getElementById('career-duration');
+  var highlightEl = document.getElementById('career-current-highlight');
+
+  var title = [current.company, current.position].filter(Boolean).join(' | ');
+  if (titleEl && title) titleEl.textContent = title;
+  if (summaryEl && current.summary) summaryEl.textContent = current.summary;
+  if (periodEl && current.period) periodEl.textContent = current.period;
+  if (highlightEl) {
+    var lines = (current.achievements || []).filter(Boolean).slice(0, 2);
+    if (!lines.length && current.summary) lines = [current.summary];
+    if (lines.length) {
+      highlightEl.textContent = '';
+      lines.forEach(function(line, idx) {
+        if (idx > 0) highlightEl.appendChild(document.createElement('br'));
+        highlightEl.appendChild(document.createTextNode(line));
+      });
+    }
+  }
+}
+
 function renderCareerGrid() {
   var grid  = document.getElementById('career-grid');
   var empty = document.getElementById('career-empty-msg');
@@ -1053,6 +1080,7 @@ function toggleActivity(id) {
 function updateCareerDuration() {
   var el = document.getElementById('career-duration');
   if (!el) return;
+  if (Array.isArray(D.careerHistory) && D.careerHistory.length) return;
   var start  = new Date('2025-03-01');
   var now    = new Date();
   var months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
@@ -1169,6 +1197,7 @@ document.addEventListener('keydown', function(e) {
 (async function init() {
   await _loadData();
   updateHero();
+  renderCareerHeader();
   renderCareerGrid();
   renderDxGrid();
   renderTraining();

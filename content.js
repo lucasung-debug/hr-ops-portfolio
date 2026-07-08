@@ -100,7 +100,10 @@ const SITE_CONTENT = {
         "modalContent": "<div class=\"space-y-6\"><div><h4 class=\"text-primary-600\">🔍 문제 상황</h4><p class=\"text-slate-600 text-sm leading-relaxed\">HR 전략팀이 매주 산업·정책 동향을 수동 수집·선별하는 데 시간이 들고 담당자별 품질 편차가 컸음.</p></div><div><h4 class=\"text-primary-600\">🛠️ 실행 (Action)</h4><ul class=\"list-disc pl-4 text-sm text-slate-600 space-y-2\"><li>GitHub Actions 주간 스케줄로 뉴스 API·RSS에서 HR 관련 기사 자동 수집</li><li>중복 제거·관련도 스코어링 후 Gemini로 구조화 요약, 품질 게이트로 발송/보류 자동 판정</li><li>Gmail로 전략팀에 발송하고 GitHub Pages에 아카이브 자동 발행</li></ul></div><div><h4 class=\"text-primary-600\">📈 결과 (Result)</h4><ul class=\"list-disc pl-4 text-sm text-slate-600 space-y-2\"><li>프로토타입을 1개월간 매일 발행하며 파이프라인 안정성 검증, 이후 핵심 큐레이션을 로컬 운영으로 이관해 현재까지 정기 발행 지속</li><li>개발 2주 중 상당 부분을 리서치 범위·관련도 기준 튜닝에 투입해 발송 품질 확보</li><li>HR 전략팀의 주간 수동 동향 리서치를 자동 파이프라인으로 대체</li></ul></div></div>",
         "evidenceUrl": "https://lucasung-debug.github.io/hr-newsletter-automation/"
     }
-],
+  ],
+
+  // ===== Career history (Notion: Career DB) =====
+  careerHistory: [],
 
   // ===== DX 사례 (Notion: 케이스 스터디 DB, 유형=dx) =====
   dxCases: {

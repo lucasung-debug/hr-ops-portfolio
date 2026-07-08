@@ -15,6 +15,7 @@ const notion = new Client({ auth: process.env.NOTION_API_KEY });
 const DB_CASES    = process.env.NOTION_DB_ID_CASES;
 const DB_GROWTH   = process.env.NOTION_DB_ID_GROWTH;
 const DB_SKILLS   = process.env.NOTION_DB_ID_SKILLS;
+const DB_CAREER   = process.env.NOTION_DB_ID_CAREER;
 const PAGE_SETTINGS = process.env.NOTION_PAGE_ID_SETTINGS;
 
 const DEFAULT_HERO_DESCRIPTION = 'ATS 도입 · 근태 시스템 재편 · 52시간 관리 · 업무 자동화<br>1년 안에 4개 영역을 직접 설계하고 작동시켰습니다.';
@@ -574,6 +575,57 @@ async function fetchCases() {
   };
 }
 
+async function fetchCareerHistory() {
+  if (!DB_CAREER) {
+    console.warn('[warn] NOTION_DB_ID_CAREER is not set; skipping career history DB sync.');
+    return {
+      careerHistory: [],
+      sync: {
+        skipped: true,
+        publishedRows: 0,
+        publishProperty: '',
+        publishPropertyType: '',
+        publishValues: [],
+      },
+    };
+  }
+
+  const publishFilter = await publishFilterForDatabase(DB_CAREER, 'Career history');
+  const rows = await queryAll(
+    DB_CAREER,
+    publishFilter.filter,
+    [{ property: '순서', direction: 'ascending' }],
+    'Career history'
+  );
+
+  const careerHistory = rows.map((row, index) => {
+    const achievements = prop(row, '핵심성과')
+      .split(/\r?\n/)
+      .map(line => line.trim())
+      .filter(Boolean);
+    return {
+      id:       `role_${prop(row, '순서') || index + 1}`,
+      company:  prop(row, '회사'),
+      position: prop(row, '직책'),
+      period:   prop(row, '기간'),
+      summary:  prop(row, '한줄요약'),
+      achievements,
+      order:    prop(row, '순서') || index + 1,
+    };
+  });
+
+  return {
+    careerHistory,
+    sync: {
+      skipped: false,
+      publishedRows: rows.length,
+      publishProperty: publishFilter.propertyName,
+      publishPropertyType: publishFilter.propertyType,
+      publishValues: publishFilter.publishValues,
+    },
+  };
+}
+
 async function fetchGrowth() {
   const publishFilter = await publishFilterForDatabase(DB_GROWTH, 'Growth records');
   const rows = await queryAll(
@@ -721,7 +773,7 @@ async function fetchSkills() {
 // content.js 파일 생성
 // ──────────────────────────────────────────────
 function buildContentJs(data) {
-  const { settings, careerProjects, dxCases, trainingList, activitiesList, certificationList, modalDetails, skillsHtml, academicHtml } = data;
+  const { settings, careerProjects, careerHistory, dxCases, trainingList, activitiesList, certificationList, modalDetails, skillsHtml, academicHtml } = data;
 
   const serialize = val => JSON.stringify(val, null, 2)
     .replace(/"modalContent":/g, 'modalContent:')
@@ -756,6 +808,9 @@ const SITE_CONTENT = {
   // ===== 경력 프로젝트 (Notion: 케이스 스터디 DB, 유형=career) =====
   careerProjects: ${JSON.stringify(careerProjects, null, 4)},
 
+  // ===== Career history (Notion: Career DB) =====
+  careerHistory: ${JSON.stringify(careerHistory, null, 4)},
+
   // ===== DX 사례 (Notion: 케이스 스터디 DB, 유형=dx) =====
   dxCases: ${JSON.stringify(dxCases, null, 4)},
 
@@ -780,11 +835,13 @@ const SITE_CONTENT = {
 `;
 }
 
-function buildSyncSummary(caseData, growthData, skillData, contentLength) {
+function buildSyncSummary(caseData, careerData, growthData, skillData, contentLength) {
   return {
     cases: caseData.sync.publishedRows,
     career: caseData.careerProjects.length,
     dx: Object.keys(caseData.dxCases).length,
+    careerHistory: careerData.sync.publishedRows,
+    careerHistorySkipped: careerData.sync.skipped,
     growth: growthData.sync.publishedRows,
     training: growthData.trainingList.length,
     activities: growthData.activitiesList.length,
@@ -801,13 +858,18 @@ function writeSyncSummary(summary) {
   fs.writeFileSync(outPath, `${JSON.stringify(summary, null, 2)}\n`, 'utf8');
 }
 
-function printSyncSummary(settings, caseData, growthData, skillData, contentLength) {
-  const summary = buildSyncSummary(caseData, growthData, skillData, contentLength);
+function printSyncSummary(settings, caseData, careerData, growthData, skillData, contentLength) {
+  const summary = buildSyncSummary(caseData, careerData, growthData, skillData, contentLength);
 
   console.log('Sync summary:');
   console.log(`- Case studies: ${caseData.sync.publishedRows} published rows using "${caseData.sync.publishProperty}" (${caseData.sync.publishPropertyType}: ${caseData.sync.publishValues.join(', ')})`);
   console.log(`  - Career projects: ${summary.career}`);
   console.log(`  - DX cases: ${summary.dx}`);
+  if (careerData.sync.skipped) {
+    console.log('- Career history: skipped (NOTION_DB_ID_CAREER not set)');
+  } else {
+    console.log(`- Career history: ${careerData.sync.publishedRows} published rows using "${careerData.sync.publishProperty}" (${careerData.sync.publishPropertyType}: ${careerData.sync.publishValues.join(', ')})`);
+  }
   console.log(`- Growth records: ${growthData.sync.publishedRows} published rows using "${growthData.sync.publishProperty}" (${growthData.sync.publishPropertyType}: ${growthData.sync.publishValues.join(', ')})`);
   console.log(`  - Training: ${summary.training}`);
   console.log(`  - Activities: ${summary.activities}`);
@@ -848,9 +910,10 @@ async function main() {
   }
 
   console.log('Fetching Notion data...');
-  const [settings, caseData, growthData, skillData] = await Promise.all([
+  const [settings, caseData, careerData, growthData, skillData] = await Promise.all([
     fetchSettings(),
     fetchCases(),
+    fetchCareerHistory(),
     fetchGrowth(),
     fetchSkills(),
   ]);
@@ -870,6 +933,7 @@ async function main() {
       },
     },
     careerProjects: caseData.careerProjects,
+    careerHistory: careerData.careerHistory,
     dxCases:        caseData.dxCases,
     trainingList:      growthData.trainingList,
     activitiesList:    growthData.activitiesList,
@@ -881,7 +945,7 @@ async function main() {
 
   const outPath = path.join(__dirname, '..', 'content.js');
   fs.writeFileSync(outPath, content, 'utf8');
-  const summary = printSyncSummary(settings, caseData, growthData, skillData, content.length);
+  const summary = printSyncSummary(settings, caseData, careerData, growthData, skillData, content.length);
   writeSyncSummary(summary);
   console.log(`content.js written (${content.length} bytes)`);
 }
