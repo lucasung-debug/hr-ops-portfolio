@@ -102,7 +102,22 @@
       margin-bottom: 6px;
     }
     .role-company { font-size: 12pt; font-weight: 900; color: var(--gray-900); }
-    .role-position { color: var(--brand); font-size: 9.5pt; font-weight: 800; margin-top: 1px; }
+    .role-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      color: var(--gray-500);
+      font-size: 8.5pt;
+      font-weight: 800;
+      margin-top: 3px;
+    }
+    .employment-type {
+      color: var(--brand);
+      background: var(--brand-light);
+      border-radius: 999px;
+      padding: 1px 7px;
+    }
     .role-period {
       color: var(--gray-500);
       font-size: 9pt;
@@ -110,6 +125,8 @@
       white-space: nowrap;
     }
     .summary { color: var(--gray-700); font-size: 9.5pt; margin: 6px 0 9px; }
+    .departure-reason { color: var(--gray-500); font-size: 8.5pt; margin: -3px 0 9px; }
+    .departure-reason strong { color: var(--gray-700); margin-right: 6px; }
     .achievements { list-style: none; padding-left: 0; display: grid; gap: 6px; }
     .achievements li {
       display: grid;
@@ -195,18 +212,25 @@
     }
 
     function roleHtml(role) {
-      var achievements = (role.achievements || []).filter(Boolean);
-      var items = achievements.map(function(item) {
+      var details = (role.details || role.achievements || []).filter(Boolean);
+      var items = details.map(function(item) {
         var parts = splitAchievement(item);
         return '<li><span class="metric">' + escapeHtml(parts.metric) + '</span><span>' + escapeHtml(parts.detail) + '</span></li>';
       }).join('');
+      var title = [role.company, role.department, role.position].filter(Boolean).join(' · ');
+      var meta = [role.employmentType, role.status].filter(Boolean);
       return '<article class="role">'
         + '<div class="role-head">'
-        + '<div><div class="role-company">' + escapeHtml(role.company || '') + '</div>'
-        + '<div class="role-position">' + escapeHtml(role.position || '') + '</div></div>'
+        + '<div><div class="role-company">' + escapeHtml(title) + '</div>'
+        + (meta.length ? '<div class="role-meta">'
+          + (role.employmentType ? '<span class="employment-type">' + escapeHtml(role.employmentType) + '</span>' : '')
+          + (role.status ? '<span>' + escapeHtml(role.status) + '</span>' : '')
+          + '</div>' : '')
+        + '</div>'
         + '<div class="role-period">' + escapeHtml(role.period || '') + '</div>'
         + '</div>'
         + (role.summary ? '<p class="summary">' + escapeHtml(role.summary) + '</p>' : '')
+        + (role.departureReason ? '<p class="departure-reason"><strong>퇴사 사유</strong>' + escapeHtml(role.departureReason) + '</p>' : '')
         + (items ? '<ul class="achievements">' + items + '</ul>' : '')
         + '</article>';
     }

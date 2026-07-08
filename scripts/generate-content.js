@@ -52,6 +52,7 @@ function prop(page, name, fallback = '') {
   if (p.type === 'status')    return p.status ? p.status.name : fallback;
   if (p.type === 'number')    return p.number ?? fallback;
   if (p.type === 'url')       return p.url ?? fallback;
+  if (p.type === 'date')      return p.date ? { start: p.date.start || '', end: p.date.end || '' } : fallback;
   return fallback;
 }
 
@@ -61,6 +62,26 @@ function propAny(page, names, fallback = '') {
     if (value !== undefined && value !== null && value !== '') return value;
   }
   return fallback;
+}
+
+function splitContentLines(value) {
+  return String(value || '')
+    .split(/\r?\n|<br\s*\/?>/i)
+    .map(line => line.trim())
+    .filter(Boolean);
+}
+
+function formatYearMonth(value) {
+  const match = String(value || '').match(/^(\d{4})-(\d{2})/);
+  return match ? `${match[1]}.${match[2]}` : '';
+}
+
+function formatCareerPeriod(dateValue, status) {
+  const start = formatYearMonth(dateValue?.start);
+  const end = formatYearMonth(dateValue?.end);
+  if (!start) return status === '재직 중' ? '재직 중' : '';
+  if (status === '재직 중' || !end) return `${start} ~ 재직 중`;
+  return `${start} ~ ${end}`;
 }
 
 const PUBLISH_STATUS_PROPERTY_ALIASES = [
@@ -599,18 +620,21 @@ async function fetchCareerHistory() {
   );
 
   const careerHistory = rows.map((row, index) => {
-    const achievements = prop(row, '핵심성과')
-      .split(/\r?\n/)
-      .map(line => line.trim())
-      .filter(Boolean);
+    const order = prop(row, '순서') || index + 1;
+    const status = prop(row, '재직상태');
+    const details = splitContentLines(prop(row, '업무상세'));
     return {
-      id:       `role_${prop(row, '순서') || index + 1}`,
+      id:       `role_${order}`,
       company:  prop(row, '회사'),
+      department: prop(row, '부서명'),
       position: prop(row, '직책'),
-      period:   prop(row, '기간'),
-      summary:  prop(row, '한줄요약'),
-      achievements,
-      order:    prop(row, '순서') || index + 1,
+      period:   formatCareerPeriod(prop(row, '재직기간', null), status),
+      summary:  prop(row, '업무요약'),
+      details,
+      employmentType: prop(row, '구분'),
+      status,
+      departureReason: prop(row, '퇴사사유'),
+      order,
     };
   });
 

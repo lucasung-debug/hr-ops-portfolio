@@ -489,7 +489,7 @@
       <div>
         <div class="flex flex-wrap gap-2 mb-3">
           <span class="section-label px-3 py-1.5 rounded-full border" style="color: var(--primary); border-color: #99d3eb; background: #e6f4fa">HR Ops</span>
-          <span class="section-label bg-gray-50 text-slate-500 px-3 py-1.5 rounded-full border border-gray-200">Recruiter</span>
+          <span id="career-current-employment-type" class="section-label bg-gray-50 text-slate-500 px-3 py-1.5 rounded-full border border-gray-200">Recruiter</span>
         </div>
         <h3 id="career-current-title" class="text-xl md:text-2xl font-black text-slate-900">오뚜기라면(주) | 인사팀 | 사원</h3>
         <p id="career-current-summary" class="text-slate-500 text-sm mt-2 break-keep">채용운영 · 근태관리 · 도급/파견관리 · 급여 운영 지원 · 정부지원사업 관리</p>
@@ -811,13 +811,15 @@ function renderCareerHeader() {
   var summaryEl = document.getElementById('career-current-summary');
   var periodEl = document.getElementById('career-duration');
   var highlightEl = document.getElementById('career-current-highlight');
+  var employmentTypeEl = document.getElementById('career-current-employment-type');
 
-  var title = [current.company, current.position].filter(Boolean).join(' | ');
+  var title = [current.company, current.department, current.position].filter(Boolean).join(' · ');
   if (titleEl && title) titleEl.textContent = title;
   if (summaryEl && current.summary) summaryEl.textContent = current.summary;
   if (periodEl && current.period) periodEl.textContent = current.period;
+  if (employmentTypeEl && current.employmentType) employmentTypeEl.textContent = current.employmentType;
   if (highlightEl) {
-    var lines = (current.achievements || []).filter(Boolean).slice(0, 2);
+    var lines = (current.details || current.achievements || []).filter(Boolean).slice(0, 2);
     if (!lines.length && current.summary) lines = [current.summary];
     if (lines.length) {
       highlightEl.textContent = '';
