@@ -886,3 +886,208 @@ Notes:
 - Claude self-refuted the earlier "career hub" over-scope; root cause measured: volatile identity/hero fields are HARDCODED (generate-content.js:730-743) while stable fields are Notion-editable — inverted design.
 - Draft plan: docs/plans/2026-07-08-living-portfolio-plan.md — L0 un-hardcode identity/hero to 사이트 설정 keys (+remove 이력서 buttons, re-scope branding rules), L1 경력 DB + career.html 경력기술서 (print→PDF, noindex), L2 repositioning editorial. §7 lists explicit refutation targets.
 - Flow inverted this time: Fable drafts → codex REFUTES (not implements) → master arbitrates → freeze.
+
+### 2026-07-08 - Codex adversarial refutation of Living Portfolio plan
+
+Scope:
+- Mission: refute docs/plans/2026-07-08-living-portfolio-plan.md only; no implementation.
+- Baseline checked: latest main `e378279a15ab1e9a8d5a3f748c616c1db6dff702`.
+- Files read for evidence: `docs/plans/2026-07-08-living-portfolio-plan.md`, `scripts/generate-content.js`, `index.html`, `print.html`, `.github/workflows/sync-notion.yml`, plus missed interaction surfaces `admin.html`, `functions/api/content.js`, `scripts/notify-notion.js`, `sitemap.xml`, `robots.txt`, and `content.js`.
+
+BLOCKER findings:
+
+1. L0's "parser already exists; key: value lines" premise is false for the proposed living fields.
+   - Plan evidence: L0 wants `profile_title`, `company_name`, `hero_subtitle`, `hero_description`, `hero_headline_html`, `hero_impact_html` as settings-page keys (`docs/plans/2026-07-08-living-portfolio-plan.md:40-42`).
+   - Code evidence: `fetchSettings()` only initializes download and academic fields from page properties (`scripts/generate-content.js:472-483`). The body `key: value` parser only runs inside `if (!result.school)` (`scripts/generate-content.js:485-487`), so a settings page that already has `academic_school` bypasses body parsing entirely.
+   - Code evidence: even when the body parser runs, `keyMap` does not include any proposed L0 keys (`scripts/generate-content.js:488-495`).
+   - Code evidence: body parsing is single-block, single-line, plain-text only (`texts.map(t => t.plain_text).join('').trim()` plus `/^(\w+):\s*(.+)$/`, `scripts/generate-content.js:496-503`). It does not preserve Notion rich-text HTML semantics and does not support continuation lines for `hero_impact_html` or long hero copy.
+   - Failure: L0-G1 cannot pass by merely adding the proposed keys to the settings page. The sync will silently keep old generated values unless code changes both the property reads and the body parser gate/keyMap.
+
+2. L0 does not actually remove the stale employer/current-role problem that motivated the plan.
+   - Plan evidence: the stated root problem is that the site still shows the old employer after career reality changed (`docs/plans/2026-07-08-living-portfolio-plan.md:13-18`, `23-28`).
+   - Code evidence: the active career header hardcodes `오뚜기라면(주) | 인사팀 | 사원` (`index.html:494`), the employment span starts as `2025.03 ~ 재직 중` (`index.html:500`), and the 700-person employer description is hardcoded in the same section (`index.html:502-503`).
+   - Code evidence: `companyName` is generated in `content.js` (`scripts/generate-content.js:735`) and editable in admin (`admin.html:91`, `339`), but active `index.html` has no `companyName` read path in the career section.
+   - Failure: changing `company_name` in Notion can update a generated field, but it will not update the visible stale career section. This breaks the core "living intro page/current role" goal.
+
+3. The plan misses a competing content source: admin/KV edits the same fields, but active pages prioritize `content.js` over KV/localStorage.
+   - Code evidence: admin exposes and saves `profileTitle`, `companyName`, `heroHeadlineHTML`, `heroSubtitle`, `heroDescription`, and `heroImpactHTML` (`admin.html:84-101`, `337-344`) and uploads the full JSON to `/api/content` (`admin.html:460-468`).
+   - Code evidence: `/api/content` stores and returns `portfolio_content` from Cloudflare KV (`functions/api/content.js:34-37`, `65-66`).
+   - Code evidence: `index.html` fetches KV JSON, then merges `Object.assign({}, json, base)`, making `SITE_CONTENT` from `content.js` win over KV for duplicate keys (`index.html:788-797`).
+   - Code evidence: `print.html` does the same for API and localStorage: `Object.assign({}, d, defaults)` and `Object.assign({}, JSON.parse(saved), defaults)`, so `content.js` wins over admin/KV/local edits (`print.html:162-171`).
+   - Failure: L0 would introduce Notion as the "living" source without reconciling an existing admin/KV source that already claims to edit these fields. Admin writes can appear successful while the public pages ignore them.
+
+MAJOR findings:
+
+4. L0-G2 and L0-G3 are internally incompatible.
+   - Plan evidence: L0-G2 demands that with no Notion keys set, the rendered site is byte-identical to today (`docs/plans/2026-07-08-living-portfolio-plan.md:55-56`).
+   - Plan evidence: L0-G3 simultaneously demands that résumé buttons are gone (`docs/plans/2026-07-08-living-portfolio-plan.md:57`).
+   - Code evidence: the current visible hero CTA includes an `이력서 다운로드` anchor (`index.html:413-420`).
+   - Failure: removing that anchor means rendered HTML and screenshot cannot be byte-identical. The gates cannot both pass.
+
+5. The active hero does not consume all fields L0 plans to move.
+   - Code evidence: `updateHero()` only applies `D.heroHeadlineHTML` and `D.heroDescription` (`index.html:805-809`).
+   - Code evidence: there is no active `heroSubtitle` target; the current visible hero badge/status row is hardcoded (`index.html:363-376`).
+   - Code evidence: active hero impact cards are hardcoded `–85%`, `+217%`, `+12%p` (`index.html:394-410`); `D.heroImpactHTML` is not rendered on the main page.
+   - Code evidence: `print.html` does consume `D.heroImpactHTML`, `D.heroHeadlineHTML`, and `D.heroDescription` (`print.html:219-225`, `448-453`).
+   - Failure: moving `hero_subtitle` and `hero_impact_html` to settings will not make the main intro page fully living; it will mostly affect `content.js` and print output, not the visible main hero.
+
+6. `print.html untouched` is true only as a file-edit boundary, not as behavior.
+   - Plan evidence: non-goals say `print.html untouched` (`docs/plans/2026-07-08-living-portfolio-plan.md:35`).
+   - Code evidence: `print.html` renders `D.profileTitle` in the header (`print.html:184-185`), `D.heroImpactHTML` in the impact box (`print.html:219-225`), and hero headline/description in the intro section (`print.html:448-453`).
+   - Failure: L0 changes to generated content fields will change the PDF submission flow even if `print.html` itself is not edited. The plan needs print behavior gates, not just "untouched" as a file constraint.
+
+7. Static head metadata will drift as soon as L0 succeeds.
+   - Plan evidence: L0-G4 allows "head stays static-but-true" and only says to flag later if hero numbers change (`docs/plans/2026-07-08-living-portfolio-plan.md:58-60`).
+   - Code evidence: meta description, OG/Twitter descriptions, and JSON-LD are static raw HTML in `index.html:6-21`.
+   - Code evidence: visible hero text is runtime-replaced from `D.heroHeadlineHTML` and `D.heroDescription` (`index.html:805-809`).
+   - Failure: after L0/L2, Notion can change the visible hero/current positioning while raw crawlers keep seeing old ATS/700-person/Ottogi JSON-LD. This is especially risky because SEO-1b intentionally made raw head metadata more authoritative.
+
+8. L1's sync/notify gate omits the actual notify surface.
+   - Plan evidence: L1-G4 says sync summary reports the new DB count and existing counts unchanged (`docs/plans/2026-07-08-living-portfolio-plan.md:82`).
+   - Code evidence: generator summary already includes `career` and `dx` counts inside the case DB (`scripts/generate-content.js:777-789`) and prints career/DX subcounts (`scripts/generate-content.js:801-804`).
+   - Code evidence: `notify-notion.js` callout text only appends `케이스`, `성장`, `스킬`, and `이미지` (`scripts/notify-notion.js:155-160`), not `career`, `dx`, or any future `careerHistory` count.
+   - Failure: even if the console summary gains a fourth DB count, the operator-facing Notion callout can still omit it. The plan's "sync summary" gate is under-specified for the actual notify chain.
+
+9. L1's `기간(text)` conflicts with its own period-order gate.
+   - Plan evidence: the new DB schema proposes `기간(text, e.g. "2024.01 – 2025.12")` (`docs/plans/2026-07-08-living-portfolio-plan.md:64-67`).
+   - Plan evidence: L1-G1 requires every published row to render in period order (`docs/plans/2026-07-08-living-portfolio-plan.md:79`).
+   - Code evidence: the current pipeline relies on explicit Notion sorts such as `순서` for deterministic ordering (`scripts/generate-content.js:511-516`, `569-574`, `691-696` from the reviewed file).
+   - Failure: free text cannot reliably encode sortable intervals, ongoing roles, missing months, or overlapping roles. The gate and schema conflict.
+
+10. Public `career.html` + `noindex` is not a privacy control.
+   - Plan evidence: the plan frames public+noindex as a candidate because employer history is already public (`docs/plans/2026-07-08-living-portfolio-plan.md:97-99`).
+   - Code evidence: current public site already exposes employer, role, broad responsibilities, and operations/compliance bullets (`index.html:494-523`).
+   - Attack position: public+noindex survives only for resume-level, intentionally redacted content. `noindex` does not prevent direct access, sharing, scraping, or AI-crawler reads. Cloudflare Access would protect content but would also make recruiter PDF workflows worse unless the PDF is exported and sent separately.
+
+11. Branding and status guardrails are not fully accounted for.
+   - Plan evidence: L0 proposes moving headline ownership from code-frozen to master-owned Notion while agents still must never change it (`docs/plans/2026-07-08-living-portfolio-plan.md:48-50`).
+   - Code evidence: the current visible badge/status is hardcoded as HR Ops / 채용 / 자동화 / 구직 중 (`index.html:363-376`), and the plan does not include badge/status settings keys.
+   - Failure: if the current status changed from job-seeking to contract role, the most visible status badge remains stale. If headline becomes Notion-editable, the guardrail must distinguish master edits from agent/sync edits; the current plan only states the intent, not a verifiable boundary.
+
+MINOR findings:
+
+12. The active résumé button is hardcoded, not powered by the Notion download keys.
+   - Code evidence: active hero résumé CTA has a literal Google Drive URL and no `id="hero-resume-kr"` (`index.html:416-420`).
+   - Code evidence: `updateHero()` tries to set `hero-resume-kr` and `hero-portfolio-kr`, but those IDs are absent in active hero markup (`index.html:810-817`).
+   - Survived with caveat: removing the visible résumé CTA should not break `print.html`, because print does not use download links. But clearing Notion download keys alone will not remove the active button.
+
+13. Sitemap impact mostly survives, but the gate should be explicit.
+   - Code evidence: current `sitemap.xml` lists only the canonical root (`sitemap.xml:1-6`), and `robots.txt` points to it (`robots.txt:1-4`).
+   - Survived: if `career.html` is public+noindex, excluding it from the sitemap is consistent with the current sitemap shape.
+   - Residual risk: if `career.html` is behind Access, raw crawlers cannot see its noindex. If it is public, noindex is not privacy.
+
+Survived claims:
+
+- Survived: `scripts/generate-content.js:730-742` really hardcodes `profileTitle`, `companyName`, `email`, and hero fields exactly as the plan says.
+- Survived with caveat: settings-derived downloads and academics are present in `fetchSettings()` (`scripts/generate-content.js:472-483`) and emitted into `content.js` downloads/education (`scripts/generate-content.js:855-872`), but active main-page download CTA does not use those IDs.
+- Survived: `print.html` exists as the PDF submission flow and has QR/print behavior (`print.html:179-204`, `448-466`).
+- Survived: a separate `career.html` can be excluded from the existing sitemap because the sitemap currently only includes `/`.
+
+Positions on plan §7 open questions:
+
+1. 4th DB vs case DB merge: use a 4th DB if L1 proceeds. Roles have a different shape from case cards: company, role, period, summary, achievements. The current case pipeline assumes `유형=career|dx`, builds project modal HTML, and sorts by `순서` (`scripts/generate-content.js:519-560`). Merging roles into that DB would pollute the case schema and renderer. The added pipeline complexity is real but cleaner than forcing role history into project-case fields.
+2. Period free text vs dates: free text fails the plan's own period-order gate. Use machine-sortable start/end fields or keep an explicit `순서`; text can remain as a display label.
+3. `career.html` exposure: public+noindex is acceptable only for redacted, recruiter-safe content. Cloudflare Access is stronger privacy but bad for recruiter review and PDF generation. Noindex must not be treated as access control.
+4. Removing résumé buttons in code vs clearing Notion keys: code removal is the only clean option for the active page. The visible CTA is hardcoded in `index.html:416-420`; clearing Notion keys will not remove it.
+5. Silent fallback vs fail-loud: silent fallback is wrong for "living" identity/current-role fields because it makes stale content look successful. The current generator already only warns for missing recommended settings (`scripts/generate-content.js:813-825`); L0 needs stronger validation semantics for required living fields after migration.
+6. Career hub over-engineering: L0 is not enough because it misses the hardcoded career section. L1 is not inherently over-engineered if a numbers-first career statement is truly needed, but it becomes over-engineered if used to avoid fixing the stale on-page role/current-status source first.
+
+### 2026-07-08 - Living Portfolio plan REFUTATION (codex, findings only — no implementation)
+
+Mission = BREAK the plan. Read plan + all cited code, verify every claim. Severity: BLOCKER / MAJOR / MINOR. "survived" = claim held under attack.
+
+---
+
+## A. FALSIFIED FACTUAL CLAIMS
+
+### BLOCKER B1 — L0-G1 gate is unachievable as written: `companyName` is dead in index.html
+- Plan §4 L0-G1: "master changes `company_name` in Notion → sync → live in ≤2 min, zero code edits."
+- **Code reality:** `index.html` NEVER reads `D.companyName`. Grep confirms zero references. The visible employer is hardcoded HTML at `index.html:494` — `<h3 ...>오뚜기라면(주) | 인사팀 | 사원</h3>`. `updateHero()` (`index.html:805-818`) reads only `heroHeadlineHTML` + `heroDescription`, not companyName.
+- Moving `company_name` to a Notion key → `content.js` updates → **visible page does not change.** L0-G1 fails unless `index.html:494` is ALSO rewired. The plan's "zero code edits" promise for this gate is false. This is the plan's HEADLINE gate and it is broken.
+
+### BLOCKER B2 — "사이트 설정 parser already exists" is false for the L0 keys
+- Plan §4: "Move to 사이트 설정 page keys (parser already exists; key: value lines)" — implies no parser work.
+- **Code reality (`generate-content.js:469-508` `fetchSettings()`):**
+  1. The body-text `key: value` parser ONLY runs if `!result.school` (line 486) — i.e., as a fallback when page properties are empty.
+  2. The `keyMap` (lines 488-495) contains ONLY `academic_*`, `resume_*`, `portfolio_*`. It does **NOT** include `profile_title`, `company_name`, `hero_subtitle`, `hero_description`, `hero_headline_html`, `hero_impact_html`. New keys are silently dropped.
+  3. The regex `/^(\w+):\s*(.+)$/` (line 500): `\w` = `[A-Za-z0-9_]`, rejects Korean key names; and it parses **one block = one line** (`texts.map(...).join('')` per block). Multi-line values are truncated (first-match-wins, line 503). `hero_impact_html` / `hero_description` contain `<br>` (line breaks) → these become separate Notion blocks → only the first line survives. HTML values (`<span>`) survive only as literal chars on a single line.
+- To make L0 work, `fetchSettings()` MUST be extended (new `keyMap` entries + property reads, or a real multi-line parser). The "small PR / parser already exists" framing understates real generator work. Either master creates new page **properties** (rich_text) and `prop()` reads them, or the body parser needs a multi-line-aware rewrite.
+
+---
+
+## B. MAJOR FINDINGS (plan misses or mishandles)
+
+### MAJOR M1 — Dual edit-path conflict: admin.html edits the SAME fields L0 moves
+- `admin.html` reads/writes `profileTitle`, `companyName`, `heroHeadlineHTML`, `heroSubtitle`, `heroDescription`, `heroImpactHTML` directly (`populateForms` lines 209-218, `saveAll` lines 335-344) → saves to `localStorage` + KV via `uploadToKV()` (line 452).
+- After L0, TWO edit paths exist for these fields: **Notion** (sync → `content.js`) and **admin.html** (KV PUT → runtime).
+- **Merge order defeats admin:** `_loadData()` (`index.html:796`) does `D = Object.assign({}, json, base)` — `base` (content.js) OVERRIDES `json` (KV). So post-L0, admin's hero/companyName edits to KV are **dead** (content.js values win). Currently masked because both hold identical values.
+- The plan does not mention admin.html at all. Any L0 PR that doesn't reconcile the merge order or remove these fields from admin will leave a confusing half-working editor. **Biggest plan omission.**
+
+### MAJOR M2 — JSON-LD / meta drift contradicts L0's purpose
+- `index.html:6-21`: meta description, OG, Twitter, and the entire JSON-LD `ProfilePage` (including `"worksFor":{"name":"오뚜기라면"}` and the metric string) are STATIC HTML. No JS updates the `<head>`. content.js only injects visible hero text at runtime.
+- L0-G4 defers this ("head stays static-but-true ... flag if hero numbers change later"). But L0's WHOLE POINT (master's intent §1) is that the company changed. If `company_name` → Notion → new employer, the JSON-LD `worksFor.name` and OG tags still say 오뚜기라면 → **machine-readable identity is wrong** (AEO/SEO damage, exactly what SEO-1b just fixed). The deferral is self-contradictory: either L0 makes the company editable end-to-end (incl. head) or it doesn't achieve master's goal. Plan must pick.
+
+### MAJOR M3 — "Sync button → ≤2 min" assumes UI that does not exist
+- Plan L0-G1: "master changes company_name in Notion → sync button → live."
+- `admin.html` has only "☁️ KV 서버에 업로드" (`uploadToKV`, line 452) — writes to KV, does NOT trigger Notion→content.js sync. No "sync" button anywhere.
+- `sync-notion.yml` triggers: cron `0 0 * * *` (daily KST 09:00) + `workflow_dispatch` (line 3-6). Real latency after a Notion edit = **up to 24h**, or manual GitHub Actions run. The "≤2 min / sync button" gate needs a new trigger (e.g., a dispatch button calling GH API). Plan doesn't scope this.
+
+### MAJOR M4 — "Remove 이력서 buttons" underspecified; "clear Notion keys" alternative (Q4-B) is impossible
+- Hero primary CTA `index.html:416-421` is "이력서 다운로드" — a **hardcoded** Drive link (`id=1sTqdcd8...`), not read from `downloads`. Removing it leaves the hero with NO primary CTA (only "프로젝트 사례 보기" secondary remains). Plan doesn't specify a replacement CTA.
+- Contact section `index.html:647-678`: 4 buttons (resume_kr/en, portfolio_kr/en), ALL hardcoded Drive IDs inline. The Notion `downloads` object is **dead-wired** here: `setHref('hero-resume-kr', dl.resume_kr)` (`index.html:816`) targets `id="hero-resume-kr"` which **does not exist** in the DOM. So the Notion download keys currently affect nothing visible on index.html.
+- **Q4 consequence:** the "leave buttons, just clear Notion keys" option (Q4-B) is impossible — buttons don't read Notion. Code removal (Q4-A) is the only effective option. Plan's L0 choice (remove in code) is correct; the alternative is based on a false premise about wiring.
+
+---
+
+## C. MINOR FINDINGS
+
+- **m1 — `heroSubtitle` is dead code.** Written by generator (`generate-content.js:739`), in `content.js:16`, but read by NEITHER `index.html` (updateHero ignores it) NOR `print.html`. L0 moving `hero_subtitle` to Notion perpetuates a dead field. Drop it from the L0 key list.
+- **m2 — Sync-summary key collision.** `buildSyncSummary` already uses `career:` for `careerProjects.length` (`generate-content.js:780`). A new 경력 DB needs a distinct key (e.g. `careerRoles`), and `notify-notion.js:156-161` needs a new `appendCount` line. L1-G4 ("existing counts unchanged") doesn't flag this.
+- **m3 — Branding-rule re-scope weakens enforcement.** Moving `hero_headline_html` to Notion removes the code-freeze mechanism that currently enforces "절대 변경 금지" (CLAUDE.md). Post-L0, the rule lives only in AGENTS.md text — an instruction file cannot prevent a Notion edit or a future agent obeying a different instruction. Plan asks for master sign-off (good) but underplays that the enforcement mechanism is gone, not just moved.
+- **m4 — §2 "least volatile" framing imprecise.** Email is grouped with "hardcoded volatile" yet the plan keeps email hardcoded (§4). Names are hardcoded and correctly kept. The volatility story is right for hero/company, loose for email.
+
+---
+
+## D. §7 OPEN QUESTIONS — evidence-based positions
+
+**Q1 (4th DB vs merge roles into case DB): ARGUE FOR 4th DB.** Existing `careerProjects` are project-level achievements (ATS 도입, 근태 리스크 예방) fetched via 유형=career (`generate-content.js:524`). The proposed 경력 DB is employer-level (회사/직책/기간/핵심성과) — different granularity, different schema. Merging as 유형=role pollutes one DB with two shapes and forces a 3rd branch in the `fetchCases()` 유형-switch (line 523). The "pipeline simplicity" argument for merging is weak: `queryAll` + `publishFilterForDatabase` (lines 397-467) already handle N DBs uniformly; a 4th DB = one env var + one `Promise.all` entry. Cost of merge > cost of 4th DB.
+
+**Q2 (기간 free text vs start/end dates): ARGUE FOR free text + 순서 column.** All existing DBs sort by `순서` number (`generate-content.js:515,576,687`), NOT by date parsing. The L1 schema already includes `순서(number)`, so L1-G1 (기간-order) works via 순서 without parseable dates. Start/end columns are only worth adding if a timeline view is planned — it isn't (§3 non-goals). Defer.
+
+**Q3 (career.html public+noindex vs Cloudflare Access): ARGUE FOR public + noindex.** Employer history is already public (`index.html:494` 오뚜기, activities section military roles). career.html is a submission artifact (master opens → print → PDF) — Access would break sharing with recruiters. noindex keeps it out of search. print.html sets this exact precedent (`print.html:6` noindex). Plan's instinct is correct.
+
+**Q4 (remove buttons in code vs clear Notion keys): code removal is the ONLY option.** See M4 — buttons are hardcoded, Notion keys are dead-wired. Content-only approach is impossible. Plan's L0 choice survives; the alternative does not.
+
+**Q5 (silent fallback vs fail-loud): ARGUE FOR hybrid — fail-loud at sync, silent at render.** The pipeline is already fail-loud by design: `publishFilterForDatabase` throws on missing status property (lines 442-458), `queryAll` refuses unfiltered queries to avoid publishing drafts (lines 404-413). For identity keys, pure silent fallback creates the drift the plan worries about, and pure fail-loud would 500 the site on a blank field. The codebase already has the middle pattern: `printSyncSummary` warns on `missingSettings` (lines 813-825). Extend that warn list to the new L0 keys; keep content.js defaults for render-time safety. Matches existing philosophy.
+
+**Q6 (over-engineering repeat?): survived — with one smell.** L0 is tightly scoped. L1 (경력 DB + career.html) reuses the proven print.html pattern and is justified by master's explicit 경력기술서 ask. L2 is editorial. This is NOT the refuted "career hub." Smell: career.html is a **4th HTML page** (index/print/admin/career) with no shared template (no build tools, per constraints) — each duplicates the head/meta scaffold. Acceptable, but the plan should commit to career.html being the LAST new page.
+
+---
+
+## E. CLAIMS THAT SURVIVED
+
+- §2 root cause (generate-content.js:730-743 hardcodes volatile identity/hero): **survived** — verified, values are exactly as claimed.
+- §3 non-goals (no redesign, no frameworks, print.html untouched): **survived.**
+- §4 "Keep hardcoded: profileName/En, email, lastUpdated": **survived** — consistent with code (names/email at 731-734, lastUpdated auto at 736).
+- §5 "career.html follows the proven print.html pattern" (noindex, A4, content.js read): **survived** — print.html:6 noindex, print.html:11 content.js, A4 @page at 60. Pattern is real.
+- §7 Q3/Q6 instincts: **survived** (see above).
+
+---
+
+## F. VERDICT
+
+Two BLOCKERS (B1, B2) mean L0 as written cannot deliver its headline gate (L0-G1) without MORE code edits than the plan claims, and the "parser already exists" premise is false. Four MAJORS (M1-M4) are unaddressed interactions (admin.html dual-path, JSON-LD drift, missing sync trigger, hardcoded buttons). The plan's DIRECTION is sound and the refuted "career hub" over-scope is genuinely avoided — but the plan is not implementable as-is. Required revisions before freeze:
+1. Add rewiring of `index.html:494` to read `D.companyName` (else L0-G1 fails).
+2. Extend `fetchSettings()` keyMap + decide property-vs-body for the 6 new keys (else keys are dropped).
+3. Reconcile admin.html: either remove L0 fields from admin or flip merge order — pick one and document.
+4. Decide JSON-LD/meta: either wire head fields to update or explicitly descope L0's "company change" to visible-only (and tell master the JSON-LD stays stale).
+5. Add an on-demand sync trigger (or restate L0-G1 latency honestly as "next cron / manual dispatch").
+6. Specify the hero CTA replacement when 이력서 button is removed.
+
+No files modified. Deliverable complete.
+
+### 2026-07-08 - Dual refutation counter-verified; plan revised to v0.2
+
+- codex + GLM-5.2 independently refuted plan v0.1. Claude re-measured every claim: B1/B2 blockers CONFIRMED (employer block hardcoded at index.html:494 with 0 companyName refs; settings parser school-fallback-only, closed keyMap). GLM M3 ("no sync button, 24h latency") REFUTED with evidence — sync.html + /api/sync live on main, prod 200.
+- v0.2 key changes: (1) stale employer = career SECTION issue → L1 경력 DB feeds both index career block and career.html (no settings-key double migration); (2) JSON-LD worksFor DROPPED — the only rotting head field, already false; head becomes evergreen; (3) L0+L1 ship as one train; sort by 순서; hybrid fail-loud(sync)/silent(render); admin dead-input cleanup deferred.
+- Cross-model lesson: two independent refuters converged on the same 2 blockers (strong signal); cross-check killed 1 false claim (M3, likely stale checkout).

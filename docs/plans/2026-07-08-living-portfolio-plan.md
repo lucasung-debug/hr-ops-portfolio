@@ -107,3 +107,54 @@ as an AI-era case. Pure content; uses L0's new keys; B-2-style review loop.
 
 L0 (small PR, unblocks everything) → master updates current-role content same day →
 L1 (경력기술서) → L2 (repositioning editorial). Each phase independently shippable.
+
+## 9. Revision v0.2 — after dual refutation (codex + GLM-5.2, Claude counter-verified)
+
+Verdicts (all re-measured by Claude): B1/B2 CONFIRMED (index.html:494 hardcodes the
+employer block, 0 refs to companyName; settings parser is school-fallback-only with
+a closed keyMap). codex's gate contradiction + heroImpact/print findings CONFIRMED.
+GLM M1/M2/M4 CONFIRMED. **GLM M3 REFUTED** — sync.html + /api/sync exist on main and
+serve 200 in production (built and E2E-verified this week; reviewer likely read a
+stale checkout). L1-기간 gate conflict CONFIRMED → order by 순서.
+
+§4/§5 are SUPERSEDED by the following:
+
+### L0 (revised) — parser + hero + head evergreen + buttons (small PR)
+- Settings body parser: parse key:value lines ALWAYS (not only when school empty);
+  extend keyMap with `hero_headline_html`, `hero_description` (the two fields
+  updateHero actually reads). Values are single-line by convention (HTML with <br>
+  allowed on one line); fail-loud at sync (warn in summary, per existing
+  missingSettings pattern), silent-safe at render (fallback to current copy).
+- Remove the hardcoded 이력서 CTA buttons (hardcoded Drive href — Notion-key
+  clearing cannot remove them; code removal is correct). 포트폴리오 PDF CTA stays
+  and becomes the primary.
+- **Drop `worksFor` from JSON-LD** — the only head field that rots with job changes
+  (and is already false today). Head becomes permanently true; no manual checklist.
+- Do NOT move company_name to settings — superseded by L1 (the stale employer
+  display is the CAREER SECTION, not the hero).
+- Gates: L0-G1 hero headline/description editable via Notion ≤2min zero-code;
+  L0-G2 rendered site identical EXCEPT intended removals (이력서 buttons, worksFor);
+  L0-G3 sync summary warns when hero keys missing; L0-G4 print flow intact
+  (print content changing with content.js is INTENDED living-doc behavior).
+
+### L1 (revised) — 경력 DB feeds BOTH the main career section and career.html
+- 경력 DB (4th DB confirmed by both reviewers): 회사(title) · 직책 · 기간(free text,
+  display-only) · 한줄요약 · 핵심성과(one line per achievement, numbers-first) ·
+  상태(초안/발행) · 순서(number; sole sort key).
+- generate-content.js → `careerHistory` in content.js.
+- index.html career-section header block (the :494 hardcode) is REWIRED to render
+  from careerHistory (top row = current role; "재직 중" comes from data).
+- career.html 경력기술서: A4 print-optimized, numbers-first, noindex + absent from
+  sitemap, print.html pattern. Redaction note: contains only what the public site
+  already shows; anything sensitive stays out of the 경력 DB by policy.
+- Gates: L1-G1 renders 발행 rows in 순서-order; L1-G2 index career section shows the
+  CURRENT contract role with zero code edits after DB row edit; L1-G3 career.html
+  noindex + not in sitemap + clean A4 print; L1-G4 existing counts unchanged.
+
+### Also adopted
+- admin.html's hero/company inputs are dead weight (KV loses to content.js) —
+  flagged; cleanup deferred to a separate small task, documented here.
+- L0+L1 ship as one train (L0 alone does not fix the stale employer — codex).
+- L2 unchanged (editorial repositioning after the train).
+
+Status: v0.2 ready for freeze on master approval (or one more codex pass on §9 only).
