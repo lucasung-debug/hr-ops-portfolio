@@ -806,6 +806,54 @@ Decisions and failures:
 - For small Notion DB checks, workspace search plus individual page fetches can be enough when every expected row can be enumerated and fetched directly.
 - No repository code or Notion row content changed in this Track C pass.
 
+## 2026-07-07 - SEO-1 head metadata PR opened
+
+Context:
+- Mission: SEO-1 from `docs/plans/2026-07-06-seo-aeo-strategy-plan.md`, section 3.
+- Branch: `codex/seo-head`.
+- Base: latest `main` at `f354a139941cc622ebc73ba04960bca9a266d3bf`.
+- Hard scope: `index.html` `<head>` only, additive except replacing the one-line description.
+- Existing local untracked files remained out of scope: `.claude/`, `AGENTS.md`, `docs/_html/`.
+
+Progress:
+- Added rich `meta name="description"` using the public `content.js` hero-impact facts:
+  - 700-person workplace.
+  - attendance recognition `+12%p`.
+  - manual corrections `–8%p`.
+  - claims `0건`.
+- Added canonical and robots tags for `https://smjportfolio.com/`.
+- Added Open Graph and Twitter card tags using `https://smjportfolio.com/assets/profile-illustration.png`.
+- Added one `Person` JSON-LD block with:
+  - `name`: `성명재`.
+  - `alternateName`: `Sung Myeong Jae`.
+  - `jobTitle`: `HR Operations`.
+  - `worksFor`: `오뚜기라면`.
+  - 11 `knowsAbout` entries from the plan.
+  - No `email` or `contactPoint`.
+- Did not touch body markup, existing script/style blocks, or the known Tailwind config/CDN ordering.
+
+Evidence:
+- Commit: `36a5bf62edd182ace866c884ca20d524ebac5358`.
+- PR: `#15` - `https://github.com/lucasung-debug/hr-ops-portfolio/pull/15`.
+- PR state: open, base `main`, head `codex/seo-head`.
+- Changed file in PR: `index.html` only.
+- Local validation passed:
+  - JSON-LD parsed with Node and checked as `Person`, `성명재`, `HR Operations`, 11 `knowsAbout` entries, no email/contactPoint.
+  - Head-only verifier passed: content after `</head>` matched `HEAD:index.html`.
+  - Tailwind config block verifier passed unchanged.
+  - Required tag verifier passed: canonical, robots, og:type, og:title, og:image, twitter card, application/ld+json.
+  - Description metric verifier passed: `700명`, `+12%p`, `–8%p`, `0건`.
+  - CRLF-aware whitespace check passed: `git -c core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol diff --check`.
+  - EOL/stat gate passed: `git diff --stat` matched `git diff --ignore-all-space --stat`.
+- GitHub checks:
+  - Cloudflare Pages: pass.
+  - Claude review: pass (`https://github.com/lucasung-debug/hr-ops-portfolio/actions/runs/28802836410/job/85410497911`).
+
+Notes:
+- Local `assets/profile-illustration.png` exists and is `912x1173`, not the ideal 1200x630 OG image ratio. Per plan, this was flagged but not blocking.
+- Optional sitemap/robots sanity found that current public `/sitemap.xml` and `/robots.txt` requests return the HTML app fallback. This was not fixed because SEO-1 is a head-only PR.
+- The PR was not merged.
+
 ### 2026-07-06 - Track C independently verified (Claude)
 
 - Verified via master-account Notion fetch (not codex self-report): 스킬 DB 카테고리 select now has exactly 4 options — Data & Analytics / Automation & Dev / HR Tech & AI / Office & Documentation. Stray `Office & Document` is GONE (G-c2 PASS).
@@ -821,3 +869,13 @@ Decisions and failures:
 - Plan: docs/plans/2026-07-06-seo-aeo-strategy-plan.md. Track SEO-1 (index.html head: rich meta + canonical smjportfolio.com + Open Graph + JSON-LD Person — the AEO core; additive only, must NOT touch the tailwind-config-before-CDN block owned by a separate task). Track SEO-2 (Notion copy: career_5 제목 misread fix, dx2 550→전원, career_3 desc+MZ, dx3 완결형, career_4 CCTV 순화 [needs fact-check], career_6 자동화 총괄 rewrite [needs master scope]).
 - Gates G-S1..G-S5 (JSON-LD parses in raw HTML, valid Person schema, no on-screen change, content counts intact, share preview resolves). Freeze on approval.
 - Facts: canonical smjportfolio.com (200), assets/profile-illustration.png exists (OG candidate).
+
+### 2026-07-08 - SEO/AEO program CLOSED (all tracks production-verified)
+
+- SEO-1 (PR #15, merged): head JSON-LD Person + OG/Twitter + canonical + rich meta. Machine identity for AEO.
+- SEO-1b (PR #16, merged): GLM-5.2 cross-critique findings — ProfilePage wrap, sameAs LinkedIn, hasCredential x2, additionalName "Myeongjae Sung" (master-confirmed), alumniOf 한국항공대(real), knowsLanguage/nationality, real sitemap.xml + robots.txt + llms.txt (were SPA-fallback), print.html noindex, meta description fixed to on-screen metrics (dead heroImpact –8%p dropped).
+- SEO-2a (Notion, sync 9dbfc4c): case copy de-risking — career_5 "제고"→"개선", career_4 CCTV→"현장 확인" (honesty-preserving), dx2 550→전원, career_3 MZ removed + 2.5배, dx3 완결형, career_6 full rewrite (dx1 duplicate → hr-newsletter-automation, live asset).
+- SEO-2b (hermes PR #1, merged): 2 dead vercel "라이브 보기" → demo videos (200).
+- Gates G-S1..S12 all PASS on production (smjportfolio.com): JSON-LD parses w/ new fields, sitemap/robots/llms real files, /print noindex, zero on-screen change, content counts intact.
+- Cross-model note: GLM-5.2 critique found 3 real gaps Claude missed (sameAs, sitemap-dummy, print-noindex); Claude's 1b-7 suspicion was falsified by live render (codex was right). Insights promoted to knowledge inbox.
+- Remaining backlog (low): dedicated 1200×630 OG card; admin/index.html tailwind-config-before-CDN bug (separate task).
