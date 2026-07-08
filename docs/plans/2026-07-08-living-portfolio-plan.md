@@ -2,7 +2,7 @@
 
 Date: 2026-07-08
 Author: Claude/Fable (plan draft). Adversarial reviewer: codex (mission = REFUTE this plan, not implement).
-Status: DRAFT v0.1 — intentionally unfrozen. Gates freeze only after codex refutation round + master approval.
+Status: v0.2 FROZEN 2026-07-08 (dual refutation applied — codex + GLM-5.2 — Claude counter-verified, master approved). §9 is AUTHORITATIVE; §4/§5 are SUPERSEDED by §9. Implementers execute toward §9 gates and MUST NOT edit them.
 
 ## 1. Master's intent (verbatim distillation, 2026-07-08)
 

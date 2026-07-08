@@ -1091,3 +1091,9 @@ No files modified. Deliverable complete.
 - codex + GLM-5.2 independently refuted plan v0.1. Claude re-measured every claim: B1/B2 blockers CONFIRMED (employer block hardcoded at index.html:494 with 0 companyName refs; settings parser school-fallback-only, closed keyMap). GLM M3 ("no sync button, 24h latency") REFUTED with evidence — sync.html + /api/sync live on main, prod 200.
 - v0.2 key changes: (1) stale employer = career SECTION issue → L1 경력 DB feeds both index career block and career.html (no settings-key double migration); (2) JSON-LD worksFor DROPPED — the only rotting head field, already false; head becomes evergreen; (3) L0+L1 ship as one train; sort by 순서; hybrid fail-loud(sync)/silent(render); admin dead-input cleanup deferred.
 - Cross-model lesson: two independent refuters converged on the same 2 blockers (strong signal); cross-check killed 1 false claim (M3, likely stale checkout).
+
+### 2026-07-08 - Plan v0.2 FROZEN; L0+L1 dispatched to codex
+
+- Master approved. Plan §9 authoritative. Branch codex/living-portfolio, one PR (L0+L1 train).
+- Master prerequisite for L1 live-verify: create 경력 Notion DB + share with integration + add GitHub secret NOTION_DB_ID_CAREER + enter published rows (incl. current contract role). codex writes code regardless; L1 live gates BLOCKED until secret+DB exist.
+- Claude next: gate review on the PR (adversarial), then master enters current role in Notion → the actual endpoint of this whole arc.
