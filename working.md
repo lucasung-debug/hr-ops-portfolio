@@ -1097,3 +1097,8 @@ No files modified. Deliverable complete.
 - Master approved. Plan §9 authoritative. Branch codex/living-portfolio, one PR (L0+L1 train).
 - Master prerequisite for L1 live-verify: create 경력 Notion DB + share with integration + add GitHub secret NOTION_DB_ID_CAREER + enter published rows (incl. current contract role). codex writes code regardless; L1 live gates BLOCKED until secret+DB exist.
 - Claude next: gate review on the PR (adversarial), then master enters current role in Notion → the actual endpoint of this whole arc.
+
+### 2026-07-08 - 경력 DB populated; PR #17 field-name mismatch found
+
+- Claude built 경력 DB via Notion MCP; master enriched schema (구분/재직기간 date/재직상태/퇴사사유) + filled the real contract role (드림어스컴퍼니, 매니저, AX·인사 자동화, 재직 중). Claude filled 오뚜기 new fields + set order (드림어스=1, 오뚜기=2), excluded 군 복무 (already in 활동).
+- BLOCKER on PR #17: codex parsed OLD field names (한줄요약/핵심성과/기간) — the finalized schema uses 업무요약/업무상세/재직기간(date) + 구분/재직상태. Rework needed; prop() also lacks a date case. Privacy rule added: 퇴사사유(이직 희망 사유) must NOT show on public main, only in career.html. Plan §10 documents the correction.

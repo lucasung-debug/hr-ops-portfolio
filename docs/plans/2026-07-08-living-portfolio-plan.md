@@ -158,3 +158,38 @@ stale checkout). L1-기간 gate conflict CONFIRMED → order by 순서.
 - L2 unchanged (editorial repositioning after the train).
 
 Status: v0.2 ready for freeze on master approval (or one more codex pass on §9 only).
+
+## 10. L1 schema CORRECTION (2026-07-08) — codex PR #17 must be reworked
+
+Claude built the 경력 DB; master then FINALIZED a richer schema. PR #17 parses the
+OLD draft field names (한줄요약/핵심성과/기간) → they don't exist → period/summary/
+achievements render BLANK. This is a timing mismatch, not a codex error. Rework
+required before merge. Actual schema + careerHistory mapping (verified via fetch):
+
+- 회사 (title) → company
+- 직책 (text) → position
+- 재직기간 (DATE: date:재직기간:start / :end) → build a display string:
+  if 재직상태 = "재직 중" OR end empty → "{YYYY.MM} ~ 재직 중"; else "{start} ~ {end}".
+  NOTE: prop() has NO 'date' case — codex MUST add date handling (read the expanded
+  start/end, not prop(row,'기간')).
+- 업무요약 (text) → summary   (was 한줄요약)
+- 업무상세 (text; one achievement/line, <br>-separated) → details  (was 핵심성과)
+- 구분 (select 정규직/계약직/파견직/인턴/기타) → employmentType — show as a small
+  label/badge on each role.
+- 재직상태 (select 재직 중/퇴사/기타(휴직 등)) → drives the "재직 중" state (NOT hardcoded).
+- 퇴사사유 (text) → **PRIVACY GATE: this holds 이직 희망 사유 ("정규직으로 안정성
+  확보 희망"). It MUST NOT render on the public main page (the current employer could
+  see it). Include it ONLY in career.html (경력기술서, noindex, submission-time PDF),
+  and even there consider it optional.**
+- 상태 (초안/발행) → publish filter; 순서 (number) → sole sort (asc = newest first).
+
+Current DB rows (Claude-entered, master-refined):
+- (주)드림어스컴퍼니 · 계약직 · 매니저 · 2026.06.23~재직 중 · 순서 1 · 상태 초안
+  (조직문화·교육·채용·기업 AX/인사 자동화 담당 — the AI-era HR positioning core).
+- 오뚜기라면(주) · 정규직 · 인사팀 사원 · 2025.03~(퇴사, end month TBD by master) ·
+  순서 2 · 상태 발행.
+- 군 복무: EXCLUDED from 경력 DB (already covered in the 활동 section as achievement
+  language; master said "애매하면 제외"). Decision: excluded.
+
+Master to confirm/fill: 오뚜기 퇴사월 (재직기간 end) + 퇴사사유(optional); whether to
+flip 드림어스 상태 초안→발행 when ready.
