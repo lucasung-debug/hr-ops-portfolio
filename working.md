@@ -879,3 +879,10 @@ Notes:
 - Gates G-S1..S12 all PASS on production (smjportfolio.com): JSON-LD parses w/ new fields, sitemap/robots/llms real files, /print noindex, zero on-screen change, content counts intact.
 - Cross-model note: GLM-5.2 critique found 3 real gaps Claude missed (sameAs, sitemap-dummy, print-noindex); Claude's 1b-7 suspicion was falsified by live render (codex was right). Insights promoted to knowledge inbox.
 - Remaining backlog (low): dedicated 1200×630 OG card; admin/index.html tailwind-config-before-CDN bug (separate task).
+
+### 2026-07-08 - Living Portfolio plan DRAFT (for codex refutation)
+
+- Master's new direction: portfolio = living intro page (design unchanged); 이력서 section out; numbers-first 경력기술서 file wanted; resume-platform skill abandoned. Career reality changed (오뚜기 퇴사 → contract role) and the site is stale.
+- Claude self-refuted the earlier "career hub" over-scope; root cause measured: volatile identity/hero fields are HARDCODED (generate-content.js:730-743) while stable fields are Notion-editable — inverted design.
+- Draft plan: docs/plans/2026-07-08-living-portfolio-plan.md — L0 un-hardcode identity/hero to 사이트 설정 keys (+remove 이력서 buttons, re-scope branding rules), L1 경력 DB + career.html 경력기술서 (print→PDF, noindex), L2 repositioning editorial. §7 lists explicit refutation targets.
+- Flow inverted this time: Fable drafts → codex REFUTES (not implements) → master arbitrates → freeze.
