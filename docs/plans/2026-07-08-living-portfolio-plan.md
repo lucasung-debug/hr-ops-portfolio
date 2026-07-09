@@ -315,3 +315,68 @@ Case↔career link = a new field on the case-studies DB (master chose "field add
 Plan → codex+GLM refutation → Claude counter-verify → freeze → Claude adds 소속경력
 field + tags existing cases via MCP → codex builds → gate review → merge → master
 re-publishes 드림어스 to see the current role correctly separated.
+
+## 14. L1-REDESIGN v2 (2026-07-09) — STACKED per-employer sections (§13 carousel RETIRED)
+
+Triple refutation (codex + GLM-5.2 + Grok) CONVERGED: carousel loses to stacked
+(current role 드림어스 has 0 cases → weakest slide first; a11y/SEO/raw-HTML cost;
+N≈2 over-engineered). Master chose STACKED. §13 carousel is RETIRED.
+
+### Data-model clarification (the real mess the refuters exposed)
+Three overlapping things must get distinct roles:
+- **KEY PROJECTS** = case-studies DB (careerProjects + dxCases), linked to an
+  employer via a NEW `소속경력` SELECT (values = 경력 DB 회사 title, exact).
+- **OPERATIONS** = 경력 DB `업무상세` (details), per employer, the day-to-day
+  duties that are NOT standalone cases.
+- FIX the data: Claude's earlier 오뚜기 `업무상세` = case-summary (duplicates
+  KEY PROJECTS) → REPLACE with the real Operations list currently hardcoded at
+  index.html:516-524 (도급/파견 정산·노무비 대시보드·정부 인건비·대관·노사협의회·
+  글로벌 심사·행사). 드림어스 `업무상세` (온보딩·블로그·채용·AX) already reads as
+  Operations — keep. (Claude via MCP, after freeze.)
+
+### Generator (fail-loud, not silent — kills B1)
+- Read `소속경력` per case → emit `company`. VALIDATE: every published case must
+  have a 소속경력 that matches a careerHistory 회사; on empty/mismatch, the sync
+  summary WARNS with the case title (fail-loud, like missingSettings). No silent drop.
+- Normalize (trim) both sides before matching to avoid the "오뚜기라면" vs
+  "오뚜기라면(주)" drift Grok flagged.
+
+### UI — stacked sections (index.html)
+- Replace the singleton career block with N employer sections in careerHistory
+  순서 (드림어스 → 오뚜기), each = 헤더(careerHistory[i]) + KEY PROJECTS(cases
+  where company==this, career grid + dx sub-block) + OPERATIONS(details[i]).
+- RETIRE (explicit, per refuters): static header block index.html:487-506,
+  renderCareerHeader :805, updateCareerDuration :1082, static Operations :516-524.
+  Keep openModal/openDxModal + the data-action delegation (:1179) intact.
+- Empty-cases employer (드림어스 now) → render 헤더 + OPERATIONS only, no empty grid.
+- Preserve anchors: `#career` lands on the section; `#dxcase` still resolves
+  (dx cases keep their ids/modals inside their employer section — do NOT drop DX).
+
+### SEO / a11y (now GATES, not optional — per refuters M3/M4)
+- Raw-HTML: the CURRENT role's company/title must be present in server-served HTML
+  (not JS-only) OR a `<noscript>` fallback — do not regress SEO-1b's crawler
+  visibility. Decide: generator can inline the first employer's header into
+  index.html at build, or a noscript block.
+- Keyboard/ARIA/reduced-motion: required. Stacked has no hidden state so this is
+  cheap, but it is a gate.
+
+### Scope check
+- print.html: verify whether it renders a career section; if yes, group by employer
+  the same way; if no, out of scope (state which).
+- career.html (경력기술서) already stacks per employer — reuse its structure/idea.
+
+### Gates
+- L14-G1: 드림어스 published → 드림어스 section shows ONLY 드림어스 Operations,
+  ZERO 오뚜기 cases; 오뚜기 section holds all 오뚜기 cases. No merge/bleed.
+- L14-G2: a published case with empty/mismatched 소속경력 → sync summary WARNS
+  (named), case not silently dropped.
+- L14-G3: current-role company/title present in raw HTML or noscript (SEO gate).
+- L14-G4: keyboard-reach + ARIA + reduced-motion verified (a11y gate).
+- L14-G5: #career + #dxcase anchors + all case modals + external #case-* evidence
+  links still work; page counts unchanged; no visual regression elsewhere.
+
+### Sequencing
+Freeze on master approval (refuters already applied) → Claude via MCP: add 소속경력
+SELECT to case-studies DB, tag all existing cases = 오뚜기라면(주), replace 오뚜기
+업무상세 with the real Operations list → codex builds stacked UI + generator
+validation → gate review → merge → master re-publishes 드림어스 (now separated).
