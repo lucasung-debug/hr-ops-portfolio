@@ -256,3 +256,62 @@ it already establishes "sensitive out of content.js" for 퇴사사유. L1.5 gene
 it to all sensitive fields + the Access-protected toggled 경력기술서.
 Master prereqs for L1.5: fill 연봉/희망처우 + phone/address in Notion; set the
 Cloudflare Access policy on /career* (Claude guides click-by-click).
+
+## 13. L1-REDESIGN (2026-07-08) — per-career carousel (헤더+케이스+업무 grouped by employer)
+
+INCIDENT: publishing 드림어스 merged it with 오뚜기 — the L1 header went dynamic
+(careerHistory) but KEY PROJECTS + OPERATIONS stayed the flat 오뚜기 case set, so
+오뚜기 work rendered UNDER the 드림어스 header. Root cause: cases have no employer
+link. RECOVERY DONE: 드림어스 → 초안, synced, 오뚜기-only restored.
+
+Master decision: a per-career CAROUSEL. Each career card = that employer's header
++ ONLY that employer's cases + that employer's 업무. Arrow/dots to switch careers.
+Case↔career link = a new field on the case-studies DB (master chose "field add").
+
+### Data
+- Case-studies DB: add `소속경력` (SELECT) whose option values EXACTLY equal the
+  경력 DB 회사 titles ("오뚜기라면(주)", "(주)드림어스컴퍼니", …). Tag ALL existing
+  cases (career_1..6 + dx1..3) = "오뚜기라면(주)". (Claude via MCP.)
+  - Matching key is the exact company string; a mismatch = a case silently drops
+    from every card. Consider a normalize step (trim) in the generator.
+- generate-content.js: emit `company` (from 소속경력) on each careerProject and
+  dxCase. Group at render time by careerHistory company.
+- careerHistory already carries company/period/details per employer.
+
+### UI (index.html career section → carousel)
+- Render N career cards in careerHistory 순서 (order asc = newest first, 드림어스
+  first once published). Prev/next arrows + dots; card = 헤더(careerHistory[i]) +
+  KEY PROJECTS(cases where company==this) + OPERATIONS(careerHistory[i].details).
+- Empty-cases career (드림어스 now) → show details only, no empty projects grid.
+- Keyboard/swipe optional; respect prefers-reduced-motion; match current visual
+  style (master: no redesign of the look, only the carousel mechanism).
+- Deep-link/anchor (#career) still lands on the section.
+
+### Privacy / SEO carryover
+- No sensitive fields (already stripped). career carousel is public (non-sensitive).
+- Cases moving between careers must not break the evidence links / modals.
+
+### Gates
+- L13-G1: publishing 드림어스 shows a 드림어스 card with ONLY 드림어스 업무 (zero
+  오뚜기 cases under it); 오뚜기 card holds all 오뚜기 cases. No merge.
+- L13-G2: a case with an unset/mismatched 소속경력 is reported by the sync summary
+  (fail-loud), not silently dropped.
+- L13-G3: with one career only (오뚜기), the carousel degrades to a single static
+  card (no broken arrows).
+- L13-G4: existing case modals + evidence links still work from inside a card.
+- L13-G5: no on-screen regression to the rest of the page; counts unchanged.
+
+### Refutation targets (codex/GLM)
+1. SELECT company-string matching vs a real Notion relation — drift risk when a
+   company is renamed? Argue.
+2. Carousel state when careers=1 vs many; SSR/raw-HTML first-card visibility for
+   crawlers (does the current role show in raw HTML, or only after JS?).
+3. Where do dxCases render per-career — same grid as careerProjects, or separate?
+4. Does grouping break the existing #dxcase / evidence anchors?
+5. Anything simpler than a carousel that still separates employers (e.g. stacked
+   sections per employer)? Challenge the carousel itself.
+
+### Sequencing
+Plan → codex+GLM refutation → Claude counter-verify → freeze → Claude adds 소속경력
+field + tags existing cases via MCP → codex builds → gate review → merge → master
+re-publishes 드림어스 to see the current role correctly separated.
