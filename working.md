@@ -1480,3 +1480,10 @@ No product files modified. This entry is the deliverable only.
 ### 2026-07-09 - Plan §14 (stacked) FROZEN; executing in order
 
 - Triple refutation (codex+GLM+Grok) converged on stacked; master chose stacked + "순서대로 진행". §14 is now the authoritative L1-redesign spec (§13 carousel retired). Order: Claude MCP data prep (소속경력 field + tag cases + fix 오뚜기 업무상세) → codex builds stacked UI + fail-loud validation → gate review → merge → master re-publishes 드림어스.
+
+### 2026-07-09 - §14 data prep DONE (Claude MCP); ready for codex stacked build
+
+- Case-studies DB (collection 31bc27c2-afbf-8053): added 소속경력 SELECT (오뚜기라면(주):brown, (주)드림어스컴퍼니:red) — values EXACTLY match 경력 DB 회사 titles (matching key OK). Fixed an escape-mangled option on first try.
+- Tagged all 9 published cases (career 6 + dx 3) 소속경력 = 오뚜기라면(주).
+- Fixed 오뚜기 경력 업무상세: replaced Claude's case-summary duplication with the REAL Operations list (도급/파견 정산·노무비 대시보드·정부 인건비·대관·노사협의회·글로벌 심사·행사) — the 7 lines previously hardcoded at index.html:516-524. 드림어스 업무상세 already reads as Operations.
+- Next: codex builds stacked UI + generator 소속경력 validation per §14. Then Claude gate-review → merge → master re-publishes 드림어스.
