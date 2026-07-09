@@ -31,6 +31,7 @@ jobs:
           NOTION_DB_ID_CASES: ${{ secrets.NOTION_DB_ID_CASES }}
           NOTION_DB_ID_GROWTH: ${{ secrets.NOTION_DB_ID_GROWTH }}
           NOTION_DB_ID_SKILLS: ${{ secrets.NOTION_DB_ID_SKILLS }}
+          NOTION_DB_ID_CAREER: ${{ secrets.NOTION_DB_ID_CAREER }}
           NOTION_PAGE_ID_SETTINGS: ${{ secrets.NOTION_PAGE_ID_SETTINGS }}
 
       - name: Commit and push if changed

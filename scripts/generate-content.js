@@ -15,7 +15,11 @@ const notion = new Client({ auth: process.env.NOTION_API_KEY });
 const DB_CASES    = process.env.NOTION_DB_ID_CASES;
 const DB_GROWTH   = process.env.NOTION_DB_ID_GROWTH;
 const DB_SKILLS   = process.env.NOTION_DB_ID_SKILLS;
+const DB_CAREER   = process.env.NOTION_DB_ID_CAREER;
 const PAGE_SETTINGS = process.env.NOTION_PAGE_ID_SETTINGS;
+
+const DEFAULT_HERO_DESCRIPTION = 'ATS 도입 · 근태 시스템 재편 · 52시간 관리 · 업무 자동화<br>1년 안에 4개 영역을 직접 설계하고 작동시켰습니다.';
+const DEFAULT_HERO_HEADLINE_HTML = '\'원래 이랬어\'를 <span style="color: var(--primary)">바꾸는</span> HR입니다.';
 
 // ──────────────────────────────────────────────
 // 유틸: Notion 텍스트 → HTML (인라인 서식)
@@ -48,6 +52,7 @@ function prop(page, name, fallback = '') {
   if (p.type === 'status')    return p.status ? p.status.name : fallback;
   if (p.type === 'number')    return p.number ?? fallback;
   if (p.type === 'url')       return p.url ?? fallback;
+  if (p.type === 'date')      return p.date ? { start: p.date.start || '', end: p.date.end || '' } : fallback;
   return fallback;
 }
 
@@ -57,6 +62,26 @@ function propAny(page, names, fallback = '') {
     if (value !== undefined && value !== null && value !== '') return value;
   }
   return fallback;
+}
+
+function splitContentLines(value) {
+  return String(value || '')
+    .split(/\r?\n|<br\s*\/?>/i)
+    .map(line => line.trim())
+    .filter(Boolean);
+}
+
+function formatYearMonth(value) {
+  const match = String(value || '').match(/^(\d{4})-(\d{2})/);
+  return match ? `${match[1]}.${match[2]}` : '';
+}
+
+function formatCareerPeriod(dateValue, status) {
+  const start = formatYearMonth(dateValue?.start);
+  const end = formatYearMonth(dateValue?.end);
+  if (!start) return status === '재직 중' ? '재직 중' : '';
+  if (status === '재직 중' || !end) return `${start} ~ 재직 중`;
+  return `${start} ~ ${end}`;
 }
 
 const PUBLISH_STATUS_PROPERTY_ALIASES = [
@@ -468,7 +493,7 @@ async function publishFilterForDatabase(dbId, label) {
 
 async function fetchSettings() {
   const page = await notion.pages.retrieve({ page_id: PAGE_SETTINGS });
-  // 먼저 페이지 속성에서 읽기
+  // Read page properties first.
   const result = {
     resume_kr:             prop(page, 'resume_kr'),
     resume_en:             prop(page, 'resume_en'),
@@ -481,27 +506,30 @@ async function fetchSettings() {
     gpaCredits:            prop(page, 'academic_gpa_credits'),
     gpaMajor:              prop(page, 'academic_gpa_major'),
     gpaMajorCredits:       prop(page, 'academic_gpa_major_credits'),
+    heroHeadlineHTML:      prop(page, 'hero_headline_html'),
+    heroDescription:       prop(page, 'hero_description'),
   };
-  // 속성에 학력 데이터가 없으면 본문 텍스트에서 "key: value" 형식 파싱
-  if (!result.school) {
-    const blocks = await fetchBlocks(PAGE_SETTINGS);
-    const keyMap = {
-      academic_school: 'school', academic_major: 'major',
-      academic_period: 'period', academic_gpa_total: 'gpaTotal',
-      academic_gpa_credits: 'gpaCredits', academic_gpa_major: 'gpaMajor',
-      academic_gpa_major_credits: 'gpaMajorCredits',
-      resume_kr: 'resume_kr', resume_en: 'resume_en',
-      portfolio_kr: 'portfolio_kr', portfolio_en: 'portfolio_en',
-    };
-    for (const b of blocks) {
-      const texts = b[b.type]?.rich_text;
-      if (!texts) continue;
-      const line = texts.map(t => t.plain_text).join('').trim();
-      const m = line.match(/^(\w+):\s*(.+)$/);
-      if (m && keyMap[m[1]]) {
-        const key = keyMap[m[1]];
-        if (!result[key]) result[key] = m[2].trim();
-      }
+
+  // Always parse body-level "key: value" lines as settings overrides.
+  const blocks = await fetchBlocks(PAGE_SETTINGS);
+  const keyMap = {
+    academic_school: 'school', academic_major: 'major',
+    academic_period: 'period', academic_gpa_total: 'gpaTotal',
+    academic_gpa_credits: 'gpaCredits', academic_gpa_major: 'gpaMajor',
+    academic_gpa_major_credits: 'gpaMajorCredits',
+    resume_kr: 'resume_kr', resume_en: 'resume_en',
+    portfolio_kr: 'portfolio_kr', portfolio_en: 'portfolio_en',
+    hero_headline_html: 'heroHeadlineHTML',
+    hero_description: 'heroDescription',
+  };
+  for (const b of blocks) {
+    const texts = b[b.type]?.rich_text;
+    if (!texts) continue;
+    const line = texts.map(t => t.plain_text).join('').trim();
+    const m = line.match(/^(\w+):\s*(.+)$/);
+    if (m && keyMap[m[1]]) {
+      const key = keyMap[m[1]];
+      if (!result[key]) result[key] = m[2].trim();
     }
   }
   return result;
@@ -560,6 +588,59 @@ async function fetchCases() {
     careerProjects,
     dxCases,
     sync: {
+      publishedRows: rows.length,
+      publishProperty: publishFilter.propertyName,
+      publishPropertyType: publishFilter.propertyType,
+      publishValues: publishFilter.publishValues,
+    },
+  };
+}
+
+async function fetchCareerHistory() {
+  if (!DB_CAREER) {
+    console.warn('[warn] NOTION_DB_ID_CAREER is not set; skipping career history DB sync.');
+    return {
+      careerHistory: [],
+      sync: {
+        skipped: true,
+        publishedRows: 0,
+        publishProperty: '',
+        publishPropertyType: '',
+        publishValues: [],
+      },
+    };
+  }
+
+  const publishFilter = await publishFilterForDatabase(DB_CAREER, 'Career history');
+  const rows = await queryAll(
+    DB_CAREER,
+    publishFilter.filter,
+    [{ property: '순서', direction: 'ascending' }],
+    'Career history'
+  );
+
+  const careerHistory = rows.map((row, index) => {
+    const order = prop(row, '순서') || index + 1;
+    const status = prop(row, '재직상태');
+    const details = splitContentLines(prop(row, '업무상세'));
+    return {
+      id:       `role_${order}`,
+      company:  prop(row, '회사'),
+      department: prop(row, '부서명'),
+      position: prop(row, '직책'),
+      period:   formatCareerPeriod(prop(row, '재직기간', null), status),
+      summary:  prop(row, '업무요약'),
+      details,
+      employmentType: prop(row, '구분'),
+      status,
+      order,
+    };
+  });
+
+  return {
+    careerHistory,
+    sync: {
+      skipped: false,
       publishedRows: rows.length,
       publishProperty: publishFilter.propertyName,
       publishPropertyType: publishFilter.propertyType,
@@ -715,7 +796,7 @@ async function fetchSkills() {
 // content.js 파일 생성
 // ──────────────────────────────────────────────
 function buildContentJs(data) {
-  const { settings, careerProjects, dxCases, trainingList, activitiesList, certificationList, modalDetails, skillsHtml, academicHtml } = data;
+  const { settings, careerProjects, careerHistory, dxCases, trainingList, activitiesList, certificationList, modalDetails, skillsHtml, academicHtml } = data;
 
   const serialize = val => JSON.stringify(val, null, 2)
     .replace(/"modalContent":/g, 'modalContent:')
@@ -737,8 +818,8 @@ const SITE_CONTENT = {
 
   // ===== 히어로 섹션 (하드코딩) =====
   heroSubtitle: "HR Operations",
-  heroDescription: \`ATS 도입 · 근태 시스템 재편 · 52시간 관리 · 업무 자동화<br>1년 안에 4개 영역을 직접 설계하고 작동시켰습니다.\`,
-  heroHeadlineHTML: \`'원래 이랬어'를 <span style="color: var(--primary)">바꾸는</span> HR입니다.\`,
+  heroDescription: \`${settings.heroDescription || DEFAULT_HERO_DESCRIPTION}\`,
+  heroHeadlineHTML: \`${settings.heroHeadlineHTML || DEFAULT_HERO_HEADLINE_HTML}\`,
   heroImpactHTML: \`700명 규모 사업장 근태 시스템 재설계 →<br>인식률 <span style="color: var(--primary)">+12%p</span>, 수기 정정 <span style="color: var(--primary)">–8%p</span>, 클레임 <span style="color: var(--primary)">0건</span>\`,
 
   // ===== 다운로드 링크 (Notion: 사이트 설정) =====
@@ -749,6 +830,9 @@ const SITE_CONTENT = {
 
   // ===== 경력 프로젝트 (Notion: 케이스 스터디 DB, 유형=career) =====
   careerProjects: ${JSON.stringify(careerProjects, null, 4)},
+
+  // ===== Career history (Notion: Career DB) =====
+  careerHistory: ${JSON.stringify(careerHistory, null, 4)},
 
   // ===== DX 사례 (Notion: 케이스 스터디 DB, 유형=dx) =====
   dxCases: ${JSON.stringify(dxCases, null, 4)},
@@ -774,11 +858,13 @@ const SITE_CONTENT = {
 `;
 }
 
-function buildSyncSummary(caseData, growthData, skillData, contentLength) {
+function buildSyncSummary(caseData, careerData, growthData, skillData, contentLength) {
   return {
     cases: caseData.sync.publishedRows,
     career: caseData.careerProjects.length,
     dx: Object.keys(caseData.dxCases).length,
+    careerHistory: careerData.sync.publishedRows,
+    careerHistorySkipped: careerData.sync.skipped,
     growth: growthData.sync.publishedRows,
     training: growthData.trainingList.length,
     activities: growthData.activitiesList.length,
@@ -795,13 +881,18 @@ function writeSyncSummary(summary) {
   fs.writeFileSync(outPath, `${JSON.stringify(summary, null, 2)}\n`, 'utf8');
 }
 
-function printSyncSummary(settings, caseData, growthData, skillData, contentLength) {
-  const summary = buildSyncSummary(caseData, growthData, skillData, contentLength);
+function printSyncSummary(settings, caseData, careerData, growthData, skillData, contentLength) {
+  const summary = buildSyncSummary(caseData, careerData, growthData, skillData, contentLength);
 
   console.log('Sync summary:');
   console.log(`- Case studies: ${caseData.sync.publishedRows} published rows using "${caseData.sync.publishProperty}" (${caseData.sync.publishPropertyType}: ${caseData.sync.publishValues.join(', ')})`);
   console.log(`  - Career projects: ${summary.career}`);
   console.log(`  - DX cases: ${summary.dx}`);
+  if (careerData.sync.skipped) {
+    console.log('- Career history: skipped (NOTION_DB_ID_CAREER not set)');
+  } else {
+    console.log(`- Career history: ${careerData.sync.publishedRows} published rows using "${careerData.sync.publishProperty}" (${careerData.sync.publishPropertyType}: ${careerData.sync.publishValues.join(', ')})`);
+  }
   console.log(`- Growth records: ${growthData.sync.publishedRows} published rows using "${growthData.sync.publishProperty}" (${growthData.sync.publishPropertyType}: ${growthData.sync.publishValues.join(', ')})`);
   console.log(`  - Training: ${summary.training}`);
   console.log(`  - Activities: ${summary.activities}`);
@@ -818,6 +909,8 @@ function printSyncSummary(settings, caseData, growthData, skillData, contentLeng
     ['academic_school', settings.school],
     ['academic_major', settings.major],
     ['academic_period', settings.period],
+    ['hero_headline_html', settings.heroHeadlineHTML],
+    ['hero_description', settings.heroDescription],
   ].filter(([, value]) => !value).map(([key]) => key);
 
   if (missingSettings.length) {
@@ -840,9 +933,10 @@ async function main() {
   }
 
   console.log('Fetching Notion data...');
-  const [settings, caseData, growthData, skillData] = await Promise.all([
+  const [settings, caseData, careerData, growthData, skillData] = await Promise.all([
     fetchSettings(),
     fetchCases(),
+    fetchCareerHistory(),
     fetchGrowth(),
     fetchSkills(),
   ]);
@@ -862,6 +956,7 @@ async function main() {
       },
     },
     careerProjects: caseData.careerProjects,
+    careerHistory: careerData.careerHistory,
     dxCases:        caseData.dxCases,
     trainingList:      growthData.trainingList,
     activitiesList:    growthData.activitiesList,
@@ -873,7 +968,7 @@ async function main() {
 
   const outPath = path.join(__dirname, '..', 'content.js');
   fs.writeFileSync(outPath, content, 'utf8');
-  const summary = printSyncSummary(settings, caseData, growthData, skillData, content.length);
+  const summary = printSyncSummary(settings, caseData, careerData, growthData, skillData, content.length);
   writeSyncSummary(summary);
   console.log(`content.js written (${content.length} bytes)`);
 }
