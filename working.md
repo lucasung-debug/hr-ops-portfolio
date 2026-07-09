@@ -1112,3 +1112,371 @@ No files modified. Deliverable complete.
 
 - Master wants per-submission control of 퇴사/이직 사유·연봉/희망처우·상세 연락처/주소; protection = Cloudflare Access.
 - Design (plan §12): public content.js NEVER contains sensitive fields; a separate career-private.js behind /career* (Cloudflare Access) holds them; career.html gets field toggles → per-employer print. PR #17 merges first (removes 퇴사사유 from public), L1.5 generalizes. Claude to add 연봉/희망처우 + phone/address fields via MCP; master sets Access policy.
+
+### 2026-07-09 - Adversarial refutation: plan §13 per-career carousel
+
+Mode: findings only, no implementation. Scope verified against latest `main` (`9386336`), `docs/plans/2026-07-08-living-portfolio-plan.md` §13, `index.html`, `scripts/generate-content.js`, `content.js`, and live Notion via MCP.
+
+#### Evidence Snapshot
+
+- Plan §13 says to add a `소속경력` SELECT on the case-studies DB, tag existing `career_1..6 + dx1..3` as `오뚜기라면(주)`, emit `company` on both `careerProject` and `dxCase`, then group at render time by `careerHistory.company`.
+- Live Notion fetch of `케이스 스터디 DB` (`31bc27c2-afbf-804c-8284-ee974d2189a0`) shows schema fields only: `desc`, `evidenceUrl`, `sub`, `결과`, `문제`, `뱃지`, `상태`, `순서`, `액션`, `유형`, `제목`. There is no `소속경력` property yet. Representative pages `ATS(채용관리솔루션) 도입` and `HR 전략 뉴스레터 자동화` also have no `소속경력` property.
+- Live Notion fetch of `경력 DB` confirms `회사` exists and current rows are `(주)드림어스컴퍼니` with `상태=초안`, `순서=1`, and `오뚜기라면(주)` with `상태=발행`, `순서=2`.
+- `scripts/generate-content.js:550-585` currently builds `careerProjects` and `dxCases` without reading `소속경력` or emitting any `company` key. `content.js:58-150` likewise has no `company` keys on either case structure.
+- `index.html:834-865` renders `careerProjects` as an array into `#career-grid`; `index.html:868-896` renders `dxCases` as an object into a separate `#dx-grid`; `index.html:1031-1050` uses separate modal openers for career and DX cases.
+
+#### BLOCKER Findings
+
+1. **L13-G2 fail-loud is not implementable from the stated "group at render time" path.**
+   - Plan evidence: §13 says exact string mismatch silently drops a case (`docs/plans/2026-07-08-living-portfolio-plan.md:275-276`), then requires unset/mismatched `소속경력` to be reported by the sync summary instead (`:297-298`).
+   - Code evidence: current sync summary only reports counts (`scripts/generate-content.js:887-894`), while cases are emitted without any employer field (`scripts/generate-content.js:550-585`). If grouping happens only in `index.html`, the generator has no validation point and a missing/mismatched company becomes a client-side non-match.
+   - Consequence: a bad or blank `소속경력` will silently disappear from every employer card unless §13 adds an explicit generator validation pass comparing every published case's `소속경력` against the set of published `careerHistory.company` values. The plan names the gate but not the mechanism.
+
+2. **`careerProjects` and `dxCases` do not share a render/model path, so "cases inside each career card" is under-specified and likely breaks existing anchors.**
+   - Code evidence: career projects are an array rendered by `renderCareerGrid()` (`index.html:834-865`) and opened by `openModal()` via `D.careerProjects.find(...)` (`index.html:1031-1038`). DX cases are an object rendered by `renderDxGrid()` (`index.html:868-896`) and opened by `openDxModal()` (`index.html:1042-1050`).
+   - Anchor evidence: the public nav points to `#dxcase` (`index.html:257`, `index.html:319`) and the DX section exists separately at `index.html:530-537`. Evidence URLs are also keyed to external `#case-*` anchors in `scripts/generate-content.js:212-219`.
+   - Consequence: simply grouping "cases where company==this" into the career carousel does not say whether DX remains in `#dxcase`, is duplicated, is moved, or gets a redirect/anchor shim. L13-G4 cannot be verified until the plan explicitly preserves `#dxcase`, existing data-action modal paths, and evidence-link behavior.
+
+#### MAJOR Findings
+
+3. **SELECT-string matching is a load-bearing rename-drift risk; relation is the more correct Notion model.**
+   - Plan evidence: §13 deliberately chooses exact SELECT option text equal to `경력 DB 회사` titles (`docs/plans/2026-07-08-living-portfolio-plan.md:272-276`).
+   - Notion evidence: career company names are title values in another DB (`회사` in `경력 DB`), while the case DB currently has no link property. A company rename in the career DB will not update SELECT option text in the case DB.
+   - Position: SELECT can survive only if generator validation is mandatory and fails sync on unknown/blank values. A Notion relation would use page identity and avoid rename drift, but requires adding relation support to `prop()` and deciding how to serialize related career title/id. The plan should justify why string SELECT is worth that long-term drift.
+
+4. **Raw HTML / crawler visibility is already weak and the carousel risks making it worse.**
+   - Code evidence: the current role title and summary fallback are empty in raw HTML (`index.html:494-495`) and filled only by `renderCareerHeader()` from `content.js` (`index.html:805-831`). `updateCareerDuration()` exits when `careerHistory` exists (`index.html:1082-1085`).
+   - SEO context: SEO-1b invested in crawlable head/schema, but §13 would move even more career/case content into JS-built carousel state unless it defines raw fallback markup or server/static generation.
+   - Consequence: crawlers or previews that do not execute JS may see an empty career header and no per-employer card content. The plan asks the right question at `docs/plans/...:307-308`, but it needs a gate such as "raw `index.html` contains the current published company/title summary or an acceptable static fallback."
+
+5. **The existing single-current-role functions and static operations list conflict with a carousel unless explicitly retired.**
+   - Code evidence: `renderCareerHeader()` always reads only `history[0]` (`index.html:805-808`), `renderCareerGrid()` always renders all `D.careerProjects` flat (`index.html:834-865`), and Operations & Compliance is still static HTML (`index.html:514-524`).
+   - Plan evidence: §13 says each card should include header + only that employer's cases + that employer's `careerHistory[i].details` (`docs/plans/...:281-285`).
+   - Consequence: an additive carousel implementation would duplicate or conflict with the current header/grid/static operations. The plan needs to name the functions/markup to remove or replace; otherwise an implementer can satisfy new markup while leaving stale flat content active.
+
+6. **Keyboard/swipe being "optional" is not acceptable for a carousel.**
+   - Plan evidence: `Keyboard/swipe optional; respect prefers-reduced-motion` (`docs/plans/...:285-287`).
+   - Code evidence: existing cards already support Enter/Space through delegated `[data-action]` handling (`index.html:1174-1190`).
+   - Consequence: once arrows/dots hide content behind state, keyboard access, focus states, ARIA labels/current state, and reduced-motion behavior are not optional. Otherwise L13 introduces an accessibility regression relative to the current static grids.
+
+#### MINOR / Survived Claims
+
+- **Survived:** The incident diagnosis is directionally correct. Current header uses `careerHistory[0]`, while cases/operations are flat/static, so publishing 드림어스 first would pair a 드림어스 header with 오뚜기 case content (`index.html:805-865`, `index.html:514-524`).
+- **Survived with caveat:** Empty-cases career handling is acknowledged (`docs/plans/...:285`). However, if 드림어스 becomes the first published card with no cases, the first carousel page becomes a details-only low-evidence panel. That may be acceptable, but should be a deliberate gate, not merely "no empty projects grid."
+- **Survived:** Sensitive public field removal carries over; current `content.js` has no `departureReason` key in `careerHistory`.
+- **Survived:** `#career` can remain valid if the outer section stays (`index.html:481`). This does not solve `#dxcase`, which is a separate anchor and navigation target.
+
+#### Answers To §13 Refutation Targets
+
+1. **SELECT vs relation:** SELECT-string matching is brittle. It only works if the option text exactly matches `careerHistory.company` and the generator fails loud on blanks/unknowns. Relation is safer for rename drift but requires relation parsing and serialization support.
+2. **One vs many / raw HTML:** One-card carousel can degrade to static if arrows/dots are suppressed, but the current role is JS-only today. A JS-built carousel without raw fallback is an SEO/raw-HTML regression risk.
+3. **Where do dxCases render:** They cannot be treated as the same path today. Career projects are array cards + `openModal`; DX cases are object cards + `openDxModal`. The plan must choose separate per-career DX subsection, unified case schema, or preserve the global `#dxcase` section.
+4. **Anchors/evidence links:** Grouping can break `#dxcase` navigation and modal routes unless explicitly preserved. External evidence URLs (`#case-gift`, `#case-sign`, `#case-keyword`, `#case-recruit`) probably survive because they point to another site, but local section anchors and event handlers still need gates.
+5. **Simpler than carousel:** A stacked per-employer section is stronger than a carousel for this portfolio: no hidden state, fewer a11y controls, more crawler-visible content if statically present, easier anchors, and no "first card has no cases" surprise. It separates employers without making evidence content harder to scan.
+
+#### Verdict
+
+Do not freeze §13 as written. The plan has the right root-cause direction, but it needs an explicit sync-time validation design, a decision on DX placement/anchors, a raw-HTML/SEO gate, and a simpler non-carousel alternative review before implementation.
+
+---
+
+### 2026-07-09 - GLM-5.2 cross-critique of §13 (independent pass, method = §9 dual-refutation)
+
+Mode: findings only, no implementation. Independent re-read of plan §13 + `index.html`, `scripts/generate-content.js`, `content.js`, `docs/plans/2026-07-06-seo-aeo-strategy-plan.md` (§9 SEO-1b). Cross-checked against the codex pass directly above; convergence/divergence noted per the §9 dual-refutation lesson.
+
+#### 1. FALSIFY — does the 소속경력 SELECT-string match actually work?
+
+**No, it is a silent-drop trap and the "fail-loud" gate (L13-G2) has no implementation path in the stated design.**
+
+- The generator today emits cases with zero employer linkage: `fetchCases()` reads `유형` then builds `careerProjects` / `dxCases` from `제목/sub/desc/문제/액션/결과/뱃지/순서` only (`generate-content.js:550-586`). No `소속경력` is read; no `company` key is written.
+- §13 says "Group at render time by careerHistory company" (`plan:278-279`). That puts the match logic in `index.html`, but the ONLY validation surface the pipeline has is `printSyncSummary` (`generate-content.js:884-922`), which reports counts + warns on `missingSettings` — it has no knowledge of case↔career linkage. A render-time-only match cannot fail-loud at sync; a blank/mismatched `소속경력` silently yields zero cards for that case.
+- **Concrete failure mode:** tag a new case "오뚜기라면" (missing the "(주)" or trailing space). `renderCareerHeader`/grouping does string `===`. Case vanishes from every card. No error, no warning, no log. This is exactly the class of bug that caused the original 드림어스 incident §13 is trying to fix.
+- **Verdict on the match:** string SELECT *can* work mechanically IF and ONLY IF the generator gains a validation pass that (a) reads `소속경력` for every published case, (b) normalizes (trim), (c) compares against the set of published `careerHistory.company`, (d) warns/fails sync on blank-or-unknown. §13 names the gate (L13-G2) but not this mechanism. The plan even half-admits it ("consider a normalize step", `plan:276`) then does not commit.
+
+#### 2. Do dxCases and careerProjects share a render path?
+
+**No — structurally and behaviorally distinct. §13 treats them as one pool ("cases where company==this") without reconciling the split.**
+
+| | careerProjects | dxCases |
+|---|---|---|
+| data shape | array (`content.js:58`) | object keyed `dx1..n` (`content.js:131`) |
+| builder | `buildCareerModalHtml` (`gen:362`) | `buildDxContentHtml` (`gen:371`) |
+| render fn | `renderCareerGrid` → `#career-grid` (`index.html:834`) | `renderDxGrid` → `#dx-grid` (`index.html:868`) |
+| modal opener | `openModal` via `D.careerProjects.find` (`index.html:1031`) | `openDxModal` via `D.dxCases[id]` (`index.html:1042`) |
+| section/anchor | `#career` (`index.html:481`) | `#dxcase` (`index.html:530`) |
+
+§13 refutation target #3 asks "same grid as careerProjects, or separate?" but the plan body (`plan:283-285`) only mentions "KEY PROJECTS" (career) + "OPERATIONS" (details) per card — dxCases are never mentioned in the card composition. **A reader of §13 alone cannot determine whether DX cases move into the carousel, stay in `#dxcase`, get duplicated, or disappear.** This is a gap, not an oversight: dx cases are 3 of the 9 tagged cases and carry 3 of the 4 external evidence links.
+
+#### 3. ATTACK — the 5 refutation targets, my positions
+
+**Target 1 — SELECT vs Notion relation (rename drift): SELECT loses, relation wins, but relation costs code.**
+Evidence: career company lives as a title-text in another DB; the case DB's SELECT option text is free-floating metadata that nothing keeps in sync with the title. Renaming `(주)드림어스컴파니` → `드림어스컴파니(주)` in the career DB title does NOT mutate the case DB SELECT options. A Notion relation property would bind by page identity and survive renames. Counter-cost: `prop()` has no `relation` case (`generate-content.js:46-57`); serializing a relation requires reading `relation[].id` then resolving the career page title — a fetch-per-case or a pre-built id→title map. Position: **SELECT is acceptable ONLY with the mandatory sync-validation pass from §1 above; otherwise it is a guaranteed future silent-drop.** If the team is willing to add relation support, it is strictly more correct.
+
+**Target 2 — raw-HTML/crawler visibility of the current role: CONFIRMED REGRESSION RISK.**
+Evidence I measured:
+- Raw `index.html:494` `<h3 id="career-current-title">` is **empty**; `:495` summary is empty. The only seeded static value is `:500` `career-duration` = "2025.03 ~ 재직 중" and `:492` a hardcoded "Recruiter" badge + `:502-504` a hardcoded highlight block citing "700명 규모 제조 현장".
+- All real career content (`renderCareerHeader`, `index.html:805-832`) is JS-injected from `content.js`.
+- SEO-1b (`seo-plan:170-217`) invested heavily in crawlable raw HTML: JSON-LD `hasCredential`/`sameAs`/`ProfilePage` must parse from raw bytes (`G-S8`), sitemap/robots must be real files (`G-S9`). The explicit philosophy is "recruiters/AI crawlers that don't run JS must still see the person."
+- A JS-built carousel moves the FIRST employer card (the current role — the single most important recruiter signal) entirely behind JS execution. A non-JS crawler today at least sees the stale static "2025.03 ~ 재직 중" + highlight; after a pure-JS carousel with empty static fallback it sees nothing meaningful for career.
+- Position: **§13 must add a gate "raw index.html career section contains a statically-seeded current-employer summary OR a `<noscript>` fallback" — otherwise L13 undoes SEO-1b's raw-HTML investment for the career section.**
+
+**Target 3 — dxCases render path: see §2. Must be decided explicitly. My position: keep `#dxcase` as the canonical DX home; do NOT fold DX into the career carousel.** DX cases are cross-cutting automation work (GAS, MAKE, text-mining) that is arguably employer-agnostic and is currently a distinct navigational section with its own nav link. Folding them into per-employer cards would shrink recruiter discoverability and break `#dxcase`. If per-employer attribution is desired, tag them but ALSO keep them in `#dxcase` (duplicate render), and document that choice.
+
+**Target 4 — anchors + evidence-link modals: `#dxcase` is the live risk; external `#case-*` are safe.**
+- External evidence URLs (`evidenceUrlForCase`, `gen:208-222`) point to a *different site* (`lucasung-debug.github.io/hermes-ops-dashboard-page/#case-gift` etc.) — these are immune to local DOM changes. Survived.
+- Local nav anchors: `#career` and `#dxcase` are both nav targets. §13 says "#career still lands on the section" (`plan:288`) but says nothing about `#dxcase`. If DX cards are moved into the carousel, `#dxcase` lands on an empty/degraded section.
+- Modal event delegation (`index.html:1174-1191`) keys on `data-action="open-modal"|"open-dx-modal"` + `data-id`. If cards are re-homed into carousel slides, these attributes must survive the move or modals break silently (click does nothing). No gate covers this.
+
+**Target 5 — simpler than carousel: YES, stacked per-employer sections are strictly better here.**
+- The portfolio has exactly 2 employers (오뚜기 published, 드림어스 draft). A carousel for 2 items is overhead with no payoff and real a11y/SEO cost.
+- Stacked sections: no hidden state, no arrow/dot controls, no keyboard trap, fully crawler-visible, trivially deep-linkable (`#career-ottogi`, `#career-dreamus`), no "first card has no cases" awkwardness, degrades to 1 section naturally.
+- The ONLY argument for a carousel is "master said carousel" (`plan:267-269`). That is a product-preference call, not a technical one — but as a refuter I must surface that the technical merits favor stacking, and the plan's refutation target #5 explicitly invites that challenge.
+
+#### 4. FIND what §13 MISSES
+
+**M1 (MAJOR) — the Operations block is hardcoded, not data-driven, and §13 ignores it.** `index.html:514-524` "Operations & Compliance" is 7 hardcoded `<li>` items (도급비 정산, 노무비 대시보드, …). §13 says each card's OPERATIONS = `careerHistory[i].details` (`plan:284`). But `careerHistory.details` for 오뚜기 (`content.js:114-123`) has 8 items that OVERLAP but DO NOT MATCH the hardcoded 7 (e.g. "경조화환 주문·전자 서명" is in `details` but the hardcoded list has no equivalent; "코스트코·BRCGS 글로벌 식사" is hardcoded but absent from `details`). An implementer following §13 literally would either (a) show `details` and silently drop the hardcoded items, or (b) show both and duplicate. **§13 must state: Operations list becomes `careerHistory[i].details`; the hardcoded `index.html:516-524` `<ul>` is removed; master must reconcile the 7 hardcoded items into the Notion `업무상세` field (some are currently missing).**
+
+**M2 (MAJOR) — the already-merged `renderCareerHeader` + fallback logic must be explicitly retired/rewired.** `renderCareerHeader` (`index.html:805-832`) reads ONLY `history[0]` and writes to singleton DOM nodes (`career-current-title`, `career-current-summary`, `career-current-highlight`, `career-current-employment-type`, `career-duration`). `updateCareerDuration` (`index.html:1082-1095`) early-returns when `careerHistory` exists. A carousel needs N sets of these nodes. §13 does not name a single function/element to remove. Risk: additive implementation leaves `renderCareerHeader` writing the first card's data into stale singleton nodes that the carousel also renders → duplicate/contradictory DOM. **§13 must enumerate: delete/replace `renderCareerHeader`, `updateCareerDuration`, and the `:487-506` singleton header block.**
+
+**M3 (MAJOR) — keyboard/reduced-motion/a11y marked "optional" is a regression.** §13: "Keyboard/swipe optional" (`plan:285`). Current cards already have keyboard support via delegated `[data-action]` Enter/Space (`index.html:1186-1191`) and `tabindex="0" role="button"`. A carousel that hides non-active slides via `display:none`/`hidden` without `aria-roledescription="carousel"`, `aria-label` per slide, focus management on slide change, and arrow-key handlers is a WCAG step backward from the current flat grid. `prefers-reduced-motion` must disable slide animation, not just "be respected" vaguely. **Demote "optional" → required gate: "L13-G6: carousel meets WCAG carousel pattern; reduced-motion renders all slides static or suppresses transition."**
+
+**M4 (MINOR→MAJOR if ignored) — the empty-cases career (드림어스) is the FIRST card by 순서, so the carousel opens on its weakest slide.** `순서 asc = newest first` (`plan:282-283`), 드림어스 = 순서 1. 드림어스 has 0 tagged cases today (none exist in the case DB for it). So the carousel's default-visible card = details-only, no Key Projects. §13 acknowledges empty-cases (`plan:285`) but does not address that this lands on the CURRENT role — the one recruiters most want to see with evidence. Position: either (a) seed 드림어스 cases before publish, or (b) default the carousel to the most-evidence-rich card, or (c) accept it as a deliberate gate.
+
+#### 5. Ranking (BLOCKER / MAJOR / MINOR) with file:line evidence
+
+**BLOCKERS**
+- **B1.** L13-G2 fail-loud has no implementation path: render-time grouping (`plan:278-279`) + count-only sync summary (`generate-content.js:887-894`) = blank/mismatched `소속경력` silently drops a case. Gate names the outcome, not the mechanism. (`generate-content.js:550-586`, `:884-922`)
+- **B2.** dxCases vs careerProjects are structurally split (array vs object, two render fns, two modal openers, two anchors) and §13's card composition omits DX entirely (`plan:283-285`). Implementer cannot determine DX fate. (`index.html:834-896`, `:1031-1050`, `content.js:58,131`)
+
+**MAJORS**
+- **M1.** Operations hardcoded `index.html:514-524` (7 items) diverges from `careerHistory.details` (8 items, partial overlap). §13 silently swaps one for the other. (`content.js:114-123`)
+- **M2.** `renderCareerHeader` (`index.html:805-832`) + `updateCareerDuration` (`:1082-1095`) + singleton header block (`:487-506`) target single-role DOM; carousel needs N. §13 names none to remove.
+- **M3.** Raw-HTML/crawler visibility: current role is JS-only today (`index.html:494-495` empty); carousel worsens it; conflicts with SEO-1b raw-HTML philosophy (`seo-plan:170-217`, G-S8). No gate.
+- **M4.** a11y "optional" (`plan:285`) is a regression vs current delegated keyboard support (`index.html:1186-1191`).
+- **M5.** 드림어스 (순서 1, 0 cases) becomes the default carousel slide = weakest first impression for the current role.
+
+**MINORS / SURVIVED**
+- **Survived:** Incident diagnosis is correct — `history[0]` header + flat cases/static operations would mis-pair on publish (`index.html:805-865`, `:514-524`).
+- **Survived:** `#career` anchor stays valid if outer section remains (`index.html:481`).
+- **Survived:** External evidence `#case-*` links point to another domain (`gen:208-222`); immune to local DOM changes.
+- **Survived:** No sensitive fields leak — `content.js` `careerHistory` has no `departureReason` today.
+- **MINOR:** §13's normalize-hint (`plan:276`) is the right instinct but uncommitted; make it a hard requirement.
+
+#### 6. Convergence with codex pass (§9 dual-refutation signal)
+
+codex (entry above, working.md:1116) and GLM-5.2 (this pass) **independently converge** on:
+- B1 fail-loud mechanism gap (both: render-time grouping can't validate at sync)
+- B2/M DX-vs-career structural split + `#dxcase` anchor risk
+- SELECT rename-drift risk, relation as the correct model
+- raw-HTML/SEO regression vs SEO-1b
+- a11y "optional" is unacceptable
+- stacked-sections beats carousel
+
+**Divergence (what this pass adds):**
+- M1 Operations hardcoded vs `details` mismatch — **codex did not surface this; the 7-vs-8 item divergence is a concrete content bug §13 inherits.**
+- M2 explicit enumeration of `renderCareerHeader`/`updateCareerDuration`/singleton block as retire-targets — codex noted the conflict generally; this pass names the exact functions/lines.
+- M5 드림어스-as-first-slide ordering problem — codex noted empty-cases; this pass adds the "it's the CURRENT role, the highest-stakes card" framing.
+
+**Verdict (GLM-5.2):** Do not freeze §13. Convergent BLOCKERS (B1, B2) across two independent refuters = strong signal (per §9 method). Minimum revisions before freeze: (1) mandatory generator-side `소속경력` validation pass; (2) explicit DX placement decision (recommend: keep `#dxcase`, do not fold into carousel); (3) raw-HTML/noscript career-fallback gate; (4) retire-list for `renderCareerHeader`/singleton header/Operations hardcoded list; (5) a11y promoted to required gate; (6) master decision on carousel-vs-stacked given that technical merits favor stacked for a 2-employer portfolio.
+
+No files modified (read-only refutation). Deliverable complete.
+
+---
+
+### 2026-07-09 - Grok adversarial refutation: plan §13 per-career carousel (NEW independent pass)
+
+Mode: findings only, no implementation. Mission = FALSIFY §13, not confirm prior TASK_DONE.
+Verified against `main` HEAD `9386336` by re-reading:
+- `docs/plans/2026-07-08-living-portfolio-plan.md` §13 (`:260-317`)
+- `scripts/generate-content.js` (`prop`, `fetchCases`, `fetchCareerHistory`, `buildSyncSummary`, `evidenceUrlForCase`)
+- `index.html` career/DX sections + render/modal/init
+- `content.js` live shapes
+- `career.html`, `print.html`, `admin.html` (side consumers §13 never names)
+
+Prior working.md entries on §13 were treated as INPUT claims only; every finding below was re-derived from code.
+
+#### 0. Plan self-contradiction (structural)
+
+§13 Data block states matching semantics as **silent drop**:
+> "a mismatch = a case silently drops from every card" (`plan:275-276`)
+
+§13 Gate L13-G2 requires the opposite:
+> "unset/mismatched 소속경력 is reported by the sync summary (fail-loud)" (`plan:297-298`)
+
+These two sentences cannot both be the design. The plan freezes an incompatible pair: it describes the failure mode as the behavior, then gates against that behavior, without naming generator code that would reconcile them.
+
+#### 1. FALSIFY — SELECT-string match vs current generator
+
+**Claim under test:** add `소속경력` SELECT, emit `company`, group at render by `careerHistory.company`.
+
+| Check | Result | Evidence |
+|---|---|---|
+| Does generator read `소속경력` today? | **NO** | `fetchCases()` builds career/dx from 유형+제목+sub/desc/문제/액션/결과/뱃지 only (`generate-content.js:550-585`). Zero `company` emission. |
+| Does `content.js` carry employer on cases? | **NO** | `careerProjects` / `dxCases` entries have no `company` key (`content.js:58-149`). |
+| Can `prop()` read a SELECT if added? | **YES (survived mechanism)** | `prop()` already handles `select` → `p.select.name` (`generate-content.js:51`). Empty select → fallback `''` (`:51`). |
+| Can `prop()` read a Notion relation? | **NO** | `prop()` switch ends at title/rich_text/select/status/number/url/date (`:46-56`). Unknown types return `fallback` (empty string). Relation path would silent-empty without new code. |
+| Does sync summary report unmatched employers? | **NO** | `buildSyncSummary` is count-only (`:861-877`): cases/career/dx/careerHistory/… No `unmatchedCompany` / `orphanCases` field. |
+| Empty or mismatched `소속경력` if grouped only at render? | **SILENT DROP** | Empty select → `''`. `'' === careerHistory.company` is false for every role → case appears in no card. No throw, no warn. |
+| L13-G2 fail-loud implementable from "group at render time" alone? | **NO — BLOCKER** | Client grouping cannot write the sync summary. Fail-loud requires a **generator-side** validation pass: for every published case, require non-empty `소속경력` (trim) ∈ published `careerHistory.company` set; else append to summary and non-zero exit / hard warn. Plan names the gate, not this pass. |
+
+**Pre-existing string drift (proves rename risk is not theoretical):**
+- `content.js` `companyName` = `"오뚜기라면 인사팀"` (`content.js:12`, also hardcoded in `generate-content.js:816`)
+- `careerHistory[0].company` = `"오뚜기라면(주)"` (`content.js:109`)
+- §13 tags cases as `"오뚜기라면(주)"` (`plan:274`)
+
+Three already-divergent labels for one employer. SELECT option text equal to career title will drift the same way the first time anyone renames a 회사 title without editing every case SELECT option.
+
+**Verdict:** SELECT-string matching is *mechanically readable* via existing `prop()`, but **does not work as a safe system** with the stated design. Current generator: no field, no emit, no validate. Empty/mismatch = silent drop. Fail-loud is unspecced. Relation is identity-stable but currently unparseable.
+
+#### 2. FALSIFY — shared render path for dxCases + careerProjects?
+
+**No. They are not groupable without an explicit dual-path (or schema-unification) design.**
+
+| Axis | careerProjects | dxCases |
+|---|---|---|
+| Shape | array | object (`dx1`, `dx2`, …) |
+| Builder | `buildCareerModalHtml` | `buildDxContentHtml` |
+| Grid | `#career-grid` via `renderCareerGrid` (`index.html:834-865`) | `#dx-grid` via `renderDxGrid` (`:868-896`) |
+| Modal | `openModal` + `find(id)` (`:1031-1039`) | `openDxModal` + `cases[id]` (`:1042-1050`) |
+| Section + nav | `#career` (`:481`, nav `:251`, `:318`) | `#dxcase` (`:530`, nav `:257`, `:319`) |
+| Card chrome | tags + title + desc + evidence | badge + title + "자세히 보기" + evidence |
+
+§13 card composition (`plan:283-285`) names only:
+- header = `careerHistory[i]`
+- KEY PROJECTS = cases where company==this
+- OPERATIONS = `careerHistory[i].details`
+
+It never says whether "cases" includes `유형=dx`. If yes → must re-home or dual-render DX and still preserve `#dxcase` + `open-dx-modal`. If no → tagging dx1..3 (`plan:274`) is pointless work with no UI consumer. **Under-specified = implementer roulette.**
+
+#### 3. ATTACK — §13's five refutation targets (evidence positions)
+
+**T1. SELECT-string vs Notion relation (rename drift)**
+- **Position: SELECT is load-bearing fragile; relation is the correct model; either needs code the plan under-states.**
+- SELECT: exact option name must stay equal to `회사` title forever. Repo already has label drift (`오뚜기라면 인사팀` vs `오뚜기라면(주)`).
+- Relation: survives rename; requires (a) `prop()` relation support or custom reader, (b) id→title map from published career rows, (c) serialize stable `company` (title) and/or `careerId`.
+- Acceptable compromise: SELECT **only if** generator validation is mandatory and sync fails/warns on blank/unknown (makes L13-G2 real). Without that, SELECT is a silent-drop landmine.
+
+**T2. careers=1 vs many; raw-HTML / crawler visibility of current role**
+- **Position: current role is already JS-only for title/summary; a pure-JS carousel worsens body crawlability for multi-employer content. SEO-1b head work does not protect the career body.**
+- Raw HTML evidence:
+  - `#career-current-title` empty (`index.html:494`)
+  - `#career-current-summary` empty (`:495`)
+  - `#career-grid` / `#dx-grid` empty shells filled by JS (`:511`, `:537`)
+  - Static residual: duration `"2025.03 ~ 재직 중"` (`:500`), employment-type fallback `"Recruiter"` (`:492`), hardcoded highlight 700명 (`:502-504`), static Operations list (`:516-524`)
+- Head SEO (JSON-LD/meta, `:6-21`) is static and **does not** list current employer from `careerHistory`. Carousel does not fix head; if non-active slides are `hidden`/`display:none`, crawlers that do run limited JS still may only see one slide.
+- L13-G3 (single career → static card, no broken arrows) **survives as a sound UX gate** — but is independent of the SEO gap.
+- Required missing gate: raw or noscript career fallback containing at least current company · position · period, or accept explicit regression vs SEO-1b body philosophy.
+
+**T3. Where do dxCases render per-career?**
+- **Position: keep `#dxcase` as canonical DX surface; do not fold DX into career carousel as the only home.**
+- Rationale: separate nav item, separate story (automation), different modal HTML, 3/4 external evidence links live on DX/career mixed cases. Folding DX only into employer cards destroys the DX narrative section and orphan `#dxcase`. Dual-tag for attribution is optional; dual-render must be explicit if chosen.
+
+**T4. Does grouping break `#dxcase` / evidence anchors?**
+- `#career` outer section can stay (`:481`) → deep-link to section **survives** if section id unchanged.
+- `#dxcase` **breaks** if DX cards leave that section empty while nav still points there (`:257`, `:319`, `:530`).
+- External evidence URLs (`evidenceUrlForCase`, `generate-content.js:209-221` → `hermes-ops-dashboard-page/#case-*`) **survive** — different origin, not local DOM.
+- Modal openers: document-level delegation (`index.html:1184-1190`) **survives re-parenting** *if* `data-action` + `data-id` attributes are preserved on re-rendered cards. L13-G4 is partial-survivable for modals; not for section anchors.
+- Plan says "Cases moving between careers must not break the evidence links / modals" (`plan:292`) but only gates L13-G4 for "inside a card" — omits `#dxcase` nav contract.
+
+**T5. Anything simpler than a carousel?**
+- **Position: stacked per-employer sections beat carousel for this portfolio. Carousel is unjustified complexity at N≈2.**
+- Counter-example already in-repo: `career.html` stacks every `careerHistory` row as full articles (`career.html:212-253`) — no carousel, no hidden state, multi-employer works today.
+- Stacked on `index.html` would:
+  - separate employers (solves the incident)
+  - keep all evidence visible without slide state
+  - avoid a11y carousel pattern requirements
+  - avoid "default slide = empty-cases current role" (see M6)
+  - degrade naturally when N=1
+- Carousel only wins if master prioritizes compact single-card chrome over scanability. Technical merits favor stack. §13 invites this challenge (`plan:311-312`); answer is **yes, stack wins**.
+
+#### 4. FIND what §13 MISSES
+
+**MISS-1 (BLOCKER) — no generator validation design for L13-G2**  
+See §1. Gate without mechanism.
+
+**MISS-2 (BLOCKER) — DX fate + `#dxcase` contract unspecified**  
+See §2 / T3 / T4.
+
+**MISS-3 (MAJOR) — Operations semantics collision (hardcoded ≠ details)**  
+- Static Operations & Compliance (`index.html:516-524`): 7 items (도급비 정산, 노무비 대시보드, 정부지원, 대관, 노사협의회, 코스트코·BRCGS, 행사).
+- `careerHistory[0].details` (`content.js:114-123`): 8 items (ATS, 52h, 채용공고, 근태기, 온보딩, 경조화환·서명, 키워드, 뉴스레터) — project-like, not the compliance list.
+- Partial overlap only. §13 maps OPERATIONS → `details` (`plan:284`) without saying to delete the static `<ul>` or to merge missing compliance bullets into Notion `업무상세`.
+- Further collision: `renderCareerHeader` already consumes `details.slice(0,2)` for the highlight box (`index.html:822-829`). Using full `details` as Operations **double-renders** the same lines as highlight + operations unless the header highlight is redefined.
+
+**MISS-4 (MAJOR) — merged single-role header path not retired by name**  
+Must explicitly replace/remove:
+- singleton header markup (`index.html:487-506`)
+- `renderCareerHeader` (`:805-832`) always `history[0]`
+- `updateCareerDuration` early-return when history exists (`:1082-1085`) then hardcoded 2025-03 fallback (`:1086-1094`)
+- `init()` call order (`:1202`, `:1210`)
+
+Additive carousel + leftover singleton header = contradictory dual UI (exactly the class of bug the incident was).
+
+**MISS-5 (MAJOR) — a11y / reduced-motion marked optional**  
+- Plan: "Keyboard/swipe optional; respect prefers-reduced-motion" (`plan:285-287`).
+- Code: zero `prefers-reduced-motion` usage in `index.html` (grep: none). No carousel ARIA pattern exists.
+- Current cards already have keyboard via delegation (`:1186-1190`) + `tabindex="0" role="button"`.
+- Hiding non-active slides without arrow keys, aria-live/aria-current, focus move, and reduced-motion static mode is a regression. "Optional" is wrong for a carousel control surface.
+
+**MISS-6 (MAJOR) — empty-cases current role is default first slide**  
+- Order asc = newest first (`plan:282-283`); 드림어스 intended as 순서 1 / current.
+- Empty-cases handling acknowledged (`plan:285`) but default-visible card becomes details-only current role — highest-stakes card, lowest evidence. Not gated.
+
+**MISS-7 (MAJOR) — `print.html` / `admin.html` unmentioned**  
+- `print.html:248-280` still flat-renders all `careerProjects` and all `dxCases` with no employer grouping.
+- `admin.html:221-224,278+` separate career vs dx field editors.
+- Multi-employer truth on the main page only = print PDF can still present a single undifferentiated case list under no employer (or wrong implied employer). §13 scope silence is a delivery gap if print is still a submission path (plan §1 says print.html stays).
+
+**MISS-8 (MINOR) — L13-G5 "counts unchanged" is underspecified**  
+Sync row counts need not change; per-card visible counts will. Ambiguous gate, easy false pass.
+
+**MISS-9 (MINOR) — normalize(trim) is "consider", not required** (`plan:276`)  
+Trailing space / fullwidth space in SELECT option → silent drop. Must be required.
+
+#### 5. Ranking (file:line evidence)
+
+**BLOCKER**
+1. **L13-G2 fail-loud has no path under "group at render time."** Plan asserts silent drop (`plan:275-276`) and fail-loud (`:297-298`) together. Generator never reads `소속경력` (`generate-content.js:550-585`); summary is count-only (`:861-877`). Empty/mismatch → silent vanish.
+2. **dxCases/careerProjects are not one pool; DX + `#dxcase` fate unspecified.** Split shapes + render + modals + anchors (`index.html:834-896`, `:1031-1050`, `:481` vs `:530`). Card recipe omits DX (`plan:283-285`) while tagging requires dx1..3 (`:274`).
+
+**MAJOR**
+3. **SELECT rename drift + existing label inconsistency.** `companyName` `"오뚜기라면 인사팀"` vs `careerHistory.company` `"오뚜기라면(주)"` (`content.js:12`, `:109`; gen `:816`). Relation unsupported by `prop()` (`generate-content.js:46-56`).
+4. **Raw-HTML current role empty; carousel deepens body SEO risk.** Title/summary empty (`index.html:494-495`); grids JS-built (`:511`, `:537`). No L13 SEO/raw gate.
+5. **Operations hardcoded vs `details` semantic mismatch + highlight double-use.** Static list `:516-524` vs `content.js:114-123` vs highlight `index.html:822-829`.
+6. **Single-role functions/markup not listed for retirement.** `renderCareerHeader` `:805-832`, `updateCareerDuration` `:1082-1095`, header block `:487-506`.
+7. **a11y "optional" is a regression.** Plan `:285-287`; keyboard exists `:1186-1190`; no reduced-motion pattern in file.
+8. **Default slide = empty-cases current employer (드림어스).** Plan `:282-285`.
+9. **print.html/admin.html side effects ignored.** `print.html:248-280`.
+
+**MINOR**
+10. L13-G5 counts gate vague.
+11. normalize(trim) not mandatory.
+
+**SURVIVED (with evidence)**
+- Incident diagnosis: `history[0]` header + flat all cases + static ops would mis-pair when a second employer publishes (`index.html:805-865`, `:514-524`). **Survived.**
+- L13-G1 intent (no cross-employer merge) is the right success criterion. **Survived as goal; blocked by missing validation.**
+- L13-G3 single-card degrade is a sound UX requirement. **Survived as design claim.**
+- External evidence `#case-*` URLs on other origin. **Survived** (`generate-content.js:209-221`).
+- `#career` section id can remain valid. **Survived** if outer section kept.
+- Document-level modal delegation can survive re-render **if** attributes preserved. **Survived partial** for L13-G4 modals only.
+- Public `careerHistory` has no `departureReason` in `content.js`. **Survived** privacy carryover.
+- `prop()` SELECT read support exists. **Survived as implementation convenience**, not as safety.
+
+#### 6. Verdict
+
+Do **not** freeze §13 as written. Do **not** implement yet.
+
+Minimum revisions before freeze:
+1. Resolve plan self-contradiction: commit to **generator-side** validate+report (or hard-fail) for blank/unknown `소속경력`; drop "silent drop" as acceptable behavior.
+2. Explicit DX decision: recommend **keep `#dxcase` canonical**; optional company tag for metadata only.
+3. Choose **stacked sections over carousel** unless master overrides on taste after seeing a11y/SEO cost; if carousel kept, promote keyboard + reduced-motion + ARIA to required gates.
+4. Retire-list: singleton header, `renderCareerHeader`, static Operations `<ul>`, clarify highlight vs details.
+5. Raw-HTML/noscript current-role gate (or explicit acceptance of SEO body regression).
+6. Scope note for `print.html` (group or explicitly out-of-scope with reason).
+7. If SELECT kept: mandatory trim + exact-set membership check; document rename procedure. If relation: add `prop`/resolve path.
+
+No product files modified. This entry is the deliverable only.
+
+### 2026-07-09 - Plan §14 (stacked) FROZEN; executing in order
+
+- Triple refutation (codex+GLM+Grok) converged on stacked; master chose stacked + "순서대로 진행". §14 is now the authoritative L1-redesign spec (§13 carousel retired). Order: Claude MCP data prep (소속경력 field + tag cases + fix 오뚜기 업무상세) → codex builds stacked UI + fail-loud validation → gate review → merge → master re-publishes 드림어스.
