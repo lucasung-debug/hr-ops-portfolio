@@ -1,0 +1,245 @@
+<title>경력기술서 시안 — 성명재</title>
+<style>
+  :root{
+    --paper:#FFFFFF; --ink:#16202A; --sub:#5A6B7A; --faint:#8A98A6;
+    --line:#E6EAEE; --line-soft:#F0F3F6;
+    --accent:#1D6FA5; --accent-soft:#EAF2F8; --accent-ink:#134D74;
+    --viewer:#EAEDF1;
+    --sens:#B4571E; --sens-soft:#FBF1E9;
+    --ok:#1B7B43;
+  }
+  @media (prefers-color-scheme: dark){ :root{ --viewer:#191C20; } }
+  :root[data-theme="light"]{ --viewer:#EAEDF1; }
+  :root[data-theme="dark"]{ --viewer:#191C20; }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--viewer);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Segoe UI",system-ui,sans-serif;
+    color:var(--ink); line-height:1.6; -webkit-font-smoothing:antialiased; padding:28px 16px 64px;
+  }
+
+  .controls{
+    max-width:840px; margin:0 auto 18px; display:flex; flex-wrap:wrap; align-items:center;
+    gap:14px 20px; padding:14px 20px; background:var(--paper); border:1px solid var(--line);
+    border-radius:14px; box-shadow:0 1px 3px rgba(20,32,42,.05);
+  }
+  .controls .lbl{font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--faint);}
+  .controls label{display:inline-flex; align-items:center; gap:7px; font-size:13.5px; font-weight:600; color:var(--sub); cursor:pointer; user-select:none;}
+  .controls input{accent-color:var(--sens); width:15px; height:15px; cursor:pointer;}
+  .controls .sp{flex:1}
+  .controls button{font:inherit; font-size:13px; font-weight:700; color:#fff; background:var(--accent); border:0; border-radius:9px; padding:9px 16px; cursor:pointer; display:inline-flex; gap:7px; align-items:center;}
+  .controls button:hover{background:#175d8c}
+  .controls button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+  .doc{max-width:840px; margin:0 auto; background:var(--paper); border:1px solid var(--line); border-radius:6px; box-shadow:0 6px 30px rgba(20,32,42,.09); padding:54px 58px 60px;}
+
+  /* header */
+  .head{display:flex; justify-content:space-between; align-items:flex-start; gap:28px; padding-bottom:20px; border-bottom:2px solid var(--ink);}
+  .name{font-size:30px; font-weight:800; letter-spacing:-.02em; margin:0; line-height:1.15;}
+  .name .en{font-size:14.5px; font-weight:600; color:var(--faint); letter-spacing:.01em; margin-left:10px;}
+  .role{font-size:14px; font-weight:700; color:var(--accent); margin:6px 0 0;}
+  .tagline{font-size:12.5px; color:var(--sub); margin:8px 0 0; max-width:46ch;}
+  .contact{text-align:right; font-size:12px; color:var(--sub); line-height:1.85; white-space:nowrap; font-variant-numeric:tabular-nums;}
+  .contact .k{color:var(--faint); font-size:10px; text-transform:uppercase; letter-spacing:.08em; margin-right:7px;}
+
+  section{margin-top:32px}
+  .sec-label{font-size:11.5px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--faint); margin:0 0 14px; display:flex; align-items:center; gap:12px;}
+  .sec-label::after{content:""; flex:1; height:1px; background:var(--line);}
+
+  /* career timeline — compact */
+  .tl{display:grid; gap:9px;}
+  .tl-row{display:flex; align-items:baseline; gap:14px; font-size:13.5px;}
+  .tl-row .co{font-weight:800; min-width:172px;}
+  .tl-row .co .dept{font-weight:600; color:var(--sub); font-size:12.5px;}
+  .tl-row .meta{color:var(--sub); flex:1;}
+  .tl-row .per{color:var(--faint); font-variant-numeric:tabular-nums; font-size:12.5px; white-space:nowrap; font-weight:600;}
+  .tl-row .badge{font-size:9.5px; font-weight:800; letter-spacing:.04em; padding:2px 8px; border-radius:20px; background:var(--accent-soft); color:var(--accent);}
+  .tl-row .badge.now{background:#E9F6EE; color:var(--ok);}
+
+  /* project blocks — the hero */
+  .proj{padding:20px 22px; border:1px solid var(--line); border-radius:14px; margin-bottom:16px; background:linear-gradient(180deg,#fff, #FCFDFE);}
+  .proj:last-child{margin-bottom:0}
+  .proj-head{display:flex; justify-content:space-between; align-items:baseline; gap:16px; flex-wrap:wrap;}
+  .proj-title{font-size:17px; font-weight:800; letter-spacing:-.01em; margin:0;}
+  .proj-org{font-size:11.5px; color:var(--faint); font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:600;}
+  .proj-tags{display:flex; flex-wrap:wrap; gap:6px; margin:9px 0 0;}
+  .tag{font-size:10.5px; font-weight:700; color:var(--accent-ink); background:var(--accent-soft); padding:2px 9px; border-radius:5px; letter-spacing:.01em;}
+  .par{margin:13px 0 0; display:grid; grid-template-columns:52px 1fr; gap:4px 14px; align-items:start;}
+  .par .pl{font-size:10px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--faint); padding-top:2px;}
+  .par .pt{font-size:13px; color:var(--ink);}
+  .par ul{margin:0; padding:0; list-style:none; display:grid; gap:4px;}
+  .par ul li{padding-left:13px; position:relative; font-size:12.8px;}
+  .par ul li::before{content:""; position:absolute; left:2px; top:8px; width:3.5px; height:3.5px; border-radius:50%; background:var(--sub);}
+  .result{background:var(--accent-soft); border-radius:8px; padding:7px 12px; display:flex; flex-wrap:wrap; gap:4px 18px;}
+  .result .r{font-size:12.8px; font-weight:600; color:var(--accent-ink);}
+  .result .r b{font-weight:800; font-variant-numeric:tabular-nums;}
+
+  .more{margin:14px 0 0; padding:0; list-style:none; display:grid; gap:7px;}
+  .more li{font-size:12.8px; padding-left:16px; position:relative; color:var(--ink);}
+  .more li::before{content:"—"; position:absolute; left:0; color:var(--accent); font-weight:700;}
+  .more b{font-weight:700} .more .m{color:var(--sub)}
+
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:34px;}
+  .skillrow{display:flex; gap:10px; margin-bottom:9px; font-size:13px;}
+  .skillrow .cat{width:120px; flex-shrink:0; font-weight:700; color:var(--sub); font-size:12px;}
+  .edu-item{font-size:13.5px; margin-bottom:6px;}
+  .edu-item .yr{color:var(--faint); font-variant-numeric:tabular-nums; font-size:12.5px; margin-left:8px;}
+
+  /* sensitive */
+  .sensitive{display:none;} .sensitive.on{display:revert;}
+  .sens-box{background:var(--sens-soft); border:1px solid #F0D9C4; border-radius:10px; padding:14px 18px; margin-top:12px;}
+  .sens-box .st{font-size:10px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--sens); margin:0 0 8px;}
+  .sens-line{font-size:13px; margin:3px 0; font-variant-numeric:tabular-nums;}
+  .sens-line .k{color:var(--sens); font-weight:700; margin-right:8px;}
+  .tl-row .rsn{display:none; color:var(--sens); font-size:12px; font-weight:600;}
+  .tl-row .rsn.on{display:inline;}
+
+  .note{max-width:840px; margin:16px auto 0; font-size:11.5px; color:var(--faint); text-align:center; line-height:1.7;}
+
+  @media print{
+    @page{size:A4; margin:13mm 14mm;}
+    body{background:#fff; padding:0;}
+    .controls,.note{display:none !important;}
+    .doc{max-width:none; margin:0; border:0; border-radius:0; box-shadow:none; padding:0;}
+    .proj,.head,.tl-row{break-inside:avoid;}
+    .proj{border-color:var(--line); background:#fff;}
+    *{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  }
+  @media (max-width:640px){
+    .doc{padding:32px 22px;} .head{flex-direction:column; gap:12px;} .contact{text-align:left}
+    .tl-row{flex-wrap:wrap; gap:4px 12px;} .tl-row .co{min-width:0}
+    .par{grid-template-columns:1fr; gap:2px} .par .pl{padding-top:8px} .grid2{grid-template-columns:1fr; gap:22px}
+  }
+</style>
+
+<div class="controls" role="group" aria-label="제출용 옵션">
+  <span class="lbl">제출처에 맞게 켜기</span>
+  <label><input type="checkbox" id="t-contact"> 상세 연락처</label>
+  <label><input type="checkbox" id="t-reason"> 이직 사유</label>
+  <label><input type="checkbox" id="t-salary"> 연봉·희망 처우</label>
+  <span class="sp"></span>
+  <button onclick="window.print()" aria-label="PDF로 저장">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>
+    PDF로 저장
+  </button>
+</div>
+
+<article class="doc">
+  <header class="head">
+    <div>
+      <h1 class="name">성명재<span class="en">Sung Myeong Jae</span></h1>
+      <p class="role">HR Operations</p>
+      <p class="tagline">채용·근태·급여 운영을 직접 설계하고, HR 업무를 데이터·자동화로 다시 짜온 실무자.</p>
+    </div>
+    <div class="contact">
+      <div><span class="k">Email</span>proposition97@gmail.com</div>
+      <div><span class="k">Site</span>smjportfolio.com</div>
+      <div class="sensitive s-contact"><span class="k">Tel</span>010-0000-0000</div>
+      <div class="sensitive s-contact"><span class="k">Loc</span>서울 ○○구</div>
+    </div>
+  </header>
+
+  <section>
+    <p class="sec-label">경력</p>
+    <div class="tl">
+      <div class="tl-row">
+        <span class="co">(주)드림어스컴퍼니 <span class="dept">· 피플팀 매니저</span></span>
+        <span class="meta">조직문화·교육·채용 지원·기업 AX 담당 <span class="rsn">· 이직 희망: 정규직 안정성</span></span>
+        <span class="badge now">재직 중</span>
+        <span class="per">2026.06 – 현재</span>
+      </div>
+      <div class="tl-row">
+        <span class="co">오뚜기라면(주) <span class="dept">· 인사팀 사원</span></span>
+        <span class="meta">채용운영·근태관리·도급/파견·급여 운영·정부지원사업 <span class="rsn">· 이직 사유: 직무 범위 확장</span></span>
+        <span class="badge">정규직</span>
+        <span class="per">2025.03 – 2026.04</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="sec-label">주요 프로젝트</p>
+
+    <div class="proj">
+      <div class="proj-head">
+        <h3 class="proj-title">ATS 도입 — 채용 프로세스 디지털 전환</h3>
+        <span class="proj-org">오뚜기라면 · 2025</span>
+      </div>
+      <div class="proj-tags"><span class="tag">Ninehire ATS</span><span class="tag">채용운영</span><span class="tag">개인정보</span></div>
+      <div class="par"><span class="pl">문제</span><span class="pt">이메일·엑셀로 지원자를 관리해 서류 분실·탈락자 개인정보 파기 리스크가 상존했고, 전형 안내 지연으로 지원자 이탈이 발생.</span></div>
+      <div class="par"><span class="pl">실행</span><ul><li>비용 대비 효율 기준으로 '나인하이어' 선정·도입</li><li>서류–면접–처우–입사 단계별 평가표·알림 템플릿 전산화</li><li>현업 면접관 실시간 평가 취합 구조 구축</li></ul></div>
+      <div class="par"><span class="pl">결과</span><div class="result"><span class="r">리드타임 관리직 <b>8→6주</b> · 생산직 <b>6→4주</b></span><span class="r">직무별 지원자 <b>+27%</b></span><span class="r">탈락자 개인정보 <b>자동 파기</b></span></div></div>
+    </div>
+
+    <div class="proj">
+      <div class="proj-head">
+        <h3 class="proj-title">근태 리스크 예방 프로세스</h3>
+        <span class="proj-org">오뚜기라면 · 2025</span>
+      </div>
+      <div class="proj-tags"><span class="tag">주 52시간</span><span class="tag">모니터링</span><span class="tag">노무</span></div>
+      <div class="par"><span class="pl">문제</span><span class="pt">생산 물량 급증 시 특정 라인의 연장 근로가 법적 한도(52시간)에 육박했고, 사후 대응만 가능해 법적 리스크에 노출.</span></div>
+      <div class="par"><span class="pl">실행</span><ul><li>주 45시간 도달 시 직원·부서장 자동 경고 발송</li><li>라인별 2주 단위 탄력근무제 시범 운영</li><li>부서·개인별 근로시간 대시보드로 매주 경영진 공유</li></ul></div>
+      <div class="par"><span class="pl">결과</span><div class="result"><span class="r">초과 예상 인원 <b>144→21명</b></span><span class="r">특별연장근로 <b>2→0건</b></span><span class="r">근무 <b>–5%</b>에도 생산량 보전</span></div></div>
+    </div>
+
+    <div class="proj">
+      <div class="proj-head">
+        <h3 class="proj-title">HR 전략 뉴스레터 자동화</h3>
+        <span class="proj-org">오뚜기라면 · 2025–</span>
+      </div>
+      <div class="proj-tags"><span class="tag">GitHub Actions</span><span class="tag">Python</span><span class="tag">Gemini</span><span class="tag">AX</span></div>
+      <div class="par"><span class="pl">문제</span><span class="pt">HR 전략팀이 매주 산업·정책 동향을 수동으로 수집·선별하는 데 시간이 들고, 담당자별 품질 편차가 컸음.</span></div>
+      <div class="par"><span class="pl">실행</span><ul><li>주간 스케줄로 뉴스 API·RSS 자동 수집</li><li>중복 제거·관련도 스코어링 후 Gemini 구조화 요약, 품질 게이트로 발송 판정</li><li>Gmail 발송 + GitHub Pages 아카이브 자동 발행</li></ul></div>
+      <div class="par"><span class="pl">결과</span><div class="result"><span class="r">프로토 <b>1개월 매일 발행</b>으로 검증 후 정기 운영 이관</span><span class="r">주간 수동 리서치 <b>완전 자동화</b></span></div></div>
+    </div>
+
+    <p style="font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin:20px 0 9px">그 외 프로젝트</p>
+    <ul class="more">
+      <li><b>근태기 루트 효율화</b> <span class="m">— 동선 데이터 분석 기반 재배치. 태깅률 73→85%, 수기 정정 –85%</span></li>
+      <li><b>직무 분석 기반 채용 공고 개편</b> <span class="m">— 텍스트마이닝으로 공고 고도화. 면접 전환율 2.5배</span></li>
+      <li><b>반복 행정 자동화</b> <span class="m">— 경조화환·전자서명 GAS·MAKE 자동화. 휴먼에러 0건</span></li>
+      <li><b>온보딩 구조화</b> <span class="m">— 5주 커리큘럼·버디제. 조기 퇴사율 –10%p</span></li>
+    </ul>
+  </section>
+
+  <section class="sensitive s-salary">
+    <p class="sec-label">희망 처우</p>
+    <div class="sens-box">
+      <p class="st">◆ 제출처 지정 시에만 노출</p>
+      <p class="sens-line"><span class="k">직전 연봉</span>4,200만원</p>
+      <p class="sens-line"><span class="k">희망 연봉</span>4,800만원 (협의 가능)</p>
+    </div>
+  </section>
+
+  <section>
+    <p class="sec-label">역량 · 학력</p>
+    <div class="grid2">
+      <div>
+        <div class="skillrow"><span class="cat">Data & Analytics</span><span>Tableau · GA4 · Python (Text Mining)</span></div>
+        <div class="skillrow"><span class="cat">Automation & Dev</span><span>Google Apps Script · MAKE · HTML/CSS</span></div>
+        <div class="skillrow"><span class="cat">HR Tech & AI</span><span>Ninehire ATS · GPT Agent · Claude Code</span></div>
+        <div class="skillrow"><span class="cat">Office & Docs</span><span>Excel · Slack · Notion · Teams</span></div>
+      </div>
+      <div>
+        <div class="edu-item">한국항공대학교 <span class="yr">졸업</span></div>
+        <div class="edu-item">Google Analytics Certification <span class="yr">GA4</span></div>
+        <div class="edu-item">TOEIC Speaking IM2</div>
+        <div class="edu-item">Claude Code in Action <span class="yr">수료</span></div>
+      </div>
+    </div>
+  </section>
+</article>
+
+<p class="note">Notion 경력·프로젝트 데이터와 실시간 연동 — 프로젝트가 추가되면 여기도 채워집니다. 민감정보(연락처·이직 사유·연봉)는 기본 숨김이며 제출처에 맞게 위에서 켜고 PDF로 저장하세요.</p>
+
+<script>
+  function bind(id, sels){
+    var c = document.getElementById(id);
+    c.addEventListener('change', function(){
+      sels.forEach(function(sel){ document.querySelectorAll(sel).forEach(function(e){ e.classList.toggle('on', c.checked); }); });
+    });
+  }
+  bind('t-contact', ['.s-contact']);
+  bind('t-reason',  ['.rsn']);
+  bind('t-salary',  ['.s-salary']);
+</script>

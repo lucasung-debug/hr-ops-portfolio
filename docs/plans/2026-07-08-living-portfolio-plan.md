@@ -380,3 +380,53 @@ Freeze on master approval (refuters already applied) → Claude via MCP: add 소
 SELECT to case-studies DB, tag all existing cases = 오뚜기라면(주), replace 오뚜기
 업무상세 with the real Operations list → codex builds stacked UI + generator
 validation → gate review → merge → master re-publishes 드림어스 (now separated).
+
+## 15. 경력기술서 redesign (2026-07-10) — project-first STAR, Notion-linked, Access-gated
+
+Master approved the mockup direction (모던 미니멀, project-first). Design SSOT:
+docs/career-statement-mockup.html (mock data — codex matches the DESIGN, wires REAL
+content.js). Master decisions: ALL projects detailed as STAR (문제→실행→결과);
+국문 first, 영문 후속 (separate step). This SUPERSEDES the plain career.html from L1.
+
+### The problem being fixed
+index.html:636/644 "경력기술서 (국문/영문)" buttons point at STATIC Google Drive
+PDFs → never reflect Notion. career.html (Notion-linked) exists but is unlinked and
+plain. Fix: make career.html the project-first 경력기술서, link the buttons to it.
+
+### Build (codex)
+- Rewrite career.html to the mockup design (docs/career-statement-mockup.html):
+  header(name/role/tagline/contact) → 경력 타임라인(compact, careerHistory) →
+  주요 프로젝트(EVERY case as a STAR block: 제목 + 소속·기간 + tags + 문제/실행/결과,
+  결과 = metric-highlight chips) grouped/labeled by 소속경력 → 역량·학력.
+  Data: careerHistory + case-studies DB (문제/액션/결과/소속경력 all exist for
+  career AND dx). Render ALL published cases as detailed STAR (master chose "전부").
+- Sensitive toggles (연봉·이직사유·연락처): client-side show/hide, default OFF,
+  print respects toggles. Per §12 PRIVACY: these fields live in career-private
+  data behind /career* Cloudflare Access, NEVER in public content.js.
+- Point index.html:636/644 buttons → /career (remove the Google Drive hrefs).
+- PDF: @media print A4, clean (already in the mockup CSS).
+- 국문 only this pass; leave a clean seam for a future 영문 (lang toggle + EN data).
+
+### Data prep (Claude MCP + master)
+- Already present: 이직사유 = 경력 DB 퇴사사유; case 문제/액션/결과; 소속경력 tags.
+- To add: 연봉/희망처우 + 전화/주소 as PRIVATE fields routed ONLY to career-private
+  (사이트 설정 private keys or a small private block) — master fills values.
+
+### Access (master, guided)
+- Cloudflare Access policy on /career* (email allowlist = master), like admin/preview.
+  Public site (/ , /content.js) stays open; career-private served only behind Access.
+
+### Gates
+- L15-G1: /career renders EVERY published case as a STAR block, grouped by 소속경력;
+  matches the mockup design.
+- L15-G2: public content.js contains NO 연봉/전화/주소/퇴사사유 (grep=0); those load
+  only from career-private behind Access.
+- L15-G3: /career* returns Cloudflare Access login when unauthenticated.
+- L15-G4: toggles OFF → PDF has zero sensitive fields; each toggle adds only its own.
+- L15-G5: index.html buttons open /career (no drive.google href remains); print = clean A4.
+
+### Sequencing
+Freeze on master approval (mockup already approved) → optional codex/GLM refutation
+(security-sensitive: Access + private data) → Claude adds private fields via MCP +
+master fills values + sets Access → codex builds → gate review → merge → buttons live.
+포트폴리오 전체 PDF (print.html redesign) = SEPARATE next step, not this pass.
