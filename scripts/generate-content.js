@@ -221,6 +221,19 @@ function evidenceUrlForCase(row, type, title) {
   return '';
 }
 
+function normalizeCompanyName(value) {
+  return String(value || '').trim();
+}
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // ──────────────────────────────────────────────
 // 유틸: Notion 페이지 블록 → HTML
 // ──────────────────────────────────────────────
@@ -535,7 +548,13 @@ async function fetchSettings() {
   return result;
 }
 
-async function fetchCases() {
+async function fetchCases(careerHistory = [], options = {}) {
+  const validateCompany = options.validateCompany !== false;
+  const knownCompanies = new Set(
+    careerHistory
+      .map(role => normalizeCompanyName(role.company))
+      .filter(Boolean)
+  );
   const publishFilter = await publishFilterForDatabase(DB_CASES, 'Case studies');
   const rows = await queryAll(
     DB_CASES,
@@ -546,15 +565,31 @@ async function fetchCases() {
 
   const careerProjects = [];
   const dxCases = {};
+  const companyWarnings = [];
+
+  function validateCaseCompany(title, company) {
+    if (!validateCompany) return;
+    if (!company) {
+      companyWarnings.push({ title, issue: 'missing 소속경력' });
+      return;
+    }
+    if (!knownCompanies.has(company)) {
+      companyWarnings.push({ title, issue: `unknown 소속경력 "${company}"` });
+    }
+  }
 
   for (const row of rows) {
     const type = prop(row, '유형');
+    const title = prop(row, '제목');
+    const company = normalizeCompanyName(prop(row, '소속경력'));
+    validateCaseCompany(title, company);
+
     if (type === 'career') {
-      const title = prop(row, '제목');
       const evidenceUrl = evidenceUrlForCase(row, type, title);
       const project = {
         id:           `career_${prop(row, '순서') || careerProjects.length + 1}`,
         title,
+        company,
         sub:          prop(row, 'sub'),
         desc:         prop(row, 'desc'),
         modalContent: buildCareerModalHtml(
@@ -567,12 +602,12 @@ async function fetchCases() {
       careerProjects.push(project);
     } else if (type === 'dx') {
       const key = `dx${Object.keys(dxCases).length + 1}`;
-      const title = prop(row, '제목');
       const badge = prop(row, '뱃지');
       const evidenceUrl = evidenceUrlForCase(row, type, title);
       dxCases[key] = {
         title,
         badge,
+        company,
         content: buildDxContentHtml(
           title,
           badge,
@@ -592,6 +627,7 @@ async function fetchCases() {
       publishProperty: publishFilter.propertyName,
       publishPropertyType: publishFilter.propertyType,
       publishValues: publishFilter.publishValues,
+      companyWarnings,
     },
   };
 }
@@ -858,6 +894,61 @@ const SITE_CONTENT = {
 `;
 }
 
+const CAREER_NOSCRIPT_START = '<!-- CAREER_NOSCRIPT_FALLBACK_START -->';
+const CAREER_NOSCRIPT_END = '<!-- CAREER_NOSCRIPT_FALLBACK_END -->';
+
+function buildCareerNoscriptFallback(careerHistory) {
+  const current = Array.isArray(careerHistory) && careerHistory.length ? careerHistory[0] : {};
+  const title = [current.company, current.department, current.position].filter(Boolean).join(' · ') || '경력 정보를 불러오는 중입니다.';
+  const summary = current.summary || '';
+  const period = current.period || '';
+  const employmentType = current.employmentType || 'Career';
+  const details = (current.details || current.achievements || []).filter(Boolean).slice(0, 7);
+  const detailItems = details.map(line => `        <li>${escapeHtml(line)}</li>`).join('\n');
+  const detailsHtml = detailItems
+    ? `\n      <div class="mt-8">\n        <h4 class="section-label text-slate-400 mb-4">Operations &amp; Compliance</h4>\n        <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-slate-600 list-disc pl-4 marker:text-slate-300">\n${detailItems}\n        </ul>\n      </div>`
+    : '';
+
+  return `${CAREER_NOSCRIPT_START}
+<noscript id="career-noscript-fallback">
+  <div class="bg-white rounded-3xl border p-7 md:p-10" style="border-color: var(--border)">
+    <div class="flex flex-col md:flex-row justify-between gap-4 pb-8 border-b border-gray-100">
+      <div>
+        <div class="flex flex-wrap gap-2 mb-3">
+          <span class="section-label px-3 py-1.5 rounded-full border" style="color: var(--primary); border-color: #99d3eb; background: #e6f4fa">HR Ops</span>
+          <span class="section-label bg-gray-50 text-slate-500 px-3 py-1.5 rounded-full border border-gray-200">${escapeHtml(employmentType)}</span>
+        </div>
+        <h3 class="text-xl md:text-2xl font-black text-slate-900">${escapeHtml(title)}</h3>
+        ${summary ? `<p class="text-slate-500 text-sm mt-2 break-keep">${escapeHtml(summary)}</p>` : ''}
+      </div>
+      ${period ? `<p class="text-slate-400 text-sm font-bold flex items-center md:justify-end gap-1 shrink-0">${escapeHtml(period)}</p>` : ''}
+    </div>${detailsHtml}
+  </div>
+</noscript>
+${CAREER_NOSCRIPT_END}`;
+}
+
+function updateIndexCareerNoscriptFallback(careerHistory) {
+  const indexPath = path.join(__dirname, '..', 'index.html');
+  if (!fs.existsSync(indexPath)) return false;
+  const html = fs.readFileSync(indexPath, 'utf8');
+  const start = html.indexOf(CAREER_NOSCRIPT_START);
+  const end = html.indexOf(CAREER_NOSCRIPT_END);
+  if (start === -1 || end === -1 || end < start) {
+    console.warn('[warn] Career noscript fallback markers not found in index.html; raw HTML fallback was not updated.');
+    return false;
+  }
+
+  const next = html.slice(0, start)
+    + buildCareerNoscriptFallback(careerHistory)
+    + html.slice(end + CAREER_NOSCRIPT_END.length);
+  if (next !== html) {
+    fs.writeFileSync(indexPath, next, 'utf8');
+    return true;
+  }
+  return false;
+}
+
 function buildSyncSummary(caseData, careerData, growthData, skillData, contentLength) {
   return {
     cases: caseData.sync.publishedRows,
@@ -873,6 +964,7 @@ function buildSyncSummary(caseData, careerData, growthData, skillData, contentLe
     skillCategories: skillData.sync.categories,
     assets: generatedAssetFiles.size,
     contentBytes: contentLength,
+    caseCompanyWarnings: caseData.sync.companyWarnings || [],
   };
 }
 
@@ -888,6 +980,13 @@ function printSyncSummary(settings, caseData, careerData, growthData, skillData,
   console.log(`- Case studies: ${caseData.sync.publishedRows} published rows using "${caseData.sync.publishProperty}" (${caseData.sync.publishPropertyType}: ${caseData.sync.publishValues.join(', ')})`);
   console.log(`  - Career projects: ${summary.career}`);
   console.log(`  - DX cases: ${summary.dx}`);
+  const companyWarnings = caseData.sync.companyWarnings || [];
+  if (companyWarnings.length) {
+    console.warn(`[warn] Case employer mapping warnings: ${companyWarnings.length}`);
+    companyWarnings.forEach(item => {
+      console.warn(`  - ${item.title || '(untitled)'}: ${item.issue}`);
+    });
+  }
   if (careerData.sync.skipped) {
     console.log('- Career history: skipped (NOTION_DB_ID_CAREER not set)');
   } else {
@@ -933,13 +1032,15 @@ async function main() {
   }
 
   console.log('Fetching Notion data...');
-  const [settings, caseData, careerData, growthData, skillData] = await Promise.all([
+  const [settings, careerData, growthData, skillData] = await Promise.all([
     fetchSettings(),
-    fetchCases(),
     fetchCareerHistory(),
     fetchGrowth(),
     fetchSkills(),
   ]);
+  const caseData = await fetchCases(careerData.careerHistory, {
+    validateCompany: !careerData.sync.skipped,
+  });
   pruneUnusedGeneratedAssets();
 
   const skillsByCategory = skillData.byCategory;
@@ -968,9 +1069,11 @@ async function main() {
 
   const outPath = path.join(__dirname, '..', 'content.js');
   fs.writeFileSync(outPath, content, 'utf8');
+  const indexFallbackUpdated = updateIndexCareerNoscriptFallback(careerData.careerHistory);
   const summary = printSyncSummary(settings, caseData, careerData, growthData, skillData, content.length);
   writeSyncSummary(summary);
   console.log(`content.js written (${content.length} bytes)`);
+  if (indexFallbackUpdated) console.log('index.html career noscript fallback updated');
 }
 
 if (require.main === module) {

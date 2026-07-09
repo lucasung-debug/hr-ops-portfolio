@@ -183,6 +183,15 @@
     :focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 4px; }
     [data-action]:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
     /* ── Section label ── */
     .section-label { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: var(--primary); }
 
@@ -478,63 +487,43 @@
 </section>
 
 <!-- ── CAREER ── -->
-<section id="career" class="mb-20 scroll-mt-6">
+<section id="career" class="mb-28 scroll-mt-6">
   <div class="mb-10 reveal">
     <p class="section-label mb-2">Career</p>
     <h2 class="text-2xl md:text-3xl font-black text-slate-900 break-keep">경력</h2>
   </div>
 
-  <div class="bg-white rounded-3xl border p-7 md:p-10 reveal" style="border-color: var(--border)">
-    <div class="flex flex-col md:flex-row justify-between gap-4 mb-8 pb-8 border-b border-gray-100">
+  <!-- CAREER_NOSCRIPT_FALLBACK_START -->
+<noscript id="career-noscript-fallback">
+  <div class="bg-white rounded-3xl border p-7 md:p-10" style="border-color: var(--border)">
+    <div class="flex flex-col md:flex-row justify-between gap-4 pb-8 border-b border-gray-100">
       <div>
         <div class="flex flex-wrap gap-2 mb-3">
           <span class="section-label px-3 py-1.5 rounded-full border" style="color: var(--primary); border-color: #99d3eb; background: #e6f4fa">HR Ops</span>
-          <span id="career-current-employment-type" class="section-label bg-gray-50 text-slate-500 px-3 py-1.5 rounded-full border border-gray-200">Recruiter</span>
+          <span class="section-label bg-gray-50 text-slate-500 px-3 py-1.5 rounded-full border border-gray-200">정규직</span>
         </div>
-        <h3 id="career-current-title" class="text-xl md:text-2xl font-black text-slate-900"></h3>
-        <p id="career-current-summary" class="text-slate-500 text-sm mt-2 break-keep"></p>
+        <h3 class="text-xl md:text-2xl font-black text-slate-900">오뚜기라면(주) · 인사팀 · 사원</h3>
+        <p class="text-slate-500 text-sm mt-2 break-keep">채용운영 · 근태관리 · 도급/파견관리 · 급여 운영 지원 · 정부지원사업 관리</p>
       </div>
-      <div class="md:text-right shrink-0">
-        <p class="text-slate-400 text-sm font-bold flex items-center md:justify-end gap-1 mb-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-          <span id="career-duration">2025.03 ~ 재직 중</span>
-        </p>
-        <p id="career-current-highlight" class="text-slate-600 text-sm font-medium bg-gray-50 px-4 py-2 rounded-xl border border-gray-100 inline-block break-keep text-left md:text-right max-w-xs">
-          700명 규모 제조 현장의 인사 운영 구조를<br>데이터 기반으로 재설계 · 운영 담당
-        </p>
-      </div>
+      <p class="text-slate-400 text-sm font-bold flex items-center md:justify-end gap-1 shrink-0">2025.03 ~ 2026.04</p>
     </div>
-
-    <div class="mb-8">
-      <h4 class="section-label text-slate-400 mb-4">Key Projects — Click for Detail</h4>
-      <p id="career-empty-msg" class="hidden text-center text-slate-400 text-sm py-8">준비 중입니다.</p>
-      <div id="career-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-    </div>
-
-    <div>
-      <h4 class="section-label text-slate-400 mb-4">Operations &amp; Compliance</h4>
-      <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-slate-600 list-disc pl-4 marker:text-slate-300">
-        <li>M/H 기반 도급비 · 파견비 정산 오류 제로 달성</li>
+      <div class="mt-8">
+        <h4 class="section-label text-slate-400 mb-4">Operations &amp; Compliance</h4>
+        <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-slate-600 list-disc pl-4 marker:text-slate-300">
+        <li>M/H 기반 도급비·파견비 정산 오류 제로 달성</li>
         <li>월별 노무비 분석 대시보드 개발 참여</li>
         <li>정부 인건비 지원사업 운영 및 관리</li>
         <li>대관업무 지원 (노동부 해석 질의 등)</li>
         <li>분기 노사협의회 자료 준비 및 노조 대응 지원</li>
-        <li>코스트코 · BRCGS 글로벌 심사 인권 분야 대응</li>
+        <li>코스코·BRCGS 글로벌 심사 인권 분야 대응</li>
         <li>기업 월례/연례 행사 기획 및 운영</li>
-      </ul>
-    </div>
+        </ul>
+      </div>
   </div>
-</section>
-
-<!-- ── DX CASE ── -->
-<section id="dxcase" class="mb-28 scroll-mt-6">
-  <div class="mb-10 reveal">
-    <p class="section-label mb-2">DX Case</p>
-    <h2 class="text-2xl md:text-3xl font-black text-slate-900 break-keep">자동화 &amp; 디지털 전환</h2>
-    <p class="text-slate-500 mt-2 text-sm break-keep">반복 행정 · 현장 서명 · 채용 언어 분석 — HR 문제를 시스템으로 풀었습니다.</p>
-  </div>
-  <p id="dx-empty-msg" class="hidden text-center text-slate-400 text-sm py-12">준비 중입니다.</p>
-  <div id="dx-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5 reveal"></div>
+</noscript>
+<!-- CAREER_NOSCRIPT_FALLBACK_END -->
+  <div id="dxcase" class="scroll-mt-6 h-px" aria-hidden="true"></div>
+  <div id="career-employer-sections" class="space-y-6"></div>
 </section>
 
 <!-- ── GROWTH ── -->
@@ -801,98 +790,128 @@ function updateHero() {
   setHref('hero-portfolio-kr', dl.portfolio_kr);
 }
 
-// ── Career grid
-function renderCareerHeader() {
+// ── Career by employer
+function normalizeCompanyName(value) {
+  return String(value || '').trim();
+}
+
+function attr(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function careerTitle(role) {
+  return [role.company, role.department, role.position].filter(Boolean).join(' · ');
+}
+
+function renderCareerProjectCard(p) {
+  var tags = (p.tags || []).map(function(t) {
+    return '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wide" style="color: var(--primary); background: #e6f4fa; border-color: #99d3eb">' + t + '</span>';
+  }).join('');
+  var highlight = p.highlight
+    ? '<div class="mt-4 bg-white rounded-xl border border-gray-200 px-4 py-2 text-xs font-bold" style="color: var(--primary)">' + p.highlight + '</div>'
+    : '';
+  var evidenceCta = p.evidenceUrl
+    ? '<a class="inline-flex items-center mt-4 text-xs font-black text-primary-600 hover:text-primary-700 transition" href="' + attr(p.evidenceUrl) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">실제 작동 증거 보기 →</a>'
+    : '';
+  return '<div class="bg-gray-50 rounded-2xl border border-gray-200 p-5 card-hover-border cursor-pointer group" tabindex="0" role="button" data-action="open-modal" data-id="' + attr(p.id || '') + '" aria-label="' + attr((p.title || '경력 프로젝트') + ' 상세 보기') + '">'
+    + '<div class="flex flex-wrap gap-2 mb-3">' + tags + '</div>'
+    + '<h5 class="font-black text-slate-900 mb-2 break-keep group-hover:text-primary-600 transition text-sm">' + (p.title || '') + '</h5>'
+    + '<p class="text-sm text-slate-500 break-keep line-clamp-2">' + (p.desc || '') + '</p>'
+    + highlight
+    + evidenceCta
+    + '</div>';
+}
+
+function renderDxCaseCard(entry) {
+  var k = entry.key;
+  var c = entry.caseData;
+  var badgeHtml = c.badge
+    ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wide" style="color: var(--primary); background: #e6f4fa; border-color: #99d3eb">' + c.badge + '</span>'
+    : '';
+  var evidenceCta = c.evidenceUrl
+    ? '<a class="inline-flex items-center mt-4 text-xs font-black text-primary-600 hover:text-primary-700 transition" href="' + attr(c.evidenceUrl) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">실제 작동 증거 보기 →</a>'
+    : '';
+  return '<div class="bg-white rounded-3xl border p-6 card-hover-scale cursor-pointer group" tabindex="0" role="button" data-action="open-dx-modal" data-id="' + attr(k) + '" aria-label="' + attr((c.title || k) + ' 상세 보기') + '" style="border-color: var(--border)">'
+    + '<div class="flex flex-wrap gap-2 mb-4">' + badgeHtml + '</div>'
+    + '<h5 class="font-black text-lg text-slate-900 mb-2 break-keep group-hover:text-primary-600 transition">' + (c.title || k) + '</h5>'
+    + '<span class="text-xs font-bold flex items-center gap-1" style="color: var(--primary)">자세히 보기 →</span>'
+    + evidenceCta
+    + '</div>';
+}
+
+function renderOperations(details) {
+  if (!details.length) return '';
+  var items = details.map(function(line) {
+    return '<li>' + line + '</li>';
+  }).join('');
+  return '<div class="mt-8 pt-8 border-t border-gray-100">'
+    + '<h4 class="section-label text-slate-400 mb-4">Operations &amp; Compliance</h4>'
+    + '<ul class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-slate-600 list-disc pl-4 marker:text-slate-300">' + items + '</ul>'
+    + '</div>';
+}
+
+function renderEmployerSection(role, index, projects, dxEntries) {
+  var titleId = 'career-role-title-' + index;
+  var title = careerTitle(role) || role.company || '경력 정보';
+  var details = (role.details || role.achievements || []).filter(Boolean);
+  var highlightLines = details.slice(0, 2);
+  if (!highlightLines.length && role.summary) highlightLines = [role.summary];
+  var highlight = highlightLines.length
+    ? '<p class="text-slate-600 text-sm font-medium bg-gray-50 px-4 py-2 rounded-xl border border-gray-100 inline-block break-keep text-left md:text-right max-w-xs">' + highlightLines.join('<br>') + '</p>'
+    : '';
+  var period = role.period
+    ? '<p class="text-slate-400 text-sm font-bold flex items-center md:justify-end gap-1 mb-2">'
+      + '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>'
+      + '<span>' + role.period + '</span></p>'
+    : '';
+  var projectGrid = projects.length
+    ? '<div class="mt-8"><h4 class="section-label text-slate-400 mb-4">Key Projects — Click for Detail</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-4">' + projects.map(renderCareerProjectCard).join('') + '</div></div>'
+    : '';
+  var dxGrid = dxEntries.length
+    ? '<div class="mt-8 pt-8 border-t border-gray-100"><h4 class="section-label text-slate-400 mb-4">DX Case</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-5">' + dxEntries.map(renderDxCaseCard).join('') + '</div></div>'
+    : '';
+
+  return '<article class="bg-white rounded-3xl border p-7 md:p-10 reveal" style="border-color: var(--border)" role="region" aria-labelledby="' + titleId + '" data-company="' + attr(role.company || '') + '">'
+    + '<div class="flex flex-col md:flex-row justify-between gap-4 pb-8 border-b border-gray-100">'
+    + '<div><div class="flex flex-wrap gap-2 mb-3">'
+    + '<span class="section-label px-3 py-1.5 rounded-full border" style="color: var(--primary); border-color: #99d3eb; background: #e6f4fa">HR Ops</span>'
+    + '<span class="section-label bg-gray-50 text-slate-500 px-3 py-1.5 rounded-full border border-gray-200">' + (role.employmentType || 'Career') + '</span>'
+    + '</div><h3 id="' + titleId + '" class="text-xl md:text-2xl font-black text-slate-900">' + title + '</h3>'
+    + (role.summary ? '<p class="text-slate-500 text-sm mt-2 break-keep">' + role.summary + '</p>' : '')
+    + '</div><div class="md:text-right shrink-0">' + period + highlight + '</div></div>'
+    + projectGrid
+    + dxGrid
+    + renderOperations(details)
+    + '</article>';
+}
+
+function renderCareerSections() {
+  var root = document.getElementById('career-employer-sections');
+  if (!root) return;
   var history = Array.isArray(D.careerHistory) ? D.careerHistory : [];
-  var current = history[0];
-  if (!current) return;
-
-  var titleEl = document.getElementById('career-current-title');
-  var summaryEl = document.getElementById('career-current-summary');
-  var periodEl = document.getElementById('career-duration');
-  var highlightEl = document.getElementById('career-current-highlight');
-  var employmentTypeEl = document.getElementById('career-current-employment-type');
-
-  var title = [current.company, current.department, current.position].filter(Boolean).join(' · ');
-  if (titleEl && title) titleEl.textContent = title;
-  if (summaryEl && current.summary) summaryEl.textContent = current.summary;
-  if (periodEl && current.period) periodEl.textContent = current.period;
-  if (employmentTypeEl && current.employmentType) employmentTypeEl.textContent = current.employmentType;
-  if (highlightEl) {
-    var lines = (current.details || current.achievements || []).filter(Boolean).slice(0, 2);
-    if (!lines.length && current.summary) lines = [current.summary];
-    if (lines.length) {
-      highlightEl.textContent = '';
-      lines.forEach(function(line, idx) {
-        if (idx > 0) highlightEl.appendChild(document.createElement('br'));
-        highlightEl.appendChild(document.createTextNode(line));
-      });
-    }
-  }
-}
-
-function renderCareerGrid() {
-  var grid  = document.getElementById('career-grid');
-  var empty = document.getElementById('career-empty-msg');
-  if (!grid) return;
-  var projects = D.careerProjects || [];
-  if (!projects.length) {
-    grid.classList.add('hidden');
-    if (empty) empty.classList.remove('hidden');
+  if (!history.length) {
+    setNodeContent(root, '<div class="bg-white rounded-3xl border p-7 md:p-10 reveal text-center text-slate-400 text-sm" style="border-color: var(--border)" role="status">경력 정보를 불러오는 중입니다.</div>');
     return;
   }
-  if (empty) empty.classList.add('hidden');
-  grid.classList.remove('hidden');
-  var html = projects.map(function(p) {
-    var tags = (p.tags || []).map(function(t) {
-      return '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wide" style="color: var(--primary); background: #e6f4fa; border-color: #99d3eb">' + t + '</span>';
-    }).join('');
-    var highlight = p.highlight
-      ? '<div class="mt-4 bg-white rounded-xl border border-gray-200 px-4 py-2 text-xs font-bold" style="color: var(--primary)">' + p.highlight + '</div>'
-      : '';
-    var evidenceCta = p.evidenceUrl
-      ? '<a class="inline-flex items-center mt-4 text-xs font-black text-primary-600 hover:text-primary-700 transition" href="' + p.evidenceUrl + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">실제 작동 증거 보기 →</a>'
-      : '';
-    return '<div class="bg-gray-50 rounded-2xl border border-gray-200 p-5 card-hover-border cursor-pointer group" tabindex="0" role="button" data-action="open-modal" data-id="' + (p.id || '') + '">'
-      + '<div class="flex flex-wrap gap-2 mb-3">' + tags + '</div>'
-      + '<h5 class="font-black text-slate-900 mb-2 break-keep group-hover:text-primary-600 transition text-sm">' + (p.title || '') + '</h5>'
-      + '<p class="text-sm text-slate-500 break-keep line-clamp-2">' + (p.desc || '') + '</p>'
-      + highlight
-      + evidenceCta
-      + '</div>';
-  }).join('');
-  setNodeContent(grid, html);
-}
 
-// ── DX grid
-function renderDxGrid() {
-  var grid  = document.getElementById('dx-grid');
-  var empty = document.getElementById('dx-empty-msg');
-  if (!grid) return;
-  var cases = D.dxCases || {};
-  var keys  = Object.keys(cases);
-  if (!keys.length) {
-    grid.classList.add('hidden');
-    if (empty) empty.classList.remove('hidden');
-    return;
-  }
-  if (empty) empty.classList.add('hidden');
-  var html = keys.map(function(k) {
-    var c = cases[k];
-    var badgeHtml = c.badge
-      ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wide" style="color: var(--primary); background: #e6f4fa; border-color: #99d3eb">' + c.badge + '</span>'
-      : '';
-    var evidenceCta = c.evidenceUrl
-      ? '<a class="inline-flex items-center mt-4 text-xs font-black text-primary-600 hover:text-primary-700 transition" href="' + c.evidenceUrl + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">실제 작동 증거 보기 →</a>'
-      : '';
-    return '<div class="bg-white rounded-3xl border p-6 card-hover-scale cursor-pointer group" tabindex="0" role="button" data-action="open-dx-modal" data-id="' + k + '" style="border-color: var(--border)">'
-      + '<div class="flex flex-wrap gap-2 mb-4">' + badgeHtml + '</div>'
-      + '<h4 class="font-black text-lg text-slate-900 mb-2 break-keep group-hover:text-primary-600 transition">' + (c.title || k) + '</h4>'
-      + '<span class="text-xs font-bold flex items-center gap-1" style="color: var(--primary)">자세히 보기 →</span>'
-      + evidenceCta
-      + '</div>';
+  var projects = Array.isArray(D.careerProjects) ? D.careerProjects : [];
+  var dxCases = D.dxCases || {};
+  var dxKeys = Object.keys(dxCases);
+  var html = history.map(function(role, index) {
+    var company = normalizeCompanyName(role.company);
+    var roleProjects = projects.filter(function(p) {
+      return normalizeCompanyName(p.company) === company;
+    });
+    var roleDxEntries = dxKeys
+      .filter(function(k) { return normalizeCompanyName(dxCases[k].company) === company; })
+      .map(function(k) { return { key: k, caseData: dxCases[k] }; });
+    return renderEmployerSection(role, index, roleProjects, roleDxEntries);
   }).join('');
-  setNodeContent(grid, html);
+  setNodeContent(root, html);
 }
 
 // ── Training list
@@ -1078,22 +1097,6 @@ function toggleActivity(id) {
   if (icon) icon.style.transform = body.classList.contains('open') ? 'rotate(180deg)' : '';
 }
 
-// ── Career duration
-function updateCareerDuration() {
-  var el = document.getElementById('career-duration');
-  if (!el) return;
-  if (Array.isArray(D.careerHistory) && D.careerHistory.length) return;
-  var start  = new Date('2025-03-01');
-  var now    = new Date();
-  var months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
-  var y = Math.floor(months / 12);
-  var m = months % 12;
-  var parts = [];
-  if (y > 0) parts.push(y + '년');
-  if (m > 0) parts.push(m + '개월');
-  el.textContent = '2025.03 ~ 재직 중 (' + (parts.join(' ') || '1개월 미만') + ')';
-}
-
 // ── Charts
 function initCharts() {
   var base = {
@@ -1199,15 +1202,12 @@ document.addEventListener('keydown', function(e) {
 (async function init() {
   await _loadData();
   updateHero();
-  renderCareerHeader();
-  renderCareerGrid();
-  renderDxGrid();
+  renderCareerSections();
   renderTraining();
   renderActivities();
   renderCertifications();
   renderAcademic();
   renderSkills();
-  updateCareerDuration();
   setupReveal();
   waitForChart(initCharts);
 })();
