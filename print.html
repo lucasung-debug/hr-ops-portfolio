@@ -243,12 +243,27 @@
         const ul = m[1].match(/<ul[\s\S]*?<\/ul>/);
         return ul ? ul[0] : '';
     }
-    // ── 경력 프로젝트 (번호 + Result만)
-    function renderCareers(start = 0, end = undefined, compact = false) {
-        if (!D.careerProjects?.length) return '';
-        const projects = D.careerProjects.slice(start, end);
+    function normalizeCompanyName(value) {
+        return String(value || '').trim();
+    }
+
+    function careerTitle(role) {
+        return [role.company, role.department, role.position].filter(Boolean).join(' · ');
+    }
+
+    function careerProjectsFor(role) {
+        const company = normalizeCompanyName(role.company);
+        return (D.careerProjects || []).filter(p => normalizeCompanyName(p.company) === company);
+    }
+
+    function dxCasesFor(role) {
+        const company = normalizeCompanyName(role.company);
+        return Object.values(D.dxCases || {}).filter(c => normalizeCompanyName(c.company) === company);
+    }
+
+    function renderCareerProjectItems(projects) {
         const items = projects.map((p, i) => {
-            const num = start + i + 1;
+            const num = i + 1;
             return `
             <div class="career-item">
                 <div class="career-item-head">
@@ -265,7 +280,7 @@
                 </div>
             </div>`;
         }).join('');
-        return `<div class="print-section" style="margin-bottom:12px"><h2>경력 프로젝트</h2>${items}</div>`;
+        return items;
     }
 
     // ── DX 사례 (Background + Result만 파싱 추출)
@@ -275,21 +290,15 @@
         if (!m) return '';
         return m[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
     }
-    function renderDx(compact = false, start = 0, end = undefined) {
-        if (!D.dxCases) return '';
-        const allCases = Object.values(D.dxCases);
-        if (!allCases.length) return '';
-        const cases = allCases.slice(start, end);
+    function renderDxItems(cases) {
         if (!cases.length) return '';
-        const itemMargin = compact ? '14px' : '18px';
         const items = cases.map((c, idx) => {
-            const i = start + idx;
             const bg = extractDxSection(c.content, 'Background');
             const result = extractDxSection(c.content, 'Result') || extractDxSection(c.content, 'Future Plan');
             return `<div class="dx-item" style="margin-bottom:10px;">
                 <div class="dx-head">
                     <strong style="font-size:9.5pt;color:var(--gray-900);">
-                        <span style="color:var(--brand);margin-right:6px;">${i + 1}.</span>${c.title || ''}
+                        <span style="color:var(--brand);margin-right:6px;">${idx + 1}.</span>${c.title || ''}
                     </strong>
                     <span class="dx-badge">${c.badge || ''}</span>
                 </div>
@@ -303,7 +312,31 @@
                 </div>` : ''}
             </div>`;
         }).join('');
-        return `<div class="print-section"><h2>DX / 업무 자동화 사례</h2>${items}</div>`;
+        return items;
+    }
+
+    function renderCareerEmployers() {
+        const history = Array.isArray(D.careerHistory) ? D.careerHistory : [];
+        if (!history.length) return '';
+        return history.map(role => {
+            const details = (role.details || []).map(line => `<li>${line}</li>`).join('');
+            const projects = careerProjectsFor(role);
+            const dxCases = dxCasesFor(role);
+            const projectHtml = projects.length
+                ? `<h3>경력 프로젝트</h3>${renderCareerProjectItems(projects)}`
+                : '';
+            const dxHtml = dxCases.length
+                ? `<h3>DX / 업무 자동화 사례</h3>${renderDxItems(dxCases)}`
+                : '';
+            return `<div class="print-section" style="margin-bottom:14px;">
+                <h2>${careerTitle(role) || role.company || '경력'}</h2>
+                <div style="font-size:8.5pt;color:var(--gray-500);font-weight:700;margin-bottom:4px;">${role.period || ''} · ${role.employmentType || ''}</div>
+                ${role.summary ? `<p style="font-size:8.8pt;margin-bottom:6px;">${role.summary}</p>` : ''}
+                ${details ? `<h3>Operations &amp; Compliance</h3><ul style="margin-bottom:8px;">${details}</ul>` : ''}
+                ${projectHtml}
+                ${dxHtml}
+            </div>`;
+        }).join('');
     }
 
     // ── 교육/스킬
@@ -442,7 +475,7 @@
         return `<div class="print-section"><h2>외부 활동</h2>${items}</div>`;
     }
 
-    // ── 전체 렌더 (3개 명시적 A4 페이지)
+    // ── 전체 렌더
     page.innerHTML = `
         <div class="a4-page">
             ${renderHeader()}
@@ -452,14 +485,9 @@
                 <p>${(D.heroHeadlineHTML||'').replace(/<[^>]+>/g,' ').trim()}</p>
                 <p style="margin-top:6px;">${(D.heroDescription||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim()}</p>
             </div>
-            ${renderCareers(0, 3)}
-        </div>
-        <div class="a4-page">
-            ${renderCareers(3, 6)}
-            ${renderDx(false, 0, 2)}
+            ${renderCareerEmployers()}
         </div>
         <div class="a4-page compact">
-            ${renderDx(false, 2)}
             ${renderEducation()}
             ${renderActivities()}
             <div style="text-align:center;font-size:8.5pt;color:#94a3b8;margin-top:8px;padding-top:6px;border-top:1px solid #e2e8f0;">
